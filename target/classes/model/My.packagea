@@ -1,0 +1,4 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<packageA:C xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:packageA="http://www.adesso.ais.parser.de" name="ein c">
+  <As href="My1.packagea#/"/>
+</packageA:C>

@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<xsd:schema xmlns:ecore="http://www.eclipse.org/emf/2002/Ecore" xmlns:packageA="http://www.adesso.ais.parser.de" xmlns:xsd="http://www.w3.org/2001/XMLSchema" ecore:nsPrefix="packageA" ecore:package="packageA" targetNamespace="http://www.adesso.ais.parser.de">
+  <xsd:import namespace="http://www.eclipse.org/emf/2002/Ecore" schemaLocation="platform:/plugin/org.eclipse.emf.ecore/model/Ecore.xsd"/>
+  <xsd:element ecore:ignore="true" name="A" type="packageA:A"/>
+  <xsd:element ecore:ignore="true" name="B" type="packageA:B"/>
+  <xsd:element ecore:ignore="true" name="C" type="packageA:C"/>
+  <xsd:complexType name="A">
+    <xsd:attribute name="name" type="ecore:EString" use="required"/>
+    <xsd:attribute ecore:reference="packageA:B" name="einB" use="required">
+      <xsd:simpleType>
+        <xsd:list itemType="xsd:anyURI"/>
+      </xsd:simpleType>
+    </xsd:attribute>
+    <xsd:attribute ecore:name="ID" ecore:unsettable="false" name="ID" type="ecore:EInt" use="required"/>
+  </xsd:complexType>
+  <xsd:complexType name="B">
+    <xsd:attribute name="name" type="ecore:EString"/>
+  </xsd:complexType>
+  <xsd:complexType name="C">
+    <xsd:attribute name="name" type="ecore:EString" use="required"/>
+    <xsd:attribute ecore:name="As" ecore:reference="packageA:A" name="As">
+      <xsd:simpleType>
+        <xsd:list itemType="xsd:anyURI"/>
+      </xsd:simpleType>
+    </xsd:attribute>
+    <xsd:attribute ecore:name="Bs" ecore:reference="packageA:B" name="Bs">
+      <xsd:simpleType>
+        <xsd:list itemType="xsd:anyURI"/>
+      </xsd:simpleType>
+    </xsd:attribute>
+  </xsd:complexType>
+</xsd:schema>
