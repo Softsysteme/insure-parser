@@ -14,4 +14,19 @@
       </application>
    </extension>
 
+   <extension point="org.eclipse.emf.ecore.generated_package">
+      <!-- @generated insure-parser-domain -->
+      <package
+            uri="http://de.adesso.ais.insure-parser"
+            class="parser.ParserPackage"/>
+   </extension>
+
+   <extension point="org.eclipse.emf.ecore.generated_package">
+      <!-- @generated parser -->
+      <package
+            uri="http://www.adesso.ais.parser.de"
+            class="packageA.PackageAPackage"
+            genModel="src/main/resources/model/parser.genmodel"/>
+   </extension>
+
 </plugin>

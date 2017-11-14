@@ -22,10 +22,6 @@ Require-Bundle: org.eclipse.xsd.ecore.exporter;bundle-version="[2.5.0,3.0.0)";vi
  org.eclipse.equinox.util;bundle-version="[1.0.0,2.0.0)";visibility:=reexport,
  org.eclipse.emf.codegen;bundle-version="[2.0.0,3.0.0)",
  org.eclipse.emf.exporter;bundle-version="[2.7.0,3.0.0)"
-Export-Package: JAXBandStAX;uses:="javax.xml.stream,javax.xml.stream.events",
- JaXBClasses;uses:="javax.xml.validation,javax.xml.bind",
- handler;uses:="org.eclipse.equinox.app",
- tools;uses:="org.eclipse.core.resources"
 Import-package: org.eclipse.emf.ecore.resource
 Bundle-ActivationPolicy: lazy
 

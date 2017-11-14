@@ -22,6 +22,8 @@ import javax.xml.validation.Validator;
 
 import org.xml.sax.SAXException;
 
+import JAXBandStAX.objectVerarbeitung;
+
 /**
  * Klasse zum Parsen XML-Dateien (durch Kombination von JAXB mit StAX). Es wird
  * nicht das StartElement geparst, aber alle darunter angeordneten Elemente.
@@ -30,7 +32,7 @@ public class XmlToJavaParserMitStaxUndJaxb {
 
 	/**
 	 * Hilfsmethode zum Parsen grosser XML-Dateien (durch Kombination von JAXB mit
-	 * StAX). Es können alle Klassen geparst werden, die die
+	 * StAX). Es kï¿½nnen alle Klassen geparst werden, die die
 	 * XmlRootElement-Annotation haben.
 	 *
 	 * @param xsdDatei

@@ -1,7 +1,7 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <units size='1'>
-  <unit id='de.adesso.ais.insure-parser' version='1.0.0.201711091740'>
-    <update id='de.adesso.ais.insure-parser' range='[0.0.0,1.0.0.201711091740)' severity='0'/>
+  <unit id='de.adesso.ais.insure-parser' version='1.0.0.201711141436'>
+    <update id='de.adesso.ais.insure-parser' range='[0.0.0,1.0.0.201711141436)' severity='0'/>
     <properties size='6'>
       <property name='org.eclipse.equinox.p2.name' value='%pluginName'/>
       <property name='org.eclipse.equinox.p2.provider' value='%providerName'/>
@@ -10,13 +10,9 @@
       <property name='maven-artifactId' value='de.adesso.ais.insure-parser'/>
       <property name='maven-version' value='1.0.0-SNAPSHOT'/>
     </properties>
-    <provides size='7'>
-      <provided namespace='org.eclipse.equinox.p2.iu' name='de.adesso.ais.insure-parser' version='1.0.0.201711091740'/>
-      <provided namespace='osgi.bundle' name='de.adesso.ais.insure-parser' version='1.0.0.201711091740'/>
-      <provided namespace='java.package' name='JAXBandStAX' version='0.0.0'/>
-      <provided namespace='java.package' name='JaXBClasses' version='0.0.0'/>
-      <provided namespace='java.package' name='handler' version='0.0.0'/>
-      <provided namespace='java.package' name='tools' version='0.0.0'/>
+    <provides size='3'>
+      <provided namespace='org.eclipse.equinox.p2.iu' name='de.adesso.ais.insure-parser' version='1.0.0.201711141436'/>
+      <provided namespace='osgi.bundle' name='de.adesso.ais.insure-parser' version='1.0.0.201711141436'/>
       <provided namespace='org.eclipse.equinox.p2.eclipse.type' name='bundle' version='1.0.0'/>
     </provides>
     <requires size='12'>
@@ -34,13 +30,13 @@
       <required namespace='java.package' name='org.eclipse.emf.ecore.resource' range='0.0.0'/>
     </requires>
     <artifacts size='1'>
-      <artifact classifier='osgi.bundle' id='de.adesso.ais.insure-parser' version='1.0.0.201711091740'/>
+      <artifact classifier='osgi.bundle' id='de.adesso.ais.insure-parser' version='1.0.0.201711141436'/>
     </artifacts>
     <touchpoint id='org.eclipse.equinox.p2.osgi' version='1.0.0'/>
     <touchpointData size='1'>
       <instructions size='1'>
         <instruction key='manifest'>
-          Bundle-SymbolicName: de.adesso.ais.insure-parser;singleton:=true&#xA;Bundle-Version: 1.0.0.201711091740&#xA;
+          Bundle-SymbolicName: de.adesso.ais.insure-parser;singleton:=true&#xA;Bundle-Version: 1.0.0.201711141436&#xA;
         </instruction>
       </instructions>
     </touchpointData>

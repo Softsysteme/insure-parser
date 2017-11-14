@@ -1,5 +1,10 @@
 Manifest-Version: 1.0
 Bundle-SymbolicName: de.adesso.ais.insure-parser;singleton:=true
+Bundle-Name: %pluginName
+Bundle-Version: 1.0.0.201711141436
+Bundle-ClassPath: .,src/main/java/JAXBandStAX/,src/main/java/handler/,
+ bin/,src/main/resources/
+Bundle-Localization: plugin
 Require-Bundle: org.eclipse.xsd.ecore.exporter;bundle-version="[2.5.0,
  3.0.0)";visibility:=reexport,org.eclipse.emf.common;bundle-version="[
  2.0.0,3.0.0)";visibility:=reexport,org.eclipse.core.runtime;bundle-ve
@@ -17,13 +22,4 @@ Bundle-RequiredExecutionEnvironment: JavaSE-1.8
 Bundle-ActivationPolicy: lazy
 Bundle-Vendor: %providerName
 Import-package: org.eclipse.emf.ecore.resource
-Export-Package: JAXBandStAX;uses:="javax.xml.stream,javax.xml.stream.e
- vents",JaXBClasses;uses:="javax.xml.validation,javax.xml.bind",handle
- r;uses:="org.eclipse.equinox.app",tools;uses:="org.eclipse.core.resou
- rces"
-Bundle-Name: %pluginName
-Bundle-Version: 1.0.0.201711091740
-Bundle-ClassPath: .,src/main/java/JAXBandStAX/,src/main/java/handler/,
- bin/,src/main/resources/
-Bundle-Localization: plugin
 

@@ -1,4 +1,305 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<packageA:C xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:packageA="http://www.adesso.ais.parser.de" name="ein c">
-  <As href="My1.packagea#/"/>
-</packageA:C>
+<core:RootRepository xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:core="http://insure/core" xmlns:enums="http://de.adesso.ais/domainreference/enums" xmlns:enums_1="http://insure/domain/enums" xmlns:insure111="http://de.adesso.ais/domainreference/entity/tickets/insure111" xmlns:insure164="http://de.adesso.ais/domainreference/entity/tickets/insure164" xmlns:insure391="http://de.adesso.ais/domainreference/entity/tickets/insure391" xmlns:insure419="http://de.adesso.ais/domainreference/entity/tickets/insure419" xmlns:insure432="http://de.adesso.ais/domainreference/entity/tickets/insure432" xmlns:insure436="http://de.adesso.ais/domainreference/entity/tickets/insure436" xmlns:insure450="http://de.adesso.ais/domainreference/entity/tickets/insure450" xmlns:insure469="http://de.adesso.ais/domainreference/entity/tickets/insure469" xmlns:insure491="http://de.adesso.ais/domainreference/entity/tickets/insure491" xmlns:insure514="http://de.adesso.ais/domainreference/entity/tickets/insure514" xmlns:insure592="http://de.adesso.ais/domainreference/entity/tickets/insure592" xmlns:konfiguration="http://de.adesso.ais/domainreference/prototype/konfiguration" modelElementId="_lhqBUMfyEeSbSLJORdU11w" name="domain" beschreibung="" basePackage="de.adesso.ais">
+  <repositories modelElementId="_r2gDgMfyEeSbSLJORdU11w" name="prototype" pattern="Repository">
+    <repositories modelElementId="_31oFoPVdEeS418PNM6QFbw" name="konfiguration" beschreibung="" pattern="Repository">
+      <repositories modelElementId="_wEGUgEZmEeWAtMexrdobGg" name="modell" pattern="Modell">
+        <repositories modelElementId="_8gp70EZmEeWAtMexrdobGg" name="identifier" pattern="ModellIdentifier">
+          <enumerations xsi:type="konfiguration:ModellIdentifier" modelElementId="_BBRAdUZnEeWAtMexrdobGg" name="Der_up"/>
+          <enumerations xsi:type="konfiguration:ModellIdentifier" modelElementId="_HjTKFUZnEeWAtMexrdobGg" name="Der_Polo" key="1"/>
+          <enumerations xsi:type="konfiguration:ModellIdentifier" modelElementId="_VmIyjkZnEeWAtMexrdobGg" name="Der_Golf" key="2"/>
+          <enumerations xsi:type="konfiguration:ModellIdentifier" modelElementId="_YH9PNUZnEeWAtMexrdobGg" name="Der_Golf_Sportsvan" key="3"/>
+          <enumerations xsi:type="konfiguration:ModellIdentifier" modelElementId="_jv4UlUZnEeWAtMexrdobGg" name="Der_Golf_Variant" key="4"/>
+        </repositories>
+        <prototypes xsi:type="konfiguration:Modell" modelElementId="_zcz86EZmEeWAtMexrdobGg" name="Der up" beschreibung="" identifier="_BBRAdUZnEeWAtMexrdobGg" ausstattungsvariante="_P48euUcJEeWXi9Ipxg1p3Q _WgTNOUcJEeWXi9Ipxg1p3Q _ervkqUcJEeWXi9Ipxg1p3Q _uWls6UcJEeWXi9Ipxg1p3Q _nvv7yUcJEeWXi9Ipxg1p3Q"/>
+        <prototypes xsi:type="konfiguration:Modell" modelElementId="_K3znuEZnEeWAtMexrdobGg" name="Der Polo" identifier="_HjTKFUZnEeWAtMexrdobGg" ausstattungsvariante="_cK_hmUZ5EeWfcqNePpKGZg _qQxJeUZ5EeWfcqNePpKGZg _GYUfeUZ5EeWfcqNePpKGZg _VeIoCUZ5EeWfcqNePpKGZg _hnBFaUZ5EeWfcqNePpKGZg _PQ8tCUZ5EeWfcqNePpKGZg _u4s96UZ5EeWfcqNePpKGZg _qUIb-UZ4EeWfcqNePpKGZg"/>
+        <prototypes xsi:type="konfiguration:Modell" modelElementId="_ZpmBCEZnEeWAtMexrdobGg" name="Der Golf" identifier="_VmIyjkZnEeWAtMexrdobGg"/>
+        <prototypes xsi:type="konfiguration:Modell" modelElementId="_gtHHGEZnEeWAtMexrdobGg" name="Der Golf Sportsvan" identifier="_YH9PNUZnEeWAtMexrdobGg"/>
+        <prototypes xsi:type="konfiguration:Modell" modelElementId="_l9IPOEZnEeWAtMexrdobGg" name="Der Golf Variant" identifier="_jv4UlUZnEeWAtMexrdobGg"/>
+      </repositories>
+      <repositories modelElementId="_Sh-OMEZ4EeWfcqNePpKGZg" name="ausstattungsvariante" pattern="Ausstattungsvariante">
+        <repositories modelElementId="_X4V18EZ4EeWfcqNePpKGZg" name="identifier" pattern="AusstattungsvarianteIdentifier">
+          <enumerations xsi:type="konfiguration:AusstattungsvarianteIdentifier" modelElementId="_gyyop0Z4EeWfcqNePpKGZg" name="Trendline" beschreibung="" key="1"/>
+          <enumerations xsi:type="konfiguration:AusstattungsvarianteIdentifier" modelElementId="_FVctR0Z5EeWfcqNePpKGZg" name="Comfortline" key="2"/>
+          <enumerations xsi:type="konfiguration:AusstattungsvarianteIdentifier" modelElementId="_KJfq-UZ5EeWfcqNePpKGZg" name="Highline" key="3"/>
+          <enumerations xsi:type="konfiguration:AusstattungsvarianteIdentifier" modelElementId="_OAzT10Z5EeWfcqNePpKGZg" name="CrossPolo" key="4"/>
+          <enumerations xsi:type="konfiguration:AusstattungsvarianteIdentifier" modelElementId="_aQjON0Z5EeWfcqNePpKGZg" name="BlueGT" key="5"/>
+          <enumerations xsi:type="konfiguration:AusstattungsvarianteIdentifier" modelElementId="_fgYJF0Z5EeWfcqNePpKGZg" name="GTI" key="6"/>
+          <enumerations xsi:type="konfiguration:AusstattungsvarianteIdentifier" modelElementId="_kHI410Z5EeWfcqNePpKGZg" name="BlueMotion" key="7"/>
+          <enumerations xsi:type="konfiguration:AusstattungsvarianteIdentifier" modelElementId="_tYRF90Z5EeWfcqNePpKGZg" name="LOUNGE" key="9"/>
+          <enumerations xsi:type="konfiguration:AusstattungsvarianteIdentifier" modelElementId="_M1J9p0cJEeWXi9Ipxg1p3Q" name="take_up" key="10"/>
+          <enumerations xsi:type="konfiguration:AusstattungsvarianteIdentifier" modelElementId="_U0jdJ0cJEeWXi9Ipxg1p3Q" name="move_up" key="11"/>
+          <enumerations xsi:type="konfiguration:AusstattungsvarianteIdentifier" modelElementId="_bpQrJ0cJEeWXi9Ipxg1p3Q" name="high_up" key="12"/>
+          <enumerations xsi:type="konfiguration:AusstattungsvarianteIdentifier" modelElementId="_lWjP10cJEeWXi9Ipxg1p3Q" name="cross_up" key="13"/>
+          <enumerations xsi:type="konfiguration:AusstattungsvarianteIdentifier" modelElementId="_rFFfwkcJEeWXi9Ipxg1p3Q" name="eup" key="14"/>
+        </repositories>
+        <prototypes xsi:type="konfiguration:Ausstattungsvariante" modelElementId="_qUIb-UZ4EeWfcqNePpKGZg" name="Trendline" beschreibung="" identifier="_gyyop0Z4EeWfcqNePpKGZg" motorvariante="_qeQbgLXyEeWEp8ZNFSaL_Q" farbenAussen="_k37LW0cPEeWqvIIB4FuD4A _Y1oBq0cQEeWqvIIB4FuD4A _g8MgK0cQEeWqvIIB4FuD4A _plQAlkcQEeWqvIIB4FuD4A _v5PuS0cQEeWqvIIB4FuD4A _AVHgS0cQEeWqvIIB4FuD4A _6LnLa0cPEeWqvIIB4FuD4A" farbenInnen="_58f760cQEeWqvIIB4FuD4A" felge="_46nETEcUEeW7kPSwFntsnw _YmC7TEcVEeW7kPSwFntsnw _eCjnTEcVEeW7kPSwFntsnw _lm6JjEcVEeW7kPSwFntsnw _uKxoDEcVEeW7kPSwFntsnw _4IUrvEcUEeW7kPSwFntsnw" austattung="_8noBPUcXEeWPZuKDref0YQ _HG3nTUcYEeWPZuKDref0YQ _2tygDUcXEeWPZuKDref0YQ _N7jnLUcYEeWPZuKDref0YQ _U7TAfUcYEeWPZuKDref0YQ _b2eC3UcYEeWPZuKDref0YQ _l57r3UcYEeWPZuKDref0YQ"/>
+        <prototypes xsi:type="konfiguration:Ausstattungsvariante" modelElementId="_GYUfeUZ5EeWfcqNePpKGZg" name="Comfortline" identifier="_FVctR0Z5EeWfcqNePpKGZg"/>
+        <prototypes xsi:type="konfiguration:Ausstattungsvariante" modelElementId="_PQ8tCUZ5EeWfcqNePpKGZg" name="Highline" identifier="_KJfq-UZ5EeWfcqNePpKGZg"/>
+        <prototypes xsi:type="konfiguration:Ausstattungsvariante" modelElementId="_VeIoCUZ5EeWfcqNePpKGZg" name="CrossPolo" identifier="_OAzT10Z5EeWfcqNePpKGZg"/>
+        <prototypes xsi:type="konfiguration:Ausstattungsvariante" modelElementId="_cK_hmUZ5EeWfcqNePpKGZg" name="BlueGT" identifier="_aQjON0Z5EeWfcqNePpKGZg"/>
+        <prototypes xsi:type="konfiguration:Ausstattungsvariante" modelElementId="_hnBFaUZ5EeWfcqNePpKGZg" name="GTI" identifier="_fgYJF0Z5EeWfcqNePpKGZg"/>
+        <prototypes xsi:type="konfiguration:Ausstattungsvariante" modelElementId="_qQxJeUZ5EeWfcqNePpKGZg" name="BlueMotion" identifier="_kHI410Z5EeWfcqNePpKGZg"/>
+        <prototypes xsi:type="konfiguration:Ausstattungsvariante" modelElementId="_u4s96UZ5EeWfcqNePpKGZg" name="LOUNGE" identifier="_tYRF90Z5EeWfcqNePpKGZg"/>
+        <prototypes xsi:type="konfiguration:Ausstattungsvariante" modelElementId="_P48euUcJEeWXi9Ipxg1p3Q" name="take up" beschreibung="" identifier="_M1J9p0cJEeWXi9Ipxg1p3Q" motorvariante="_blH_ukcOEeWqvIIB4FuD4A _0VXbqkcNEeWqvIIB4FuD4A" farbenAussen="_k37LW0cPEeWqvIIB4FuD4A _Y1oBq0cQEeWqvIIB4FuD4A _g8MgK0cQEeWqvIIB4FuD4A _plQAlkcQEeWqvIIB4FuD4A _v5PuS0cQEeWqvIIB4FuD4A _AVHgS0cQEeWqvIIB4FuD4A _6LnLa0cPEeWqvIIB4FuD4A" farbenInnen="_58f760cQEeWqvIIB4FuD4A" felge="_46nETEcUEeW7kPSwFntsnw _YmC7TEcVEeW7kPSwFntsnw _eCjnTEcVEeW7kPSwFntsnw _lm6JjEcVEeW7kPSwFntsnw _uKxoDEcVEeW7kPSwFntsnw _4IUrvEcUEeW7kPSwFntsnw" austattung="_8noBPUcXEeWPZuKDref0YQ _HG3nTUcYEeWPZuKDref0YQ _2tygDUcXEeWPZuKDref0YQ _N7jnLUcYEeWPZuKDref0YQ _U7TAfUcYEeWPZuKDref0YQ _l57r3UcYEeWPZuKDref0YQ"/>
+        <prototypes xsi:type="konfiguration:Ausstattungsvariante" modelElementId="_WgTNOUcJEeWXi9Ipxg1p3Q" name="move up" identifier="_U0jdJ0cJEeWXi9Ipxg1p3Q" motorvariante="_0VXbqkcNEeWqvIIB4FuD4A _blH_ukcOEeWqvIIB4FuD4A" farbenAussen="_k37LW0cPEeWqvIIB4FuD4A _Y1oBq0cQEeWqvIIB4FuD4A _g8MgK0cQEeWqvIIB4FuD4A _plQAlkcQEeWqvIIB4FuD4A _v5PuS0cQEeWqvIIB4FuD4A _AVHgS0cQEeWqvIIB4FuD4A _6LnLa0cPEeWqvIIB4FuD4A" farbenInnen="_58f760cQEeWqvIIB4FuD4A" felge="_46nETEcUEeW7kPSwFntsnw _4IUrvEcUEeW7kPSwFntsnw" austattung="_8noBPUcXEeWPZuKDref0YQ _HG3nTUcYEeWPZuKDref0YQ _2tygDUcXEeWPZuKDref0YQ _N7jnLUcYEeWPZuKDref0YQ _U7TAfUcYEeWPZuKDref0YQ _l57r3UcYEeWPZuKDref0YQ"/>
+        <prototypes xsi:type="konfiguration:Ausstattungsvariante" modelElementId="_ervkqUcJEeWXi9Ipxg1p3Q" name="high up" identifier="_bpQrJ0cJEeWXi9Ipxg1p3Q"/>
+        <prototypes xsi:type="konfiguration:Ausstattungsvariante" modelElementId="_nvv7yUcJEeWXi9Ipxg1p3Q" name="cross up" identifier="_lWjP10cJEeWXi9Ipxg1p3Q"/>
+        <prototypes xsi:type="konfiguration:Ausstattungsvariante" modelElementId="_uWls6UcJEeWXi9Ipxg1p3Q" name="e up" identifier="_rFFfwkcJEeWXi9Ipxg1p3Q"/>
+      </repositories>
+      <repositories modelElementId="_A2aewPVgEeS418PNM6QFbw" name="motorvariante" pattern="Effizienzklasse|Repository">
+        <repositories modelElementId="_cqqo0PVgEeS418PNM6QFbw" name="identifier" pattern="MotorvarianteIdentifier">
+          <enumerations xsi:type="konfiguration:MotorvarianteIdentifier" modelElementId="_KeFecPVyEeSy4aJyoArNWw" name="TSI_1_4_BlueMotion_092_kW_6Gang" beschreibung=""/>
+          <enumerations xsi:type="konfiguration:MotorvarianteIdentifier" modelElementId="_lpNRKfVgEeS418PNM6QFbw" name="TSI_1_4_BlueMotion_092_kW_7GangDSG" beschreibung="" key="1"/>
+          <enumerations xsi:type="konfiguration:MotorvarianteIdentifier" modelElementId="_aqksMPr5EeS7w8dUcYezsg" name="TSI_1_4_ACT_BlueMotion_110_kW_6Gang" beschreibung="" key="2"/>
+          <enumerations xsi:type="konfiguration:MotorvarianteIdentifier" modelElementId="_WCGamfV6EeSy4aJyoArNWw" name="TDI_1_6_BlueMotion_Diesel_088_kW_6Gang" key="3"/>
+          <enumerations xsi:type="konfiguration:MotorvarianteIdentifier" modelElementId="_dqy74flMEeS0zoGCUjWJzw" name="TDI_1_6_BlueMotion_Diesel_088_kW_7GangDSG" key="4"/>
+          <enumerations xsi:type="konfiguration:MotorvarianteIdentifier" modelElementId="_w1aWoflMEeS0zoGCUjWJzw" name="TDI_2_0_BlueMotion_Diesel_110_kW_6Gang" key="5"/>
+          <enumerations xsi:type="konfiguration:MotorvarianteIdentifier" modelElementId="_Rn_fEPlREeS0zoGCUjWJzw" name="TDI_2_0_SCR_4MOTION_BlueMotion_Diesel_110_kW_6Gang" key="6"/>
+          <enumerations xsi:type="konfiguration:MotorvarianteIdentifier" modelElementId="_YlyXoflREeS0zoGCUjWJzw" name="TDI_2_0_BlueMotion_Diesel_110_kW_6GangDSG" beschreibung="" key="7"/>
+          <enumerations xsi:type="konfiguration:MotorvarianteIdentifier" modelElementId="_fDW2qEcNEeWqvIIB4FuD4A" name="_1_00_44_kW_60_PS_5Gang_45_l100km_105_gkm" key="8"/>
+          <enumerations xsi:type="konfiguration:MotorvarianteIdentifier" modelElementId="_VWQCuEcOEeWqvIIB4FuD4A" name="_1_0_BlueMotion_Technology_044_kW_60_PS_5Gang_41_l100km_95_gkm" beschreibung="" key="9"/>
+          <enumerations xsi:type="konfiguration:MotorvarianteIdentifier" modelElementId="_eA90bbXyEeWEp8ZNFSaL_Q" name="_1_0_BlueMotion_044kW_60_PS_5Gang_50_l100km_114gkm" key="10"/>
+        </repositories>
+        <repositories modelElementId="_lpQ9IEpzEeW0pdCh6a5vXw" name="Effizienzklasse" pattern="Efizienzklasse">
+          <enumerations xsi:type="konfiguration:Effizienzklasse" modelElementId="_uL0NgUpzEeW0pdCh6a5vXw" name="A"/>
+          <enumerations xsi:type="konfiguration:Effizienzklasse" modelElementId="_yOs0IUpzEeW0pdCh6a5vXw" name="A_PLUS"/>
+          <enumerations xsi:type="konfiguration:Effizienzklasse" modelElementId="_wcVeXkpzEeW0pdCh6a5vXw" name="B"/>
+          <enumerations xsi:type="konfiguration:Effizienzklasse" modelElementId="_2iFUYUpzEeW0pdCh6a5vXw" name="B_PLUS"/>
+          <enumerations xsi:type="konfiguration:Effizienzklasse" modelElementId="_4wfsskpzEeW0pdCh6a5vXw" name="C"/>
+          <enumerations xsi:type="konfiguration:Effizienzklasse" modelElementId="_4wfss0pzEeW0pdCh6a5vXw" name="C_PLUS"/>
+        </repositories>
+        <prototypes xsi:type="konfiguration:Motorvariante" modelElementId="_ME0Q4_VgEeS418PNM6QFbw" name="TSI 1.4 BlueMotion Benziner 092 kW 6Gang" beschreibung="TSI 1.4 Blue Motion Technology, Benziner, 092 kW (125 PS), 6-Gang, 5,3l/100km, 124 g/km" identifier="_KeFecPVyEeSy4aJyoArNWw" ps="30.0" preis="7000.0" effizienzklasse="_uL0NgUpzEeW0pdCh6a5vXw"/>
+        <prototypes xsi:type="konfiguration:Motorvariante" modelElementId="_BsfF8PVyEeSy4aJyoArNWw" name="TSI 1.4 BlueMotion Benziner 092 kW 7GangDSG" beschreibung="TSI 1.4 Blue Motion Technology, Benziner, 092 kW (125 PS), 7-Gang Doppelkupplungsgetriebe, 5,1l/100km, 117 g/km" identifier="_lpNRKfVgEeS418PNM6QFbw" ps="40.0" preis="7000.0" effizienzklasse="_4wfsskpzEeW0pdCh6a5vXw"/>
+        <prototypes xsi:type="konfiguration:Motorvariante" modelElementId="_OX_gQ_r5EeS7w8dUcYezsg" name="TSI 1.4 ACT BlueMotion Benziner 110kw 6Gang" beschreibung="TSI 1.4 ACT Blue Motion Technology, Benziner, 110 kW (150 PS), 6-Gang, 5,1l/100km, 117 g/km" identifier="_aqksMPr5EeS7w8dUcYezsg" ps="70.0" preis="7000.0" effizienzklasse="_4wfsskpzEeW0pdCh6a5vXw"/>
+        <prototypes xsi:type="konfiguration:Motorvariante" modelElementId="_pfTsEfV4EeSy4aJyoArNWw" name="TDI 1.6 BlueMotion Diesel 088 kW 6Gang" beschreibung="TDI 1.6 Blue Motion Technology, Diesel, 088 kW (120 PS), 6-Gang, 4,1l/100km, 107 g/km" identifier="_WCGamfV6EeSy4aJyoArNWw" ps="60.0" preis="7000.0" effizienzklasse="_yOs0IUpzEeW0pdCh6a5vXw"/>
+        <prototypes xsi:type="konfiguration:Motorvariante" modelElementId="_PUtnIPlMEeS0zoGCUjWJzw" name="TDI 1.6 BlueMotion Diesel 088 kW 7GangDSG" beschreibung="TDI 1.6 Blue Motion Technology, Diesel, 088 kW (120 PS), 7-Gang Doppelkupplungsgetriebe, 4,0l/100km, 104 g/km" identifier="_dqy74flMEeS0zoGCUjWJzw" ps="70.0" preis="70300.0" effizienzklasse="_uL0NgUpzEeW0pdCh6a5vXw"/>
+        <prototypes xsi:type="konfiguration:Motorvariante" modelElementId="_okcmAPlMEeS0zoGCUjWJzw" name="TDI 2.0 BlueMotion Diesel 110 kW 6Gang" beschreibung="TDI 2.0 Blue Motion Technology, Diesel, 110 kW (150 PS), 6-Gang, 4,1l/100km, 107 g/km" identifier="_w1aWoflMEeS0zoGCUjWJzw" ps="80.0" preis="8000.0" effizienzklasse="_yOs0IUpzEeW0pdCh6a5vXw"/>
+        <prototypes xsi:type="konfiguration:Motorvariante" modelElementId="_4Z4Q0flQEeS0zoGCUjWJzw" name="TDI 2.0 SCR 4MOTION BlueMotion Diesel 110 kW 6Gang" beschreibung="TDI 2.0 SCR 4MOTION Blue Motion Technology, Diesel, 110 kW (150 PS), 6-Gang, 4,6l/100km, 120 g/km" identifier="_Rn_fEPlREeS0zoGCUjWJzw" ps="90.0" preis="9000.0" effizienzklasse="_uL0NgUpzEeW0pdCh6a5vXw"/>
+        <prototypes xsi:type="konfiguration:Motorvariante" modelElementId="_dPQdIflREeS0zoGCUjWJzw" name="TDI 2.0 BlueMotion Diesel 110 kW 6GangDSG" beschreibung="TDI 2.0 Blue Motion Technology, Diesel, 110 kW (150 PS), 6-Gang Doppelkupplungsgetriebe, 4,5l/100km, 119 g/km" identifier="_YlyXoflREeS0zoGCUjWJzw" ps="80.0" preis="30000.0" effizienzklasse="_wcVeXkpzEeW0pdCh6a5vXw"/>
+        <prototypes xsi:type="konfiguration:Motorvariante" modelElementId="_0VXbqkcNEeWqvIIB4FuD4A" name="1.00 44 kW 60 PS 5Gang 45 l100km 105 gkm" beschreibung="" identifier="_fDW2qEcNEeWqvIIB4FuD4A" ps="60.0" getriebe="5" verbrauch="4.5" emission="105" preis="9975.0" effizienzklasse="_4wfsskpzEeW0pdCh6a5vXw"/>
+        <prototypes xsi:type="konfiguration:Motorvariante" modelElementId="_blH_ukcOEeWqvIIB4FuD4A" name="1.0 BlueMotion Technology 044 kW 60 PS 5Gang 41 l100km 95 gkm" beschreibung="" identifier="_VWQCuEcOEeWqvIIB4FuD4A" ps="60.0" getriebe="5" verbrauch="4.1" emission="95" preis="10375.0" effizienzklasse="_yOs0IUpzEeW0pdCh6a5vXw"/>
+        <prototypes xsi:type="konfiguration:Motorvariante" modelElementId="_qeQbgLXyEeWEp8ZNFSaL_Q" name="1.0 BlueMotion Technology 044 kW 60 PS 5Gang 50 l100km 114 gkm" beschreibung="" identifier="_eA90bbXyEeWEp8ZNFSaL_Q" ps="60.0" getriebe="5" verbrauch="5.0" emission="114" preis="12600.0" effizienzklasse="_4wfsskpzEeW0pdCh6a5vXw"/>
+      </repositories>
+      <repositories modelElementId="_Zro48EcPEeWqvIIB4FuD4A" name="farben" pattern="Farben">
+        <repositories modelElementId="_fyW_kEcPEeWqvIIB4FuD4A" name="identifier" pattern="FarbenIdentifier|Repository">
+          <repositories modelElementId="_Dw0i0C_YEeetyIP1cIdERg" name="insure582" pattern="FarbenIdentifier"/>
+          <enumerations xsi:type="konfiguration:FarbenIdentifier" modelElementId="_ic_aCUcPEeWqvIIB4FuD4A" name="Blue_Aussen"/>
+          <enumerations xsi:type="konfiguration:FarbenIdentifier" modelElementId="_1QII6UcPEeWqvIIB4FuD4A" name="White_Aussen" key="1"/>
+          <enumerations xsi:type="konfiguration:FarbenIdentifier" modelElementId="_5hWtiEcPEeWqvIIB4FuD4A" name="Red_Aussen" beschreibung="" key="2"/>
+          <enumerations xsi:type="konfiguration:FarbenIdentifier" modelElementId="_V0fzCUcQEeWqvIIB4FuD4A" name="Blueberry_Aussen" key="3"/>
+          <enumerations xsi:type="konfiguration:FarbenIdentifier" modelElementId="_d5FUiUcQEeWqvIIB4FuD4A" name="Dark_Silver_Metallic_Aussen" key="4"/>
+          <enumerations xsi:type="konfiguration:FarbenIdentifier" modelElementId="_mOwmCUcQEeWqvIIB4FuD4A" name="Light_Silver_Metallic_Aussen" key="5"/>
+          <enumerations xsi:type="konfiguration:FarbenIdentifier" modelElementId="_tkxxWUcQEeWqvIIB4FuD4A" name="Orange_Metallic_Aussen" key="6"/>
+          <enumerations xsi:type="konfiguration:FarbenIdentifier" modelElementId="_2e7oskcQEeWqvIIB4FuD4A" name="Anthracite_Innen" key="7"/>
+        </repositories>
+        <prototypes xsi:type="konfiguration:Farben" modelElementId="_k37LW0cPEeWqvIIB4FuD4A" name="Blue Aussen" identifier="_ic_aCUcPEeWqvIIB4FuD4A"/>
+        <prototypes xsi:type="konfiguration:Farben" modelElementId="_6LnLa0cPEeWqvIIB4FuD4A" name="White Aussen" identifier="_1QII6UcPEeWqvIIB4FuD4A"/>
+        <prototypes xsi:type="konfiguration:Farben" modelElementId="_AVHgS0cQEeWqvIIB4FuD4A" name="Red Aussen" identifier="_5hWtiEcPEeWqvIIB4FuD4A" preis="175.0"/>
+        <prototypes xsi:type="konfiguration:Farben" modelElementId="_Y1oBq0cQEeWqvIIB4FuD4A" name="Blueberry Aussen" identifier="_V0fzCUcQEeWqvIIB4FuD4A" preis="465.0"/>
+        <prototypes xsi:type="konfiguration:Farben" modelElementId="_g8MgK0cQEeWqvIIB4FuD4A" name="Dark Silver Metallic  Aussen" identifier="_d5FUiUcQEeWqvIIB4FuD4A" preis="465.0"/>
+        <prototypes xsi:type="konfiguration:Farben" modelElementId="_plQAlkcQEeWqvIIB4FuD4A" name="Light Silver Metallic  Aussen" identifier="_mOwmCUcQEeWqvIIB4FuD4A" preis="465.0"/>
+        <prototypes xsi:type="konfiguration:Farben" modelElementId="_v5PuS0cQEeWqvIIB4FuD4A" name="Orange Metallic  Aussen" identifier="_tkxxWUcQEeWqvIIB4FuD4A" preis="465.0"/>
+        <prototypes xsi:type="konfiguration:Farben" modelElementId="_58f760cQEeWqvIIB4FuD4A" name="Anthracite Innen" identifier="_2e7oskcQEeWqvIIB4FuD4A"/>
+      </repositories>
+      <repositories modelElementId="_lJeb8EcUEeW7kPSwFntsnw" name="felge" pattern="Felge">
+        <repositories modelElementId="_nmScoEcUEeW7kPSwFntsnw" name="identifier" pattern="FelgeIdentifier">
+          <enumerations xsi:type="konfiguration:FelgeIdentifier" modelElementId="_vZWJekcUEeW7kPSwFntsnw" name="TopPaket"/>
+          <enumerations xsi:type="konfiguration:FelgeIdentifier" modelElementId="_Q-_qakcVEeW7kPSwFntsnw" name="_4_Stahlraeder_5_J_x_14" key="1"/>
+          <enumerations xsi:type="konfiguration:FelgeIdentifier" modelElementId="_WMwvykcVEeW7kPSwFntsnw" name="Leichtmetallfelge_Aspen_5_J_x_14_Brillantsilber_Preis_pro_Satz_ohne_Bereifung_und_Montage" key="2"/>
+          <enumerations xsi:type="konfiguration:FelgeIdentifier" modelElementId="_cJel2kcVEeW7kPSwFntsnw" name="Leichtmetallfelge_Classic_6_J_x_16_Schwarz_Preis_pro_Satz_ohne_Bereifung_und_Montage" key="3"/>
+          <enumerations xsi:type="konfiguration:FelgeIdentifier" modelElementId="_jKTkSkcVEeW7kPSwFntsnw" name="Leichtmetallfelge_Triangle_6J_x_16_Schwarz_Preis_pro_Satz_ohne_Bereifung_und_Montage" key="4"/>
+          <enumerations xsi:type="konfiguration:FelgeIdentifier" modelElementId="_r7WjKkcVEeW7kPSwFntsnw" name="Leichtmetallfelge_Upsilon_6_J_x_16_Schwarz_Preis_pro_Satz_ohne_Bereifung_und_Montage" key="5"/>
+        </repositories>
+        <prototypes xsi:type="konfiguration:Felge" modelElementId="_4IUrvEcUEeW7kPSwFntsnw" name="TopPaket" identifier="_vZWJekcUEeW7kPSwFntsnw" preis="24700.0"/>
+        <prototypes xsi:type="konfiguration:Felge" modelElementId="_46nETEcUEeW7kPSwFntsnw" name="4 Stahlraeder 5 J x 14" identifier="_Q-_qakcVEeW7kPSwFntsnw"/>
+        <prototypes xsi:type="konfiguration:Felge" modelElementId="_YmC7TEcVEeW7kPSwFntsnw" name="Leichtmetallfelge Aspen 5 J x 14 Brillantsilber Preis pro Satz ohne Bereifung und Montage" identifier="_WMwvykcVEeW7kPSwFntsnw" preis="448.0"/>
+        <prototypes xsi:type="konfiguration:Felge" modelElementId="_eCjnTEcVEeW7kPSwFntsnw" name="Leichtmetallfelge Classic  6 J x 16 Schwarz Preis pro Satz ohne Bereifung und Montage" identifier="_cJel2kcVEeW7kPSwFntsnw" preis="652.0"/>
+        <prototypes xsi:type="konfiguration:Felge" modelElementId="_lm6JjEcVEeW7kPSwFntsnw" name="Leichtmetallfelge Triangle 6J x 16 Schwarz Preis pro Satz ohne Bereifung und Montage" identifier="_jKTkSkcVEeW7kPSwFntsnw"/>
+        <prototypes xsi:type="konfiguration:Felge" modelElementId="_uKxoDEcVEeW7kPSwFntsnw" name="Leichtmetallfelge Upsilon 6 J x 16 Schwarz Preis pro Satz ohne Bereifung und Montage" identifier="_r7WjKkcVEeW7kPSwFntsnw" preis="608.0"/>
+      </repositories>
+      <repositories modelElementId="__zVaAEcVEeW7kPSwFntsnw" name="ausstattung" pattern="Ausstattung">
+        <repositories modelElementId="_Eu1D5EcWEeW7kPSwFntsnw" name="ausstattungIdentifier" pattern="AusstattungIdentifier">
+          <enumerations xsi:type="konfiguration:AusstattungIdentifier" modelElementId="_uaEWbEcXEeWPZuKDref0YQ" name="cool_sound"/>
+          <enumerations xsi:type="konfiguration:AusstattungIdentifier" modelElementId="_6f5fzEcXEeWPZuKDref0YQ" name="_4_doors" key="1"/>
+          <enumerations xsi:type="konfiguration:AusstattungIdentifier" modelElementId="_78wfXEcXEeWPZuKDref0YQ" name="Anschlussgarantie_Laufzeit_1_Jahr_maximale_Gesamtlaufleistung_30_000_km" key="2"/>
+          <enumerations xsi:type="konfiguration:AusstattungIdentifier" modelElementId="_ESO8jEcYEeWPZuKDref0YQ" name="PanoramaAusstellSchiebedach" beschreibung="" key="3"/>
+          <enumerations xsi:type="konfiguration:AusstattungIdentifier" modelElementId="_SXCUDEcYEeWPZuKDref0YQ" name="radio" key="4"/>
+          <enumerations xsi:type="konfiguration:AusstattungIdentifier" modelElementId="_UasN3EcYEeWPZuKDref0YQ" name="Raucherausfuehrung_Zigarettenanzuender_vorn_und_Aschenbecher_herausnehmbar" key="5"/>
+          <enumerations xsi:type="konfiguration:AusstattungIdentifier" modelElementId="_hzZUXEcYEeWPZuKDref0YQ" name="winter_pack" key="6"/>
+        </repositories>
+        <prototypes xsi:type="konfiguration:Einzelausstattung" modelElementId="_2tygDUcXEeWPZuKDref0YQ" name="cool  sound" beschreibung="" identifier="_uaEWbEcXEeWPZuKDref0YQ" preis="560.0"/>
+        <prototypes xsi:type="konfiguration:Einzelausstattung" modelElementId="_8noBPUcXEeWPZuKDref0YQ" name="4 doors" identifier="_6f5fzEcXEeWPZuKDref0YQ" preis="480.0"/>
+        <prototypes xsi:type="konfiguration:Einzelausstattung" modelElementId="_HG3nTUcYEeWPZuKDref0YQ" name="Anschlussgarantie Laufzeit 1 Jahr maximale Gesamtlaufleistung 30.000 km" beschreibung="" identifier="_78wfXEcXEeWPZuKDref0YQ" preis="140.0"/>
+        <prototypes xsi:type="konfiguration:Einzelausstattung" modelElementId="_N7jnLUcYEeWPZuKDref0YQ" name="PanoramaAusstellSchiebedach" identifier="_ESO8jEcYEeWPZuKDref0YQ" preis="905.0"/>
+        <prototypes xsi:type="konfiguration:Einzelausstattung" modelElementId="_U7TAfUcYEeWPZuKDref0YQ" name="radio" beschreibung="" identifier="_SXCUDEcYEeWPZuKDref0YQ" preis="360.0"/>
+        <prototypes xsi:type="konfiguration:Einzelausstattung" modelElementId="_b2eC3UcYEeWPZuKDref0YQ" name="Raucherausfuehrung Zigarettenanzuender vorn und Aschenbecher herausnehmbar" beschreibung="" identifier="_UasN3EcYEeWPZuKDref0YQ" preis="20.0"/>
+        <prototypes xsi:type="konfiguration:Einzelausstattung" modelElementId="_l57r3UcYEeWPZuKDref0YQ" name="winter pack" identifier="_hzZUXEcYEeWPZuKDref0YQ" preis="405.0"/>
+      </repositories>
+    </repositories>
+  </repositories>
+  <repositories modelElementId="_x6PuoMfyEeSbSLJORdU11w" name="calculator" pattern="Repository"/>
+  <repositories modelElementId="_zQ4KYMfyEeSbSLJORdU11w" name="enums" pattern="Repository">
+    <repositories modelElementId="_0KuzGRNGEeW8fKl0VVSZZA" name="bearbeitung" pattern="Bearbeitung">
+      <enumerations xsi:type="enums:Bearbeitung" modelElementId="_38bjdRNGEeW8fKl0VVSZZA" name="BESTELLUNG_ERFASSEN" key="1"/>
+      <enumerations xsi:type="enums:Bearbeitung" modelElementId="_3RtMQSScEeW9loX9FhD7RA" name="KONFIGURATION" beschreibung="Erlaubt das Bearbeiten einer Konfiguration." key="2"/>
+      <enumerations xsi:type="enums:Bearbeitung" modelElementId="_19qOoSSVEeW9loX9FhD7RA" name="ZUSAMMENFASSUNG" beschreibung="Zeigt eine Zusammenfassung der Bestellung." key="3"/>
+      <enumerations xsi:type="enums:Bearbeitung" modelElementId="_W7JY0CSVEeW9loX9FhD7RA" name="AUSSTATTUNGSVARIANTE_WAEHLEN" beschreibung="Erlaubt die Auswahl der Ausstattungsvariante einer Konfiguration." key="4"/>
+      <enumerations xsi:type="enums:Bearbeitung" modelElementId="_XFbWMCSVEeW9loX9FhD7RA" name="MOTORVARIANTE_WAEHLEN" beschreibung="Erlaubt die Auswahl der Motorvariante einer Konfiguration." key="5"/>
+      <enumerations xsi:type="enums:Bearbeitung" modelElementId="_SLi2hKSXEeWkAL6LixI-yg" name="BESTELLUNG_BEAUSKUNFTEN" key="6"/>
+    </repositories>
+    <repositories modelElementId="_27s2UMfyEeSbSLJORdU11w" name="geschlecht" pattern="Geschlecht">
+      <enumerations xsi:type="enums_1:Geschlecht" modelElementId="_JurJZtFEEeSuvMz3yrRJJQ" name="IRRELEVANT" key="100"/>
+    </repositories>
+    <repositories modelElementId="_gFv1QN3KEeSKuoZouNzKQw" name="klauselidentifier" pattern="KlauselIdentifier">
+      <enumerations xsi:type="enums:KlauselIdentifier" modelElementId="_nkAWpN3KEeSKuoZouNzKQw" name="KLAUSEL_1" beschreibung="Testklausel 1" key="1"/>
+      <enumerations xsi:type="enums:KlauselIdentifier" modelElementId="_qBz11N3KEeSKuoZouNzKQw" name="KLAUSEL_2" beschreibung="Testklausel 2" key="2"/>
+    </repositories>
+    <repositories modelElementId="_c3Le4PlSEeS-NabbQewKpw" name="aussenlackierungsfarbe" pattern="Aussenlackierungsfarbe">
+      <enumerations xsi:type="enums:Aussenlackierungsfarbe" modelElementId="_gjTybflSEeS-NabbQewKpw" name="Uranograu"/>
+      <enumerations xsi:type="enums:Aussenlackierungsfarbe" modelElementId="_1wL_0PlSEeS-NabbQewKpw" name="Pure_White" key="1"/>
+      <enumerations xsi:type="enums:Aussenlackierungsfarbe" modelElementId="_18ogYflSEeS-NabbQewKpw" name="Black_Oak_Brown_Metallic" key="2"/>
+      <enumerations xsi:type="enums:Aussenlackierungsfarbe" modelElementId="_2NLd0flSEeS-NabbQewKpw" name="Crimson_Red_Metallic" key="3"/>
+      <enumerations xsi:type="enums:Aussenlackierungsfarbe" modelElementId="_2Otu4flSEeS-NabbQewKpw" name="Harvard_Blue_Metallic" key="4"/>
+      <enumerations xsi:type="enums:Aussenlackierungsfarbe" modelElementId="_2QKgYPlSEeS-NabbQewKpw" name="Indiumgrau_Metallic" key="5"/>
+      <enumerations xsi:type="enums:Aussenlackierungsfarbe" modelElementId="_2RsKYflSEeS-NabbQewKpw" name="Night_Blue_Metallic" key="6"/>
+      <enumerations xsi:type="enums:Aussenlackierungsfarbe" modelElementId="_FlK7gPlTEeS-NabbQewKpw" name="Reflexsilber_Metallic" key="7"/>
+      <enumerations xsi:type="enums:Aussenlackierungsfarbe" modelElementId="_F4ZZgflTEeS-NabbQewKpw" name="Sand_Gold_Metallic" key="8"/>
+      <enumerations xsi:type="enums:Aussenlackierungsfarbe" modelElementId="_F7vocflTEeS-NabbQewKpw" name="Tungsten_Silver_Metallic" key="9"/>
+      <enumerations xsi:type="enums:Aussenlackierungsfarbe" modelElementId="_F9zd8flTEeS-NabbQewKpw" name="Deep_Black_Perleffekt" key="10"/>
+      <enumerations xsi:type="enums:Aussenlackierungsfarbe" modelElementId="_DVWL_vlpEeSSV8_1JiUh9g" name="Oryxweiss_Perlmutteffekt" key="11"/>
+    </repositories>
+    <repositories modelElementId="_uLBv0PlTEeS-NabbQewKpw" name="innenausstattungsfarbe" pattern="Innenausstattungsfarbe">
+      <enumerations xsi:type="enums:Innenausstattungsfarbe" modelElementId="_yp2Ej_lTEeS-NabbQewKpw" name="Titanschwarz"/>
+    </repositories>
+    <repositories modelElementId="_mRQuoAtkEeWbEs00MeM1SQ" name="version" pattern="Version">
+      <enumerations xsi:type="enums_1:Version" modelElementId="_4AxdYQtkEeWbEs00MeM1SQ" name="URSPRUNG"/>
+      <enumerations xsi:type="enums_1:Version" modelElementId="_7gQcAQtkEeWbEs00MeM1SQ" name="RELEASE_1" key="1"/>
+    </repositories>
+    <repositories modelElementId="_s9TCw3y4EeWcgadUlqqwIg" name="bestellstatus" pattern="Bestellstatus">
+      <enumerations xsi:type="enums:Bestellstatus" modelElementId="_wSI3t3y4EeWcgadUlqqwIg" name="In_Erfassung"/>
+      <enumerations xsi:type="enums:Bestellstatus" modelElementId="_1xBiR3y4EeWcgadUlqqwIg" name="Freigegeben" key="1"/>
+    </repositories>
+    <repositories modelElementId="_pVrkkCfaEeaTpdrJZlmD0A" name="abschlussmodellReferenz" pattern="Abschlussmodell">
+      <enumerations xsi:type="enums_1:Abschlussmodell" modelElementId="_uCOMMSfaEeaTpdrJZlmD0A" name="BEISPIELMODELL" key="99"/>
+      <enumerations xsi:type="enums_1:Abschlussmodell" modelElementId="_8zULMSlJEeawYejUXoNoIA" name="REFERENZABSCHLUSSMODELL" key="97"/>
+    </repositories>
+    <repositories modelElementId="_4yIDIClIEeaQ05sGST5nCw" name="abschlussmodellDieZweite" pattern="Abschlussmodell">
+      <enumerations xsi:type="enums_1:Abschlussmodell" modelElementId="_4yIqMClIEeaQ05sGST5nCw" name="TESTMODELL" key="98"/>
+    </repositories>
+  </repositories>
+  <repositories modelElementId="_BP2QECZZEeaN-ar_eslKvQ" name="tickets" pattern="Repository">
+    <repositories modelElementId="_EViOoCZZEeaN-ar_eslKvQ" name="insure111" beschreibung="" pattern="Repository">
+      <repositories modelElementId="_s8tAMEj4EeaH2MqnS1K_3w" name="enumerationMitReferenz" pattern="EnumerationMitReferenz">
+        <enumerations xsi:type="insure111:EnumerationMitReferenz" modelElementId="_xHJLOUj5EeajEdq8Qpyjbw" name="Keks" key="1" referenzierteEnumeration="_s0bY2kj5EeajEdq8Qpyjbw"/>
+      </repositories>
+      <repositories modelElementId="_qRDc0Ej5EeajEdq8Qpyjbw" name="referenzierteEnumeration" pattern="ReferenzierteEnumeration">
+        <enumerations xsi:type="insure111:ReferenzierteEnumeration" modelElementId="_s0bY2kj5EeajEdq8Qpyjbw" name="WERTEINS" key="1"/>
+        <enumerations xsi:type="insure111:ReferenzierteEnumeration" modelElementId="_vtNj2kj5EeajEdq8Qpyjbw" name="WERTZWEI" key="2"/>
+      </repositories>
+    </repositories>
+    <repositories modelElementId="_6RtK0KtCEeavj-Ak0iXxCA" name="insure391" beschreibung="" pattern="Repository">
+      <repositories modelElementId="_7_eUMKtCEeavj-Ak0iXxCA" name="insure391Enumeration" pattern="Insure391Enumeration">
+        <enumerations xsi:type="insure391:Insure391Enumeration" modelElementId="_ISu17atDEeavj-Ak0iXxCA" name="Ticket391Implementierung" key="1" referenzEnumeration="_JurJZtFEEeSuvMz3yrRJJQ"/>
+      </repositories>
+    </repositories>
+    <repositories modelElementId="__7OakL_nEeatyYki-pURpg" name="insure419" pattern="Repository|Insure419.*">
+      <prototypes xsi:type="insure419:Insure419Produkt" modelElementId="_Pu4grr_oEeatyYki-pURpg" name="Insure419Testprodukt" identifier="_LGKCD7_oEeatyYki-pURpg"/>
+      <prototypes xsi:type="insure419:Insure419Prototype" modelElementId="_CzRGkcEYEea_iNr4QPpY3w" name="EinPrototyp">
+        <containmentReferences modelElementId="_JagjgMEcEeaMroUMYBTH-g" name="einContainment">
+          <otherContainmentReferences modelElementId="_KN69cMEcEeaMroUMYBTH-g" name="eins">
+            <manyMore modelElementId="_KN69cMEcEeaMroUMYBTH-j"/>
+            <manyMore modelElementId="_KN69cMEcEeaMroUMYBTH-s"/>
+          </otherContainmentReferences>
+          <otherContainmentReferences modelElementId="_L2SCYMEcEeaMroUMYBTH-g" name="zwei"/>
+          <otherContainmentReferences modelElementId="_M7PfUMEcEeaMroUMYBTH-g" name="drei"/>
+          <singleContainmentReference modelElementId="_KN69ccEcEeaMroUMYBTH-g" someValue="wert" name="vier">
+            <oneMore modelElementId="_KN69cMEcEeaMroUMYBTH-l"/>
+          </singleContainmentReference>
+        </containmentReferences>
+      </prototypes>
+      <enumerations xsi:type="insure419:Insure419Identifier" modelElementId="_LGKCD7_oEeatyYki-pURpg" name="Insure419Testprodukt" key="1"/>
+    </repositories>
+    <repositories modelElementId="_4Z4FUNmLEeafT5hhM_GGdA" name="insure432" pattern="Repository|Insure432.*">
+      <enumerations xsi:type="insure432:Insure432Enumeration" modelElementId="_7VSt8dmLEeafT5hhM_GGdA" name="EINS" key="1" nachfolger="_EMEhYdmMEeafT5hhM_GGdA _FrnBgdmMEeafT5hhM_GGdA _G1y8sdmMEeafT5hhM_GGdA" nachfolgerOther="_JurJZtFEEeSuvMz3yrRJJQ">
+        <zahlweise href="platform:/plugin/insure.domain.daten/src/main/resources/insure-domain.insure#_uMxumlx8EeCYkdtmznWPZA"/>
+      </enumerations>
+      <enumerations xsi:type="insure432:Insure432Enumeration" modelElementId="_EMEhYdmMEeafT5hhM_GGdA" name="ZWEI" key="2">
+        <zahlweise href="platform:/plugin/insure.domain.daten/src/main/resources/insure-domain.insure#_uMxumVx8EeCYkdtmznWPZA"/>
+      </enumerations>
+      <enumerations xsi:type="insure432:Insure432Enumeration" modelElementId="_FrnBgdmMEeafT5hhM_GGdA" name="DREI" key="3"/>
+      <enumerations xsi:type="insure432:Insure432Enumeration" modelElementId="_G1y8sdmMEeafT5hhM_GGdA" name="VIER" beschreibung="" key="4"/>
+    </repositories>
+    <repositories modelElementId="_s37wgNmpEeafD_OcGbG3eg" name="insure433" pattern="Repository|Geschlecht.*|Schweregrad.*|Innenausstattungsfarbe.*">
+      <enumerations xsi:type="enums_1:Geschlecht" modelElementId="_8uqYptmpEeafD_OcGbG3eg" name="APACHEHELIKOPTER" key="42"/>
+      <enumerations xsi:type="enums_1:Schweregrad" modelElementId="_HQRWPtmqEeafD_OcGbG3eg" name="HYPERMEGA" key="98"/>
+      <enumerations xsi:type="enums_1:Schweregrad" modelElementId="_LIngztmqEeafD_OcGbG3eg" name="MEH" key="99"/>
+      <enumerations xsi:type="enums:Innenausstattungsfarbe" modelElementId="_JfmdB9voEeaLguPb-ef7WQ" name="PINKCAMOUFLAGE" key="666"/>
+    </repositories>
+    <repositories modelElementId="_K7OZgOeWEeap2eoKEzZeUA" name="insure469" pattern="Repository|Zeitmodell.*|Triggerfunktion">
+      <repositories modelElementId="_QTA9kOeWEeap2eoKEzZeUA" name="zeitmodell" pattern="Repository|Zeitmodell">
+        <repositories modelElementId="_WeC8sOeWEeap2eoKEzZeUA" name="identifier" pattern="ZeitmodellIdentifier">
+          <enumerations xsi:type="insure469:ZeitmodellIdentifier" modelElementId="_LLbjY-eXEeaDNfxOEhDyMA" name="STANDARD" key="1"/>
+        </repositories>
+        <prototypes xsi:type="insure469:Zeitmodell" modelElementId="_Jf0WIeeXEeaDNfxOEhDyMA" name="Standard" identifier="_LLbjY-eXEeaDNfxOEhDyMA">
+          <zeitmodellelemente xsi:type="insure469:Zeitmodellautomatismus" modelElementId="_N3LX0OeXEeaDNfxOEhDyMA" triggerfunktionen="_PGlxYueXEeaDNfxOEhDyMA"/>
+        </prototypes>
+      </repositories>
+      <repositories modelElementId="_a73LkOeWEeap2eoKEzZeUA" name="triggerfunktion" pattern="Repository|Triggerfunktion">
+        <functions xsi:type="insure469:Triggerfunktion" modelElementId="_PGlxYueXEeaDNfxOEhDyMA" name="Test"/>
+      </repositories>
+    </repositories>
+    <repositories modelElementId="_nmBp8OIYEeaDE84Dco1_hQ" name="insure450" pattern="Repository|Insure450.*">
+      <prototypes xsi:type="insure450:Insure450Produkt" modelElementId="_whytkuLrEeaBppv9oYiIvQ" name="EinProdukt" identifier="_z1TFtOLrEeaBppv9oYiIvQ" calculator="_vgyhc-IYEeaDE84Dco1_hQ" normalFunction="_lVltFOOqEeavgqX1epbq9g"/>
+      <functions xsi:type="insure450:Insure450Calculator" modelElementId="_vgyhc-IYEeaDE84Dco1_hQ" name="EinCalculator">
+        <body xsi:type="insure450:Insure450Formel" modelElementId="_phBZIOLrEeaBppv9oYiIvQ">
+          <expression modelElementId="_W5a7IOMHEeaR7upOmVPnkw">
+            <left modelElementId="_pwYdAOOqEeavgqX1epbq9g">
+              <left modelElementId="_qklhIOOqEeavgqX1epbq9g">
+                <left modelElementId="_sRGtUOOqEeavgqX1epbq9g"/>
+                <right modelElementId="_sRGtUeOqEeavgqX1epbq9g"/>
+              </left>
+              <right modelElementId="_qklhIeOqEeavgqX1epbq9g"/>
+            </left>
+            <right modelElementId="_pwYdAeOqEeavgqX1epbq9g">
+              <left modelElementId="_rWll0OOqEeavgqX1epbq9g"/>
+              <right modelElementId="_rWll0eOqEeavgqX1epbq9g"/>
+            </right>
+          </expression>
+        </body>
+      </functions>
+      <functions xsi:type="insure450:Insure450NormalFunction" modelElementId="_lVltFOOqEeavgqX1epbq9g" name="EineNormaleFunktion"/>
+      <enumerations xsi:type="insure450:Insure450ProduktIdentifier" modelElementId="_z1TFtOLrEeaBppv9oYiIvQ" name="EinProduktIdentifier" key="42"/>
+    </repositories>
+    <repositories modelElementId="_jd1m8P_wEeapaOIsE7vIVw" name="insure164" pattern="Repository|Insure164.*">
+      <enumerations xsi:type="insure164:Insure164Enumeration" modelElementId="_N88cR__xEeaTFP0-y62VHA" name="testEnum" key="1" referenzierteEnumeration="_Qa5FaP_xEeaTFP0-y62VHA"/>
+      <enumerations xsi:type="insure164:Insure164ReferenzierteEnumeration" modelElementId="_Qa5FaP_xEeaTFP0-y62VHA" name="eineReferenzEnum" beschreibung="" key="1" einString="Kevin" einLocalDate="2016-05-05"/>
+    </repositories>
+    <repositories modelElementId="_XdNbwATUEeexcaHkP0SJmA" name="insure491" pattern="Repository|Insure491.*">
+      <enumerations xsi:type="insure491:Insure491PrototypeIdentifier" modelElementId="_hUS1oATUEeeFpNuT9WmZnQ" name="EinIdentifier" key="1" wert="Hallo"/>
+    </repositories>
+    <repositories modelElementId="_i07lYBBuEee-o5hEgmV5cA" name="insure514" pattern="Repository|Insure514.*">
+      <enumerations xsi:type="insure514:Insure514Enumeration" modelElementId="_kuYaZBBuEee-o5hEgmV5cA" name="EINS" key="1" referenz="_pZvWWRBuEee-o5hEgmV5cA _r29muRBuEee-o5hEgmV5cA" sub514Enumerationen="_ntugeBBuEee-o5hEgmV5cA"/>
+      <enumerations xsi:type="insure514:Insure514Enumeration" modelElementId="_ntugeBBuEee-o5hEgmV5cA" name="ZWEI" key="2" referenz="_tTnK6RBuEee-o5hEgmV5cA _pZvWWRBuEee-o5hEgmV5cA _r29muRBuEee-o5hEgmV5cA"/>
+      <enumerations xsi:type="insure514:Insure514Referenz" modelElementId="_pZvWWRBuEee-o5hEgmV5cA" name="REFEINS" key="1"/>
+      <enumerations xsi:type="insure514:Insure514Referenz" modelElementId="_r29muRBuEee-o5hEgmV5cA" name="REFZWEI" key="2"/>
+      <enumerations xsi:type="insure514:Insure514Referenz" modelElementId="_tTnK6RBuEee-o5hEgmV5cA" name="REFDREI" key="3"/>
+    </repositories>
+    <repositories modelElementId="_efoK8C_cEeetyIP1cIdERg" name="insure582" pattern="Farben.*">
+      <prototypes xsi:type="konfiguration:Farben" modelElementId="_TAgZGS_YEeetyIP1cIdERg" name="Insure 582" identifier="_GEi5AC_YEeetyIP1cIdERg" preis="582.0"/>
+      <enumerations xsi:type="konfiguration:FarbenIdentifier" modelElementId="_GEi5AC_YEeetyIP1cIdERg" name="Insure_582" key="-582"/>
+    </repositories>
+    <repositories modelElementId="_EqfPQDY6EeeyMN0toF5_gw" name="insure592" pattern="Insure592.*">
+      <prototypes xsi:type="insure592:Insure592PrototypeA" modelElementId="_W84ouDY6EeedJc2qEOZLDQ" name="Foo">
+        <myContainments modelElementId="_YVahwDY6EeedJc2qEOZLDQ" otherPrototypes="_Z8nwSTY6EeedJc2qEOZLDQ _cKTv2TY6EeedJc2qEOZLDQ" wert="42"/>
+      </prototypes>
+      <prototypes xsi:type="insure592:Insure592PrototypeB" modelElementId="_Z8nwSTY6EeedJc2qEOZLDQ" name="Bar"/>
+      <prototypes xsi:type="insure592:Insure592PrototypeB" modelElementId="_cKTv2TY6EeedJc2qEOZLDQ" name="Baz"/>
+    </repositories>
+    <repositories modelElementId="_A6ow8Dl9Eee7wIVtIGmYzw" name="insure436A" pattern="Repository">
+      <enumerations xsi:type="insure436:Insure436TestEnum1" modelElementId="_JUn67Dl9Eee7wIVtIGmYzw" name="EnumA" key="2"/>
+    </repositories>
+    <repositories modelElementId="_V6RS8DmFEeeWqYKtnge9Jg" name="insure436B" pattern="Repository">
+      <enumerations xsi:type="insure436:Insure436TestEnum1" modelElementId="_RFusQDmNEeea_8UbQ9F5IQ" name="EnumC" key="2"/>
+    </repositories>
+  </repositories>
+</core:RootRepository>
