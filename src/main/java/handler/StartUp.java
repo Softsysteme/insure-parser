@@ -5,7 +5,6 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.nio.file.Files;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -13,7 +12,6 @@ import org.eclipse.core.runtime.FileLocator;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.emf.common.util.Diagnostic;
 import org.eclipse.emf.common.util.URI;
-import org.eclipse.emf.common.util.WrappedException;
 import org.eclipse.emf.ecore.EObject;
 import org.eclipse.emf.ecore.resource.Resource;
 import org.eclipse.emf.ecore.resource.ResourceSet;
@@ -29,10 +27,10 @@ import org.eclipse.emf.ecore.xmi.impl.XMLResourceImpl;
 import org.eclipse.equinox.app.IApplication;
 import org.eclipse.equinox.app.IApplicationContext;
 import org.osgi.framework.Bundle;
-import org.osgi.framework.FrameworkUtil;
 
 import JAXBandStAX.PrintObjects;
 import JAXBandStAX.XmlToJavaParserMitStaxUndJaxb;
+import parser.ParserPackage;
 import tools.XXXResourceImpl;
 
 //import tools.DynamicJavaBuilder;
@@ -41,12 +39,11 @@ public class StartUp implements IApplication {
 
 	@Override
 	public Object start(IApplicationContext context) throws Exception {
-
-		convertXMItoXML("src/main/resources/model/My.packagea", "src/main/resources/model/package.xml");
-
 		try {
-			XmlToJavaParserMitStaxUndJaxb.parseXml(readFile("src/main/resources/model/parser.xsd", "UTF-8"),
-					readFile("src/main/resources/model/package.xml", "ASCII"), "ASCII", "packageA", new PrintObjects());
+			// convertXMItoXML("src/main/resources/model/insure-parser-example-daten.parser",
+			// "src/main/resources/model/insure-parser-example-daten.xml");
+			XmlToJavaParserMitStaxUndJaxb.parseXml("./src/main/resources/model/insure-parser-domain.xsd",
+					"src/main/resources/model/insure-parser-example-daten.xml", "UTF-8", "parser.impl", new PrintObjects());
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -76,8 +73,13 @@ public class StartUp implements IApplication {
 		resourceSet.getResourceFactoryRegistry().getExtensionToFactoryMap().put(XMLResource.OPTION_EXTENDED_META_DATA,
 				new GenericXMLResourceFactoryImpl());
 
+		// Register the package to ensure it is available during loading.
+		//
+		resourceSet.getPackageRegistry().put(ParserPackage.eNS_URI, ParserPackage.eINSTANCE);
+		resourceSet.getResourceFactoryRegistry().getExtensionToFactoryMap().put("ecore", new XMIResourceFactoryImpl());
+
 		File oldfile = null;
-		XXXResourceImpl resourcexmi = null;
+		XMIResourceImpl resourcexmi = null;
 		try {
 			oldfile = new File((FileLocator.resolve(bundle.getEntry(oldpath)).toURI()));
 		} catch (URISyntaxException e) {
@@ -92,17 +94,27 @@ public class StartUp implements IApplication {
 		try {
 			// Demand load resource for this file.
 			//
-			resourcexmi = new XXXResourceImpl(uri);
+			resourcexmi = new XMIResourceImpl(uri);
+			// Map<Object, Object> options = new HashMap<Object, Object>();
+			// options.put(XMIResource.OPTION_DECLARE_XML, true);
+
+			try {
+				resourcexmi.load(null);
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 			System.out.println("Loaded " + uri);
 
 			// Validate the contents of the loaded resource.
 			//
-			for (EObject eObject : resourcexmi.getContents()) {
-				Diagnostic diagnostic = Diagnostician.INSTANCE.validate(eObject);
-				if (diagnostic.getSeverity() != Diagnostic.OK) {
-					printDiagnostic(diagnostic, "");
-				}
-			}
+			// for (EObject eObject : resourcexmi.getContents()) {
+			// Diagnostic diagnostic = Diagnostician.INSTANCE.validate(eObject);
+			// System.out.println(eObject.toString());
+			// if (diagnostic.getSeverity() != Diagnostic.OK) {
+			// printDiagnostic(diagnostic, "");
+			// }
+			// }
 		} catch (RuntimeException exception) {
 			System.out.println("Problem loading " + uri);
 			exception.printStackTrace();
@@ -110,23 +122,34 @@ public class StartUp implements IApplication {
 
 		try {
 
-			URI newuri = URI.createURI("http://de.adesso.ais.parser");
-			XMLResourceImpl resourcexml = new XMLResourceImpl(newuri);
-			resourcexml = (XMLResourceImpl) resourceSet.createResource(newuri);
+			File newFile = new File(newpath);
+			newFile.getParentFile().mkdirs();
+			newFile.createNewFile();
+			URI newuri = newFile.isFile() ? URI.createFileURI(newFile.getAbsolutePath()) : URI.createURI(newpath);
+			// URI newuri = URI.createURI(newpath);
+			XMIResourceImpl resourcexml = new XMIResourceImpl(newuri);
+			// resourcexml = resourcexmi;
+			// resourcexml = (XMLResourceImpl) resourceSet.createResource(newuri);
 
 			// TODO add some content here
+
 			resourcexml.getContents().addAll(resourcexmi.getContents());
-			
+
 			try {
 				Map<Object, Object> options = new HashMap<Object, Object>();
 				options.put(XMIResource.OPTION_SUPPRESS_XMI, true);
-				resourcexml.save(new FileOutputStream(bundle.getLocation() + newpath), options);
+				// options.put(XMLResource.OPTION_PROCESS_DANGLING_HREF, true);
+				options.put(XMIResource.OPTION_PROCESS_DANGLING_HREF_RECORD, "RECORD");
+				// options.put(XMLResource.OPTION_DECLARE_XML, true);
+				// options.put(XMIResource.OPTION_ANY_SIMPLE_TYPE, true);
+				resourcexml.save(new FileOutputStream(newFile.getAbsolutePath()), options);
 
 			} catch (IOException e) {
 				java.lang.System.out.print("no");
 
 			}
-		} catch (RuntimeException exception) {
+
+		} catch (RuntimeException | IOException exception) {
 			System.out.println("Problem loading new resource");
 			exception.printStackTrace();
 		}
@@ -136,7 +159,7 @@ public class StartUp implements IApplication {
 		System.out.print(indent);
 		System.out.println(diagnostic.getMessage());
 		for (Diagnostic child : diagnostic.getChildren()) {
-			printDiagnostic(child, indent + "  ");
+			printDiagnostic(child, indent + " ");
 		}
 	}
 

@@ -31,4 +31,19 @@
     <eStructuralFeatures xsi:type="ecore:EReference" name="lernende" lowerBound="1"
         upperBound="30" eType="#//Lernende"/>
   </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="Repository">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="name" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="RootRepository" eSuperTypes="#//Repository">
+    <eStructuralFeatures xsi:type="ecore:EReference" name="repositories" upperBound="-1"
+        eType="#//Repository" containment="true"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="AngestellterRepyosito" eSuperTypes="#//Repository">
+    <eStructuralFeatures xsi:type="ecore:EReference" name="angestellter" lowerBound="1"
+        upperBound="-1" eType="#//Angestellter"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="LernendenRepository" eSuperTypes="#//Repository">
+    <eStructuralFeatures xsi:type="ecore:EReference" name="lernenden" lowerBound="1"
+        upperBound="-1" eType="#//Lernende"/>
+  </eClassifiers>
 </ecore:EPackage>

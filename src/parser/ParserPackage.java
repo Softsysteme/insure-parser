@@ -479,6 +479,182 @@ public interface ParserPackage extends EPackage {
 
 
 	/**
+	 * The meta object id for the '{@link parser.impl.RepositoryImpl <em>Repository</em>}' class.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @see parser.impl.RepositoryImpl
+	 * @see parser.impl.ParserPackageImpl#getRepository()
+	 * @generated
+	 */
+	int REPOSITORY = 6;
+
+	/**
+	 * The feature id for the '<em><b>Name</b></em>' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int REPOSITORY__NAME = 0;
+
+	/**
+	 * The number of structural features of the '<em>Repository</em>' class.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int REPOSITORY_FEATURE_COUNT = 1;
+
+	/**
+	 * The number of operations of the '<em>Repository</em>' class.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int REPOSITORY_OPERATION_COUNT = 0;
+
+	/**
+	 * The meta object id for the '{@link parser.impl.RootRepositoryImpl <em>Root Repository</em>}' class.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @see parser.impl.RootRepositoryImpl
+	 * @see parser.impl.ParserPackageImpl#getRootRepository()
+	 * @generated
+	 */
+	int ROOT_REPOSITORY = 7;
+
+	/**
+	 * The feature id for the '<em><b>Name</b></em>' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int ROOT_REPOSITORY__NAME = REPOSITORY__NAME;
+
+	/**
+	 * The feature id for the '<em><b>Repositories</b></em>' containment reference list.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int ROOT_REPOSITORY__REPOSITORIES = REPOSITORY_FEATURE_COUNT + 0;
+
+	/**
+	 * The number of structural features of the '<em>Root Repository</em>' class.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int ROOT_REPOSITORY_FEATURE_COUNT = REPOSITORY_FEATURE_COUNT + 1;
+
+	/**
+	 * The number of operations of the '<em>Root Repository</em>' class.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int ROOT_REPOSITORY_OPERATION_COUNT = REPOSITORY_OPERATION_COUNT + 0;
+
+	/**
+	 * The meta object id for the '{@link parser.impl.AngestellterRepyositoImpl <em>Angestellter Repyosito</em>}' class.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @see parser.impl.AngestellterRepyositoImpl
+	 * @see parser.impl.ParserPackageImpl#getAngestellterRepyosito()
+	 * @generated
+	 */
+	int ANGESTELLTER_REPYOSITO = 8;
+
+	/**
+	 * The feature id for the '<em><b>Name</b></em>' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int ANGESTELLTER_REPYOSITO__NAME = REPOSITORY__NAME;
+
+	/**
+	 * The feature id for the '<em><b>Angestellter</b></em>' reference list.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int ANGESTELLTER_REPYOSITO__ANGESTELLTER = REPOSITORY_FEATURE_COUNT + 0;
+
+	/**
+	 * The number of structural features of the '<em>Angestellter Repyosito</em>' class.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int ANGESTELLTER_REPYOSITO_FEATURE_COUNT = REPOSITORY_FEATURE_COUNT + 1;
+
+	/**
+	 * The number of operations of the '<em>Angestellter Repyosito</em>' class.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int ANGESTELLTER_REPYOSITO_OPERATION_COUNT = REPOSITORY_OPERATION_COUNT + 0;
+
+	/**
+	 * The meta object id for the '{@link parser.impl.LernendenRepositoryImpl <em>Lernenden Repository</em>}' class.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @see parser.impl.LernendenRepositoryImpl
+	 * @see parser.impl.ParserPackageImpl#getLernendenRepository()
+	 * @generated
+	 */
+	int LERNENDEN_REPOSITORY = 9;
+
+	/**
+	 * The feature id for the '<em><b>Name</b></em>' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int LERNENDEN_REPOSITORY__NAME = REPOSITORY__NAME;
+
+	/**
+	 * The feature id for the '<em><b>Lernenden</b></em>' reference list.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int LERNENDEN_REPOSITORY__LERNENDEN = REPOSITORY_FEATURE_COUNT + 0;
+
+	/**
+	 * The number of structural features of the '<em>Lernenden Repository</em>' class.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int LERNENDEN_REPOSITORY_FEATURE_COUNT = REPOSITORY_FEATURE_COUNT + 1;
+
+	/**
+	 * The number of operations of the '<em>Lernenden Repository</em>' class.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int LERNENDEN_REPOSITORY_OPERATION_COUNT = REPOSITORY_OPERATION_COUNT + 0;
+
+
+	/**
 	 * Returns the meta object for class '{@link parser.Angestellter <em>Angestellter</em>}'.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
@@ -690,6 +866,90 @@ public interface ParserPackage extends EPackage {
 	EOperation getTutor__BerechneGehalt__double();
 
 	/**
+	 * Returns the meta object for class '{@link parser.Repository <em>Repository</em>}'.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @return the meta object for class '<em>Repository</em>'.
+	 * @see parser.Repository
+	 * @generated
+	 */
+	EClass getRepository();
+
+	/**
+	 * Returns the meta object for the attribute '{@link parser.Repository#getName <em>Name</em>}'.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @return the meta object for the attribute '<em>Name</em>'.
+	 * @see parser.Repository#getName()
+	 * @see #getRepository()
+	 * @generated
+	 */
+	EAttribute getRepository_Name();
+
+	/**
+	 * Returns the meta object for class '{@link parser.RootRepository <em>Root Repository</em>}'.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @return the meta object for class '<em>Root Repository</em>'.
+	 * @see parser.RootRepository
+	 * @generated
+	 */
+	EClass getRootRepository();
+
+	/**
+	 * Returns the meta object for the containment reference list '{@link parser.RootRepository#getRepositories <em>Repositories</em>}'.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @return the meta object for the containment reference list '<em>Repositories</em>'.
+	 * @see parser.RootRepository#getRepositories()
+	 * @see #getRootRepository()
+	 * @generated
+	 */
+	EReference getRootRepository_Repositories();
+
+	/**
+	 * Returns the meta object for class '{@link parser.AngestellterRepyosito <em>Angestellter Repyosito</em>}'.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @return the meta object for class '<em>Angestellter Repyosito</em>'.
+	 * @see parser.AngestellterRepyosito
+	 * @generated
+	 */
+	EClass getAngestellterRepyosito();
+
+	/**
+	 * Returns the meta object for the reference list '{@link parser.AngestellterRepyosito#getAngestellter <em>Angestellter</em>}'.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @return the meta object for the reference list '<em>Angestellter</em>'.
+	 * @see parser.AngestellterRepyosito#getAngestellter()
+	 * @see #getAngestellterRepyosito()
+	 * @generated
+	 */
+	EReference getAngestellterRepyosito_Angestellter();
+
+	/**
+	 * Returns the meta object for class '{@link parser.LernendenRepository <em>Lernenden Repository</em>}'.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @return the meta object for class '<em>Lernenden Repository</em>'.
+	 * @see parser.LernendenRepository
+	 * @generated
+	 */
+	EClass getLernendenRepository();
+
+	/**
+	 * Returns the meta object for the reference list '{@link parser.LernendenRepository#getLernenden <em>Lernenden</em>}'.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @return the meta object for the reference list '<em>Lernenden</em>'.
+	 * @see parser.LernendenRepository#getLernenden()
+	 * @see #getLernendenRepository()
+	 * @generated
+	 */
+	EReference getLernendenRepository_Lernenden();
+
+	/**
 	 * Returns the factory that creates the instances of the model.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
@@ -883,6 +1143,78 @@ public interface ParserPackage extends EPackage {
 		 * @generated
 		 */
 		EOperation TUTOR___BERECHNE_GEHALT__DOUBLE = eINSTANCE.getTutor__BerechneGehalt__double();
+
+		/**
+		 * The meta object literal for the '{@link parser.impl.RepositoryImpl <em>Repository</em>}' class.
+		 * <!-- begin-user-doc -->
+		 * <!-- end-user-doc -->
+		 * @see parser.impl.RepositoryImpl
+		 * @see parser.impl.ParserPackageImpl#getRepository()
+		 * @generated
+		 */
+		EClass REPOSITORY = eINSTANCE.getRepository();
+
+		/**
+		 * The meta object literal for the '<em><b>Name</b></em>' attribute feature.
+		 * <!-- begin-user-doc -->
+		 * <!-- end-user-doc -->
+		 * @generated
+		 */
+		EAttribute REPOSITORY__NAME = eINSTANCE.getRepository_Name();
+
+		/**
+		 * The meta object literal for the '{@link parser.impl.RootRepositoryImpl <em>Root Repository</em>}' class.
+		 * <!-- begin-user-doc -->
+		 * <!-- end-user-doc -->
+		 * @see parser.impl.RootRepositoryImpl
+		 * @see parser.impl.ParserPackageImpl#getRootRepository()
+		 * @generated
+		 */
+		EClass ROOT_REPOSITORY = eINSTANCE.getRootRepository();
+
+		/**
+		 * The meta object literal for the '<em><b>Repositories</b></em>' containment reference list feature.
+		 * <!-- begin-user-doc -->
+		 * <!-- end-user-doc -->
+		 * @generated
+		 */
+		EReference ROOT_REPOSITORY__REPOSITORIES = eINSTANCE.getRootRepository_Repositories();
+
+		/**
+		 * The meta object literal for the '{@link parser.impl.AngestellterRepyositoImpl <em>Angestellter Repyosito</em>}' class.
+		 * <!-- begin-user-doc -->
+		 * <!-- end-user-doc -->
+		 * @see parser.impl.AngestellterRepyositoImpl
+		 * @see parser.impl.ParserPackageImpl#getAngestellterRepyosito()
+		 * @generated
+		 */
+		EClass ANGESTELLTER_REPYOSITO = eINSTANCE.getAngestellterRepyosito();
+
+		/**
+		 * The meta object literal for the '<em><b>Angestellter</b></em>' reference list feature.
+		 * <!-- begin-user-doc -->
+		 * <!-- end-user-doc -->
+		 * @generated
+		 */
+		EReference ANGESTELLTER_REPYOSITO__ANGESTELLTER = eINSTANCE.getAngestellterRepyosito_Angestellter();
+
+		/**
+		 * The meta object literal for the '{@link parser.impl.LernendenRepositoryImpl <em>Lernenden Repository</em>}' class.
+		 * <!-- begin-user-doc -->
+		 * <!-- end-user-doc -->
+		 * @see parser.impl.LernendenRepositoryImpl
+		 * @see parser.impl.ParserPackageImpl#getLernendenRepository()
+		 * @generated
+		 */
+		EClass LERNENDEN_REPOSITORY = eINSTANCE.getLernendenRepository();
+
+		/**
+		 * The meta object literal for the '<em><b>Lernenden</b></em>' reference list feature.
+		 * <!-- begin-user-doc -->
+		 * <!-- end-user-doc -->
+		 * @generated
+		 */
+		EReference LERNENDEN_REPOSITORY__LERNENDEN = eINSTANCE.getLernendenRepository_Lernenden();
 
 	}
 

@@ -76,6 +76,42 @@ public interface ParserFactory extends EFactory {
 	Tutor createTutor();
 
 	/**
+	 * Returns a new object of class '<em>Repository</em>'.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @return a new object of class '<em>Repository</em>'.
+	 * @generated
+	 */
+	Repository createRepository();
+
+	/**
+	 * Returns a new object of class '<em>Root Repository</em>'.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @return a new object of class '<em>Root Repository</em>'.
+	 * @generated
+	 */
+	RootRepository createRootRepository();
+
+	/**
+	 * Returns a new object of class '<em>Angestellter Repyosito</em>'.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @return a new object of class '<em>Angestellter Repyosito</em>'.
+	 * @generated
+	 */
+	AngestellterRepyosito createAngestellterRepyosito();
+
+	/**
+	 * Returns a new object of class '<em>Lernenden Repository</em>'.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @return a new object of class '<em>Lernenden Repository</em>'.
+	 * @generated
+	 */
+	LernendenRepository createLernendenRepository();
+
+	/**
 	 * Returns the package supported by this factory.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->

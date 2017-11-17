@@ -62,6 +62,10 @@ public class ParserFactoryImpl extends EFactoryImpl implements ParserFactory {
 			case ParserPackage.SCHUELER: return createSchueler();
 			case ParserPackage.LERNENDE: return createLernende();
 			case ParserPackage.TUTOR: return createTutor();
+			case ParserPackage.REPOSITORY: return createRepository();
+			case ParserPackage.ROOT_REPOSITORY: return createRootRepository();
+			case ParserPackage.ANGESTELLTER_REPYOSITO: return createAngestellterRepyosito();
+			case ParserPackage.LERNENDEN_REPOSITORY: return createLernendenRepository();
 			default:
 				throw new IllegalArgumentException("The class '" + eClass.getName() + "' is not a valid classifier");
 		}
@@ -125,6 +129,46 @@ public class ParserFactoryImpl extends EFactoryImpl implements ParserFactory {
 	public Tutor createTutor() {
 		TutorImpl tutor = new TutorImpl();
 		return tutor;
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public Repository createRepository() {
+		RepositoryImpl repository = new RepositoryImpl();
+		return repository;
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public RootRepository createRootRepository() {
+		RootRepositoryImpl rootRepository = new RootRepositoryImpl();
+		return rootRepository;
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public AngestellterRepyosito createAngestellterRepyosito() {
+		AngestellterRepyositoImpl angestellterRepyosito = new AngestellterRepyositoImpl();
+		return angestellterRepyosito;
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public LernendenRepository createLernendenRepository() {
+		LernendenRepositoryImpl lernendenRepository = new LernendenRepositoryImpl();
+		return lernendenRepository;
 	}
 
 	/**

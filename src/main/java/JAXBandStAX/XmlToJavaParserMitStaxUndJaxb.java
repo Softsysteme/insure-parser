@@ -51,7 +51,7 @@ public class XmlToJavaParserMitStaxUndJaxb {
 			objectVerarbeitung overab) throws Exception {
 		if (xsdDatei != null && xsdDatei.trim().length() > 0) {
 			try (Reader xml = new InputStreamReader(new FileInputStream(xmlDatei), encoding)) {
-				validate(xsdDatei, xml);
+				//validate(xsdDatei, xml);
 			}
 		}
 		try (Reader xml = new InputStreamReader(new FileInputStream(xmlDatei), encoding)) {

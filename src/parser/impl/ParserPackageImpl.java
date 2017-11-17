@@ -11,10 +11,14 @@ import org.eclipse.emf.ecore.EReference;
 import org.eclipse.emf.ecore.impl.EPackageImpl;
 
 import parser.Angestellter;
+import parser.AngestellterRepyosito;
 import parser.Dozent;
 import parser.Lernende;
+import parser.LernendenRepository;
 import parser.ParserFactory;
 import parser.ParserPackage;
+import parser.Repository;
+import parser.RootRepository;
 import parser.Schueler;
 import parser.Student;
 import parser.Tutor;
@@ -67,6 +71,34 @@ public class ParserPackageImpl extends EPackageImpl implements ParserPackage {
 	 * @generated
 	 */
 	private EClass tutorEClass = null;
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	private EClass repositoryEClass = null;
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	private EClass rootRepositoryEClass = null;
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	private EClass angestellterRepyositoEClass = null;
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	private EClass lernendenRepositoryEClass = null;
 
 	/**
 	 * Creates an instance of the model <b>Package</b>, registered with
@@ -314,6 +346,78 @@ public class ParserPackageImpl extends EPackageImpl implements ParserPackage {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
+	public EClass getRepository() {
+		return repositoryEClass;
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public EAttribute getRepository_Name() {
+		return (EAttribute)repositoryEClass.getEStructuralFeatures().get(0);
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public EClass getRootRepository() {
+		return rootRepositoryEClass;
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public EReference getRootRepository_Repositories() {
+		return (EReference)rootRepositoryEClass.getEStructuralFeatures().get(0);
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public EClass getAngestellterRepyosito() {
+		return angestellterRepyositoEClass;
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public EReference getAngestellterRepyosito_Angestellter() {
+		return (EReference)angestellterRepyositoEClass.getEStructuralFeatures().get(0);
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public EClass getLernendenRepository() {
+		return lernendenRepositoryEClass;
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public EReference getLernendenRepository_Lernenden() {
+		return (EReference)lernendenRepositoryEClass.getEStructuralFeatures().get(0);
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
 	public ParserFactory getParserFactory() {
 		return (ParserFactory)getEFactoryInstance();
 	}
@@ -362,6 +466,18 @@ public class ParserPackageImpl extends EPackageImpl implements ParserPackage {
 		createEAttribute(tutorEClass, TUTOR__STUNDENZAHL);
 		createEReference(tutorEClass, TUTOR__LERNENDE);
 		createEOperation(tutorEClass, TUTOR___BERECHNE_GEHALT__DOUBLE);
+
+		repositoryEClass = createEClass(REPOSITORY);
+		createEAttribute(repositoryEClass, REPOSITORY__NAME);
+
+		rootRepositoryEClass = createEClass(ROOT_REPOSITORY);
+		createEReference(rootRepositoryEClass, ROOT_REPOSITORY__REPOSITORIES);
+
+		angestellterRepyositoEClass = createEClass(ANGESTELLTER_REPYOSITO);
+		createEReference(angestellterRepyositoEClass, ANGESTELLTER_REPYOSITO__ANGESTELLTER);
+
+		lernendenRepositoryEClass = createEClass(LERNENDEN_REPOSITORY);
+		createEReference(lernendenRepositoryEClass, LERNENDEN_REPOSITORY__LERNENDEN);
 	}
 
 	/**
@@ -396,6 +512,9 @@ public class ParserPackageImpl extends EPackageImpl implements ParserPackage {
 		studentEClass.getESuperTypes().add(this.getLernende());
 		schuelerEClass.getESuperTypes().add(this.getLernende());
 		tutorEClass.getESuperTypes().add(this.getAngestellter());
+		rootRepositoryEClass.getESuperTypes().add(this.getRepository());
+		angestellterRepyositoEClass.getESuperTypes().add(this.getRepository());
+		lernendenRepositoryEClass.getESuperTypes().add(this.getRepository());
 
 		// Initialize classes, features, and operations; add parameters
 		initEClass(angestellterEClass, Angestellter.class, "Angestellter", !IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
@@ -428,6 +547,18 @@ public class ParserPackageImpl extends EPackageImpl implements ParserPackage {
 
 		op = initEOperation(getTutor__BerechneGehalt__double(), ecorePackage.getEDouble(), "BerechneGehalt", 0, 1, IS_UNIQUE, IS_ORDERED);
 		addEParameter(op, ecorePackage.getEDouble(), "bonus", 0, 1, IS_UNIQUE, IS_ORDERED);
+
+		initEClass(repositoryEClass, Repository.class, "Repository", !IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
+		initEAttribute(getRepository_Name(), ecorePackage.getEString(), "name", null, 0, 1, Repository.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
+
+		initEClass(rootRepositoryEClass, RootRepository.class, "RootRepository", !IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
+		initEReference(getRootRepository_Repositories(), this.getRepository(), null, "repositories", null, 0, -1, RootRepository.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
+
+		initEClass(angestellterRepyositoEClass, AngestellterRepyosito.class, "AngestellterRepyosito", !IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
+		initEReference(getAngestellterRepyosito_Angestellter(), this.getAngestellter(), null, "angestellter", null, 1, -1, AngestellterRepyosito.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_COMPOSITE, IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
+
+		initEClass(lernendenRepositoryEClass, LernendenRepository.class, "LernendenRepository", !IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
+		initEReference(getLernendenRepository_Lernenden(), this.getLernende(), null, "lernenden", null, 1, -1, LernendenRepository.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_COMPOSITE, IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 
 		// Create resource
 		createResource(eNS_URI);

@@ -92,6 +92,22 @@ public class ParserAdapterFactory extends AdapterFactoryImpl {
 				return createTutorAdapter();
 			}
 			@Override
+			public Adapter caseRepository(Repository object) {
+				return createRepositoryAdapter();
+			}
+			@Override
+			public Adapter caseRootRepository(RootRepository object) {
+				return createRootRepositoryAdapter();
+			}
+			@Override
+			public Adapter caseAngestellterRepyosito(AngestellterRepyosito object) {
+				return createAngestellterRepyositoAdapter();
+			}
+			@Override
+			public Adapter caseLernendenRepository(LernendenRepository object) {
+				return createLernendenRepositoryAdapter();
+			}
+			@Override
 			public Adapter defaultCase(EObject object) {
 				return createEObjectAdapter();
 			}
@@ -192,6 +208,62 @@ public class ParserAdapterFactory extends AdapterFactoryImpl {
 	 * @generated
 	 */
 	public Adapter createTutorAdapter() {
+		return null;
+	}
+
+	/**
+	 * Creates a new adapter for an object of class '{@link parser.Repository <em>Repository</em>}'.
+	 * <!-- begin-user-doc -->
+	 * This default implementation returns null so that we can easily ignore cases;
+	 * it's useful to ignore a case when inheritance will catch all the cases anyway.
+	 * <!-- end-user-doc -->
+	 * @return the new adapter.
+	 * @see parser.Repository
+	 * @generated
+	 */
+	public Adapter createRepositoryAdapter() {
+		return null;
+	}
+
+	/**
+	 * Creates a new adapter for an object of class '{@link parser.RootRepository <em>Root Repository</em>}'.
+	 * <!-- begin-user-doc -->
+	 * This default implementation returns null so that we can easily ignore cases;
+	 * it's useful to ignore a case when inheritance will catch all the cases anyway.
+	 * <!-- end-user-doc -->
+	 * @return the new adapter.
+	 * @see parser.RootRepository
+	 * @generated
+	 */
+	public Adapter createRootRepositoryAdapter() {
+		return null;
+	}
+
+	/**
+	 * Creates a new adapter for an object of class '{@link parser.AngestellterRepyosito <em>Angestellter Repyosito</em>}'.
+	 * <!-- begin-user-doc -->
+	 * This default implementation returns null so that we can easily ignore cases;
+	 * it's useful to ignore a case when inheritance will catch all the cases anyway.
+	 * <!-- end-user-doc -->
+	 * @return the new adapter.
+	 * @see parser.AngestellterRepyosito
+	 * @generated
+	 */
+	public Adapter createAngestellterRepyositoAdapter() {
+		return null;
+	}
+
+	/**
+	 * Creates a new adapter for an object of class '{@link parser.LernendenRepository <em>Lernenden Repository</em>}'.
+	 * <!-- begin-user-doc -->
+	 * This default implementation returns null so that we can easily ignore cases;
+	 * it's useful to ignore a case when inheritance will catch all the cases anyway.
+	 * <!-- end-user-doc -->
+	 * @return the new adapter.
+	 * @see parser.LernendenRepository
+	 * @generated
+	 */
+	public Adapter createLernendenRepositoryAdapter() {
 		return null;
 	}
 

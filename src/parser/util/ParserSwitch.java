@@ -106,6 +106,33 @@ public class ParserSwitch<T> extends Switch<T> {
 				if (result == null) result = defaultCase(theEObject);
 				return result;
 			}
+			case ParserPackage.REPOSITORY: {
+				Repository repository = (Repository)theEObject;
+				T result = caseRepository(repository);
+				if (result == null) result = defaultCase(theEObject);
+				return result;
+			}
+			case ParserPackage.ROOT_REPOSITORY: {
+				RootRepository rootRepository = (RootRepository)theEObject;
+				T result = caseRootRepository(rootRepository);
+				if (result == null) result = caseRepository(rootRepository);
+				if (result == null) result = defaultCase(theEObject);
+				return result;
+			}
+			case ParserPackage.ANGESTELLTER_REPYOSITO: {
+				AngestellterRepyosito angestellterRepyosito = (AngestellterRepyosito)theEObject;
+				T result = caseAngestellterRepyosito(angestellterRepyosito);
+				if (result == null) result = caseRepository(angestellterRepyosito);
+				if (result == null) result = defaultCase(theEObject);
+				return result;
+			}
+			case ParserPackage.LERNENDEN_REPOSITORY: {
+				LernendenRepository lernendenRepository = (LernendenRepository)theEObject;
+				T result = caseLernendenRepository(lernendenRepository);
+				if (result == null) result = caseRepository(lernendenRepository);
+				if (result == null) result = defaultCase(theEObject);
+				return result;
+			}
 			default: return defaultCase(theEObject);
 		}
 	}
@@ -197,6 +224,66 @@ public class ParserSwitch<T> extends Switch<T> {
 	 * @generated
 	 */
 	public T caseTutor(Tutor object) {
+		return null;
+	}
+
+	/**
+	 * Returns the result of interpreting the object as an instance of '<em>Repository</em>'.
+	 * <!-- begin-user-doc -->
+	 * This implementation returns null;
+	 * returning a non-null result will terminate the switch.
+	 * <!-- end-user-doc -->
+	 * @param object the target of the switch.
+	 * @return the result of interpreting the object as an instance of '<em>Repository</em>'.
+	 * @see #doSwitch(org.eclipse.emf.ecore.EObject) doSwitch(EObject)
+	 * @generated
+	 */
+	public T caseRepository(Repository object) {
+		return null;
+	}
+
+	/**
+	 * Returns the result of interpreting the object as an instance of '<em>Root Repository</em>'.
+	 * <!-- begin-user-doc -->
+	 * This implementation returns null;
+	 * returning a non-null result will terminate the switch.
+	 * <!-- end-user-doc -->
+	 * @param object the target of the switch.
+	 * @return the result of interpreting the object as an instance of '<em>Root Repository</em>'.
+	 * @see #doSwitch(org.eclipse.emf.ecore.EObject) doSwitch(EObject)
+	 * @generated
+	 */
+	public T caseRootRepository(RootRepository object) {
+		return null;
+	}
+
+	/**
+	 * Returns the result of interpreting the object as an instance of '<em>Angestellter Repyosito</em>'.
+	 * <!-- begin-user-doc -->
+	 * This implementation returns null;
+	 * returning a non-null result will terminate the switch.
+	 * <!-- end-user-doc -->
+	 * @param object the target of the switch.
+	 * @return the result of interpreting the object as an instance of '<em>Angestellter Repyosito</em>'.
+	 * @see #doSwitch(org.eclipse.emf.ecore.EObject) doSwitch(EObject)
+	 * @generated
+	 */
+	public T caseAngestellterRepyosito(AngestellterRepyosito object) {
+		return null;
+	}
+
+	/**
+	 * Returns the result of interpreting the object as an instance of '<em>Lernenden Repository</em>'.
+	 * <!-- begin-user-doc -->
+	 * This implementation returns null;
+	 * returning a non-null result will terminate the switch.
+	 * <!-- end-user-doc -->
+	 * @param object the target of the switch.
+	 * @return the result of interpreting the object as an instance of '<em>Lernenden Repository</em>'.
+	 * @see #doSwitch(org.eclipse.emf.ecore.EObject) doSwitch(EObject)
+	 * @generated
+	 */
+	public T caseLernendenRepository(LernendenRepository object) {
 		return null;
 	}
 

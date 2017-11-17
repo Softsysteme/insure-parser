@@ -2,6 +2,10 @@
  */
 package parser.impl;
 
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlRootElement;
+
 import org.eclipse.emf.common.notify.Notification;
 
 import org.eclipse.emf.ecore.EClass;
@@ -27,6 +31,8 @@ import parser.ParserPackage;
  *
  * @generated
  */
+@XmlRootElement
+@XmlAccessorType(XmlAccessType.FIELD)
 public class LernendeImpl extends MinimalEObjectImpl.Container implements Lernende {
 	/**
 	 * The default value of the '{@link #getName() <em>Name</em>}' attribute.
