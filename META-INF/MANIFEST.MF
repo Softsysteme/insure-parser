@@ -11,16 +11,17 @@ Bundle-ClassPath: .,
 Bundle-Vendor: %providerName
 Bundle-Localization: plugin
 Bundle-RequiredExecutionEnvironment: JavaSE-1.8
+Export-Package: parser,
+ parser.impl,
+ parser.util
 Require-Bundle: org.eclipse.xsd.ecore.exporter;bundle-version="[2.5.0,3.0.0)";visibility:=reexport,
- org.eclipse.emf.common;bundle-version="[2.0.0,3.0.0)";visibility:=reexport,
  org.eclipse.core.runtime;bundle-version="[3.0.0,4.0.0)";visibility:=reexport,
  org.eclipse.core.resources;bundle-version="(3.0.0,4.0.0]";visibility:=reexport,
  javax.xml;bundle-version="[1.3.4,2.0.0)";visibility:=reexport,
- org.eclipse.emf.ecore.xmi;bundle-version="[2.0.0,3.0.0)";visibility:=reexport,
- org.eclipse.emf.ecore;bundle-version="[2.0.0,3.0.0)";visibility:=reexport,
  org.eclipse.equinox.util;bundle-version="[1.0.0,2.0.0)";visibility:=reexport,
  org.eclipse.emf.codegen;bundle-version="[2.0.0,3.0.0)",
- org.eclipse.emf.exporter;bundle-version="[2.7.0,3.0.0)"
+ org.eclipse.emf.exporter;bundle-version="[2.7.0,3.0.0)",
+ org.eclipse.emf.ecore.xmi
 Import-package: org.eclipse.emf.ecore.resource
 Bundle-ActivationPolicy: lazy
 

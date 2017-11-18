@@ -18,7 +18,8 @@
       <!-- @generated insure-parser-domain -->
       <package
             uri="http://de.adesso.ais.insure-parser"
-            class="parser.ParserPackage"/>
+            class="parser.ParserPackage"
+            genModel="src/main/resources/model/insure-parser-domain.genmodel"/>
    </extension>
 
    <extension point="org.eclipse.emf.ecore.generated_package">

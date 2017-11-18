@@ -142,6 +142,7 @@ public class XmlToJavaParserMitStaxUndJaxb {
 			overab.verarbeite(element);
 			anzahlElem++;
 		}
+		System.out.println(anzahlElem);
 		return anzahlElem;
 	}
 

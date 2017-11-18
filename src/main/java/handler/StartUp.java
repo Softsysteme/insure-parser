@@ -1,8 +1,11 @@
 package handler;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.Reader;
 import java.net.URISyntaxException;
 import java.nio.file.Files;
 import java.util.HashMap;
@@ -30,6 +33,14 @@ import org.osgi.framework.Bundle;
 
 import JAXBandStAX.PrintObjects;
 import JAXBandStAX.XmlToJavaParserMitStaxUndJaxb;
+import JAXBandStAX.objectVerarbeitung;
+import businessClasses.Dozent;
+import businessClasses.Lernende;
+import businessClasses.RootRepository;
+import businessClasses.Schueler;
+import businessClasses.Student;
+import businessClasses.Tutor;
+import packageA.A;
 import parser.ParserPackage;
 import tools.XXXResourceImpl;
 
@@ -43,7 +54,7 @@ public class StartUp implements IApplication {
 			// convertXMItoXML("src/main/resources/model/insure-parser-example-daten.parser",
 			// "src/main/resources/model/insure-parser-example-daten.xml");
 			XmlToJavaParserMitStaxUndJaxb.parseXml("./src/main/resources/model/insure-parser-domain.xsd",
-					"src/main/resources/model/insure-parser-example-daten.xml", "UTF-8", "parser.impl", new PrintObjects());
+					"src/main/resources/model/insure-parser-example-daten.xml", "UTF-8", "businessClasses", new PrintObjects());
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -51,7 +62,19 @@ public class StartUp implements IApplication {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		return IApplication.EXIT_OK;
+		
+		
+		
+//			try (Reader xml = new InputStreamReader(new FileInputStream("src/main/resources/model/insure-parser-example-daten.xml"), "UTF-8")) {
+//				//validate(xsdDatei, xml);
+//			
+//		}
+		try (Reader xml = new InputStreamReader(new FileInputStream("src/main/resources/model/insure-parser-example-daten.xml"), "UTF-8")) {
+//			 XmlToJavaParserMitStaxUndJaxb.parseXml( xml,Student.class, new PrintObjects());
+//			 XmlToJavaParserMitStaxUndJaxb.parseXml( xml,Schueler.class, new PrintObjects());
+			 return XmlToJavaParserMitStaxUndJaxb.parseXml( xml,Tutor.class, new PrintObjects());
+		}
+		//return IApplication.EXIT_OK;
 
 	}
 
