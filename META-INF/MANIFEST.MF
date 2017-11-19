@@ -13,7 +13,10 @@ Bundle-Localization: plugin
 Bundle-RequiredExecutionEnvironment: JavaSE-1.8
 Export-Package: parser,
  parser.impl,
- parser.util
+ parser.util,
+ packageA,
+ packageA.impl,
+ packageA.util
 Require-Bundle: org.eclipse.xsd.ecore.exporter;bundle-version="[2.5.0,3.0.0)";visibility:=reexport,
  org.eclipse.emf.common;bundle-version="[2.0.0,3.0.0)";visibility:=reexport,
  org.eclipse.core.runtime;bundle-version="[3.0.0,4.0.0)";visibility:=reexport,
