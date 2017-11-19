@@ -1,48 +1,42 @@
 package tools;
 
-
 import java.io.File;
 
-import org.eclipse.core.resources.IFile;
+import org.apache.tools.ant.BuildException;
+import org.apache.tools.ant.Task;
 import org.eclipse.emf.codegen.ecore.genmodel.GenModelPackage;
 import org.eclipse.emf.common.util.URI;
 import org.eclipse.emf.ecore.EcorePackage;
 import org.eclipse.xsd.ecore.exporter.XSDExporter;
 
+public class Ecore2XSDGeneratorTask extends Task {
 
-
-public class Ecore2XSDGenerator {
-
-	private IFile genModel;
+	private File genModel;
 
 	private File targetDir;
-	
-	public Ecore2XSDGenerator(IFile genModel){
-		this.genModel = genModel;
-	}
 
-	public void execute()  {
+	public void execute() throws BuildException {
 		EcorePackage.eINSTANCE.getClass();
 		GenModelPackage.eINSTANCE.getClass();
 
 		XSDExporter modelExporter = new XSDExporter();
-		modelExporter.setDirectoryURI(URI.createFileURI(((File) targetDir).getAbsolutePath()) + "/temp");
 
+		modelExporter.setDirectoryURI(URI.createFileURI(targetDir.getAbsolutePath()) + "/temp");
 		try {
 
-			modelExporter.loadGenModel(URI.createFileURI(((File) genModel).getAbsolutePath()));
+			modelExporter.loadGenModel(URI.createFileURI(genModel.getAbsolutePath()));
 
 			modelExporter.export(null);
 		} catch (Exception e) {
-			
+			throw new BuildException(e);
 		}
 	}
 
-	public IFile getGenModel() {
+	public File getGenModel() {
 		return genModel;
 	}
 
-	public void setGenModel(IFile genModel) {
+	public void setGenModel(File genModel) {
 		this.genModel = genModel;
 	}
 
@@ -50,8 +44,8 @@ public class Ecore2XSDGenerator {
 		return targetDir;
 	}
 
-	public void setTargetDir(File targetDir2) {
-		this.targetDir = targetDir2;
+	public void setTargetDir(File targetDir) {
+		this.targetDir = targetDir;
 	}
 
 }

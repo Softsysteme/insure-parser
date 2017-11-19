@@ -1,8 +1,8 @@
-package JAXBandStAX;
+package parser;
 
 
 
-import JAXBandStAX.objectVerarbeitung;
+import parser.objectVerarbeitung;
 
 public class PrintObjects implements objectVerarbeitung{
 

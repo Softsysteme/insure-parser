@@ -1,4 +1,4 @@
-package JAXBandStAX;
+package parser;
 
 /**
  * Interface fuer Callback-Klassen fuer die Verarbeitung der  XML-Elemente.

@@ -1,4 +1,4 @@
-package JAXBandStAX;
+package parser;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -22,13 +22,13 @@ import javax.xml.validation.Validator;
 
 import org.xml.sax.SAXException;
 
-import JAXBandStAX.objectVerarbeitung;
+import parser.objectVerarbeitung;
 
 /**
  * Klasse zum Parsen XML-Dateien (durch Kombination von JAXB mit StAX). Es wird
  * nicht das StartElement geparst, aber alle darunter angeordneten Elemente.
  */
-public class XmlToJavaParserMitStaxUndJaxb {
+public class XmlParser {
 
 	/**
 	 * Hilfsmethode zum Parsen grosser XML-Dateien (durch Kombination von JAXB mit
@@ -36,13 +36,13 @@ public class XmlToJavaParserMitStaxUndJaxb {
 	 * XmlRootElement-Annotation haben.
 	 *
 	 * @param xsdDatei
-	 *            Schema-XSD-Datei
+	 *            Schema-XSD-Datei (Metamodel datei in XSD-Format)
 	 * @param xmlDatei
-	 *            XML-Datei
+	 *            XML-Datei (Instances- Model in xmi format)
 	 * @param encoding
 	 *            Character-Encoding, z.B. UTF-8
 	 * @param packageName
-	 *            Package mit den zu lesenden Java-Klassen
+	 *            Package wo alle zu lesende Klassen zu finden sind
 	 * @param eoverab
 	 *            Callback-Objekt fuer die Verarbeitung der einzelnen Elemente
 	 * @return Anzahl der gefundenen Elemente

@@ -1,5 +1,6 @@
-/java/
-/parser/
 /handler/
+/java/
+/main/
 /model/
-/JAXBandStAX/
+/parser/
+/tools/

@@ -28,9 +28,8 @@ import org.eclipse.equinox.app.IApplication;
 import org.eclipse.equinox.app.IApplicationContext;
 import org.osgi.framework.Bundle;
 
-import JAXBandStAX.PrintObjects;
-import JAXBandStAX.XmlToJavaParserMitStaxUndJaxb;
-import parser.ParserPackage;
+import parser.PrintObjects;
+import parser.XmlParser;
 import tools.XXXResourceImpl;
 
 //import tools.DynamicJavaBuilder;
@@ -42,8 +41,9 @@ public class StartUp implements IApplication {
 		try {
 			// convertXMItoXML("src/main/resources/model/insure-parser-example-daten.parser",
 			// "src/main/resources/model/insure-parser-example-daten.xml");
-			XmlToJavaParserMitStaxUndJaxb.parseXml("./src/main/resources/model/insure-parser-domain.xsd",
-					"src/main/resources/model/insure-parser-example-daten.xml", "UTF-8", "parser.impl", new PrintObjects());
+			XmlParser.parseXml("./src/main/resources/model/insure-parser-domain.xsd",
+					"src/main/resources/model/insure-parser-example-daten.xml", "UTF-8", "parser.impl",
+					new PrintObjects());
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -75,7 +75,7 @@ public class StartUp implements IApplication {
 
 		// Register the package to ensure it is available during loading.
 		//
-		resourceSet.getPackageRegistry().put(ParserPackage.eNS_URI, ParserPackage.eINSTANCE);
+		//resourceSet.getPackageRegistry().put(ParserPackage.eNS_URI, ParserPackage.eINSTANCE);
 		resourceSet.getResourceFactoryRegistry().getExtensionToFactoryMap().put("ecore", new XMIResourceFactoryImpl());
 
 		File oldfile = null;
