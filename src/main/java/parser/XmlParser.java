@@ -5,6 +5,8 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.Reader;
+import java.util.LinkedList;
+import java.util.List;
 
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBElement;
@@ -20,9 +22,10 @@ import javax.xml.validation.Schema;
 import javax.xml.validation.SchemaFactory;
 import javax.xml.validation.Validator;
 
+import org.eclipse.core.runtime.Platform;
+import org.osgi.framework.Bundle;
+import org.osgi.framework.wiring.BundleWiring;
 import org.xml.sax.SAXException;
-
-import parser.objectVerarbeitung;
 
 /**
  * Klasse zum Parsen XML-Dateien (durch Kombination von JAXB mit StAX). Es wird
@@ -30,24 +33,30 @@ import parser.objectVerarbeitung;
  */
 public class XmlParser {
 
+	// Liste mit deserialisierte Objekten
+    private static List<Object> objects = new LinkedList<Object>();
+
+	public XmlParser() {
+		//Liste muss dynamisch wachsen
+		objects = new LinkedList<Object>();
+	}
+
 	/**
-	 * Hilfsmethode zum Parsen grosser XML-Dateien (durch Kombination von JAXB mit
-	 * StAX). Es k�nnen alle Klassen geparst werden, die die
-	 * XmlRootElement-Annotation haben.
-	 *
-	 * @param xsdDatei
-	 *            Schema-XSD-Datei (Metamodel datei in XSD-Format)
-	 * @param xmlDatei
-	 *            XML-Datei (Instances- Model in xmi format)
-	 * @param encoding
-	 *            Character-Encoding, z.B. UTF-8
-	 * @param packageName
-	 *            Package wo alle zu lesende Klassen zu finden sind
-	 * @param eoverab
-	 *            Callback-Objekt fuer die Verarbeitung der einzelnen Elemente
-	 * @return Anzahl der gefundenen Elemente
-	 */
-	public static int parseXml(String xsdDatei, String xmlDatei, String encoding, String packageName,
+     * Hilfsmethode zum Parsen grosser XML-Dateien (durch Kombination von JAXB mit StAX). Es k�nnen alle Klassen geparst werden, die die XmlRootElement-Annotation haben.
+     *
+     * @param xsdDatei
+     *            Schema-XSD-Datei (Metamodel datei in XSD-Format)
+     * @param xmlDatei
+     *            XML-Datei (Instances- Model in xmi format)
+     * @param encoding
+     *            Character-Encoding, z.B. UTF-8
+     * @param packageName
+     *            Package wo alle zu lesende Klassen zu finden sind
+     * @param eoverab
+     *            Callback-Objekt fuer die Verarbeitung der einzelnen Elemente
+     * @return Anzahl der gefundenen Elemente
+     */
+    public static int parseXml(String xsdDatei, String xmlDatei, String encoding, String packagebundleName, String packageName,
 			objectVerarbeitung overab) throws Exception {
 		if (xsdDatei != null && xsdDatei.trim().length() > 0) {
 			try (Reader xml = new InputStreamReader(new FileInputStream(xmlDatei), encoding)) {
@@ -55,26 +64,26 @@ public class XmlParser {
 			}
 		}
 		try (Reader xml = new InputStreamReader(new FileInputStream(xmlDatei), encoding)) {
-			return parseXml(xml, packageName, overab);
+            return parseXml(xml, packagebundleName, packageName, overab);
 		}
 	}
 
 	/**
-	 * Hilfsmethode zum Parsen grosser XML-Dateien (durch Kombination von JAXB mit
-	 * StAX). Es koennen alle im angegebenen Package vorhandenen Klassen geparst
-	 * werden, welche eine XmlRootElement-Annotation haben.
-	 * 
-	 * @param xml
-	 *            Reader zur XML-Datei
-	 * @param packageName
-	 *            Package mit den zu lesenden Java-Klassen
-	 * @param elemVerarb
-	 *            Callback-Objekt fuer die Verarbeitung der einzelnen Elemente
-	 * @return Anzahl der gefundenen Elemente
-	 */
-	public static int parseXml(Reader xml, String packageName, objectVerarbeitung overab)
+     * Hilfsmethode zum Parsen grosser XML-Dateien (durch Kombination von JAXB mit StAX). Es koennen alle im angegebenen Package vorhandenen Klassen geparst werden, welche eine
+     * XmlRootElement-Annotation haben.
+     *
+     * @param xml
+     *            Reader zur XML-Datei
+     * @param packageName
+     *            Package mit den zu lesenden Java-Klassen
+     * @param elemVerarb
+     *            Callback-Objekt fuer die Verarbeitung der einzelnen Elemente
+     * @return Anzahl der gefundenen Elemente
+     */
+    public static int parseXml(Reader xml, String packagebundleName, String packageName, objectVerarbeitung overab)
 			throws XMLStreamException, JAXBException {
 		// StAX:
+
 		EventFilter startElementFilter = new EventFilter() {
 			@Override
 			public boolean accept(XMLEvent event) {
@@ -84,16 +93,20 @@ public class XmlParser {
 		int anzahlElem = 0;
 		XMLInputFactory staxFactory = XMLInputFactory.newInstance();
 		XMLEventReader staxReader = staxFactory.createXMLEventReader(xml);
+        Bundle packagebundle = Platform.getBundle(packagebundleName);
+        BundleWiring bundleWiring = packagebundle.adapt(BundleWiring.class);
 		XMLEventReader staxFiltRd = staxFactory.createFilteredReader(staxReader, startElementFilter);
 		// Ueberspringe StartElement:
 		staxFiltRd.nextEvent();
 		// JAXB:
-		JAXBContext jaxbContext = JAXBContext.newInstance(packageName);
+        System.out.println(bundleWiring.getClassLoader());
+        JAXBContext jaxbContext = JAXBContext.newInstance(packageName, bundleWiring.getClassLoader());
 		Unmarshaller unmarshaller = jaxbContext.createUnmarshaller();
 		// Parsing:
 		while (staxFiltRd.peek() != null) {
 			Object element = unmarshaller.unmarshal(staxReader);
 			overab.verarbeite(element);
+			objects.add(element);
 			anzahlElem++;
 		}
 		return anzahlElem;
@@ -115,7 +128,7 @@ public class XmlParser {
 	 *            Callback-Objekt fuer die Verarbeitung der einzelnen Elemente
 	 * @return Anzahl der gefundenen Elemente
 	 */
-	public static long parseXml(Reader xml, Class<?> elementClass, objectVerarbeitung overab)
+	public long parseXml(Reader xml, Class<?> elementClass, objectVerarbeitung overab)
 			throws XMLStreamException, JAXBException {
 		// StAX:
 		EventFilter startElementFilter = new EventFilter() {
@@ -150,7 +163,7 @@ public class XmlParser {
 	 * @param xml
 	 *            XML-Reader
 	 */
-	public static void validate(String xsdSchema, Reader xml) throws SAXException, IOException {
+	public  void validate(String xsdSchema, Reader xml) throws SAXException, IOException {
 
 		final String w3cXmlSchemaNsUri = "http://www.w3.org/2001/XMLSchema";
 		SchemaFactory schemaFactory = SchemaFactory.newInstance(w3cXmlSchemaNsUri);
