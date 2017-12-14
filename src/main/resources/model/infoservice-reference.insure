@@ -1,0 +1,259 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<core:RootRepository xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:core="http://insure/core" xmlns:enums="http://de.adesso.ais/domainreference/enums" xmlns:feldsteuerung="http://insure/infoservice/feldsteuerung" xmlns:konfiguration="http://de.adesso.ais/domainreference/prototype/konfiguration" xmlns:maskensteuerung="http://insure/infoservice/maskensteuerung" xmlns:schnittstellensteuerung="http://insure/infoservice/schnittstellensteuerung" modelElementId="_AXq-oNejEeS-l-jKbluyzw" name="infoservicereference" beschreibung="Datenmodell des Infoservice fuer die Referenzdomaene." basePackage="de.adesso.ais">
+  <repositories modelElementId="_HbHMMNejEeS-l-jKbluyzw" name="feldsteuerung" beschreibung="Definiert die Eigenschaften der Feldsteuerung." pattern="Repository|Feldsteuerung.*">
+    <repositories modelElementId="_rW_lkBsLEeWeoYGlWqgNWQ" name="eingabeelemente" beschreibung="Definiert Eingabeelemente." pattern="Repository|Eingabeelement">
+      <repositories modelElementId="_tF8v0BsNEeWeoYGlWqgNWQ" name="konfiguration" beschreibung="Definiert Eingabeelemente zur Bearbeitung einer Konfiguration." pattern="Repository|Eingabeelement">
+        <enumerations xsi:type="feldsteuerung:Eingabeelement" modelElementId="_upDzahsLEeWeoYGlWqgNWQ" name="AUSSTATTUNGSVARIANTE" beschreibung="Erlaubt das Auswaehlen der Ausstattungsvariante einer Konfiguration."/>
+        <enumerations xsi:type="feldsteuerung:Eingabeelement" modelElementId="_CdIv-hsOEeWeoYGlWqgNWQ" name="MOTORVARIANTE" beschreibung="Erlaubt das Auswaehlen der Motorvariante einer Konfiguration."/>
+        <enumerations xsi:type="feldsteuerung:Eingabeelement" modelElementId="_Ve_1aUpwEeWeRr4_zPoMaw" name="Modell" beschreibung=""/>
+      </repositories>
+      <repositories modelElementId="_GRsS0KQDEeWA15eH_5GfQg" name="vertragspartner" pattern="Repository|Eingabeelement">
+        <enumerations xsi:type="feldsteuerung:Eingabeelement" modelElementId="_H32YUaQDEeWA15eH_5GfQg" name="VERTRAGSPARTNER_AKTION" beschreibung="Feldelement Tabellenspalte Aktion"/>
+      </repositories>
+      <repositories modelElementId="_5cPxwKP_EeWbN4B32j-AcQ" name="bestellpositionen" pattern="Repository|Eingabeelement">
+        <enumerations xsi:type="feldsteuerung:Eingabeelement" modelElementId="_SXq4QKQBEeWbN4B32j-AcQ" name="BESTELLPOSITIONEN_AKTION" beschreibung="Feldelement Tabellenspalte Aktion"/>
+        <enumerations xsi:type="feldsteuerung:Eingabeelement" modelElementId="_bbMSsLX3EeW36orvhsreAw" name="BESTELLPOSITIONEN_RABATT" beschreibung="Feldelement Tabellenspalte Rabatt"/>
+        <enumerations xsi:type="feldsteuerung:Eingabeelement" modelElementId="_rGDCALX3EeW36orvhsreAw" name="BESTELLPOSITIONEN_KEIN_RABATT" beschreibung="Feldelement Tabellenspalte Rabatt"/>
+      </repositories>
+      <repositories modelElementId="_5wZc0aP_EeWbN4B32j-AcQ" name="rabatte" pattern="Repository|Eingabeelement">
+        <enumerations xsi:type="feldsteuerung:Eingabeelement" modelElementId="_Gq0aIKQCEeWbN4B32j-AcQ" name="RABATTE_ABSOLUT" beschreibung=""/>
+        <enumerations xsi:type="feldsteuerung:Eingabeelement" modelElementId="_JPIw0aQCEeWbN4B32j-AcQ" name="RABATTE_RELATIV" beschreibung=""/>
+      </repositories>
+      <repositories modelElementId="_6D_uQaP_EeWbN4B32j-AcQ" name="bestellposition" pattern="Repository|Eingabeelement">
+        <enumerations xsi:type="feldsteuerung:Eingabeelement" modelElementId="_X5KrUKSYEeWkAL6LixI-yg" name="BESTELLPOSITION_MODELL"/>
+        <enumerations xsi:type="feldsteuerung:Eingabeelement" modelElementId="_bTPlgKSYEeWkAL6LixI-yg" name="BESTELLPOSITION_AUSSTATTUNGSVARIANTE"/>
+        <enumerations xsi:type="feldsteuerung:Eingabeelement" modelElementId="_pJdHMKSYEeWkAL6LixI-yg" name="BESTELLPOSITION_MOTOR"/>
+        <enumerations xsi:type="feldsteuerung:Eingabeelement" modelElementId="_pjYqIKSYEeWkAL6LixI-yg" name="BESTELLPOSITION_FARBE_AUSSEN"/>
+        <enumerations xsi:type="feldsteuerung:Eingabeelement" modelElementId="_pQYOkaSYEeWkAL6LixI-yg" name="BESTELLPOSITION_FARBE_INNEN"/>
+        <enumerations xsi:type="feldsteuerung:Eingabeelement" modelElementId="_prZWoaSYEeWkAL6LixI-yg" name="BESTELLPOSITION_FELGEN"/>
+        <enumerations xsi:type="feldsteuerung:Eingabeelement" modelElementId="_p_diIaSYEeWkAL6LixI-yg" name="BESTELLPOSITION_AUSSTATTUNG"/>
+        <enumerations xsi:type="feldsteuerung:Eingabeelement" modelElementId="_s0z8QLVWEeWaM_Gy2tpIdw" name="BESTELLPOSITION_RABATT_RELATIV" beschreibung=""/>
+        <enumerations xsi:type="feldsteuerung:Eingabeelement" modelElementId="_xXdBALVWEeWaM_Gy2tpIdw" name="BESTELLPOSITION_RABATT_ABSOLUT"/>
+      </repositories>
+    </repositories>
+    <repositories modelElementId="_O1w5YBsOEeWeoYGlWqgNWQ" name="eingabeelementeigenschaften" beschreibung="Eingabeelementeigenschaften sind im Basismodell definiert." pattern="Repository|Eingabeelementeigenschaft"/>
+    <repositories modelElementId="_f_ZT0BsOEeWeoYGlWqgNWQ" name="feldelementeigenschaften" beschreibung="Definiert Feldelementeigenschaften." pattern="Repository|Feldelementeigenschaften|TemplateFeldelementeigenschaften|StandardFeldelementeigenschaften">
+      <prototypes xsi:type="feldsteuerung:StandardFeldelementeigenschaften" modelElementId="_SuVeKSbaEeWDoMiQXiXZDQ" name="Standard" beschreibung="Standardfeldelementeigenschaften.">
+        <standardEingabeelementeigenschaft href="platform:/plugin/insure.infoservice.daten/src/main/resources/infoservice.insure#_5vjZWtO_EeSVoOolBb6ZYQ"/>
+        <standardSteuerelementeigenschaft href="platform:/plugin/insure.infoservice.daten/src/main/resources/infoservice.insure#_dP-dTNRiEeSM0uBkjWoRCg"/>
+      </prototypes>
+      <prototypes xsi:type="feldsteuerung:TemplateFeldelementeigenschaften" modelElementId="_OFaZGibfEeWDoMiQXiXZDQ" name="Konfiguration" beschreibung="Uebergreifende Feldelementeigenschaften fuer die Konfiguration." template="_SuVeKSbaEeWDoMiQXiXZDQ">
+        <eingabeelementeigenschaften key="_upDzahsLEeWeoYGlWqgNWQ">
+          <value href="platform:/plugin/insure.infoservice.daten/src/main/resources/infoservice.insure#_u9rLKtO_EeSVoOolBb6ZYQ"/>
+        </eingabeelementeigenschaften>
+        <eingabeelementeigenschaften key="_CdIv-hsOEeWeoYGlWqgNWQ">
+          <value href="platform:/plugin/insure.infoservice.daten/src/main/resources/infoservice.insure#_u9rLKtO_EeSVoOolBb6ZYQ"/>
+        </eingabeelementeigenschaften>
+        <steuerelementeigenschaften key="_Givd_RsPEeWeoYGlWqgNWQ">
+          <value href="platform:/plugin/insure.infoservice.daten/src/main/resources/infoservice.insure#_W312d9RiEeSM0uBkjWoRCg"/>
+        </steuerelementeigenschaften>
+      </prototypes>
+      <prototypes xsi:type="feldsteuerung:TemplateFeldelementeigenschaften" modelElementId="_zt5SyibeEeWDoMiQXiXZDQ" name="Ausstattungsvariante waehlen" beschreibung="Feldelementeigenschaften fuer die Auswahl der Ausstattungsvariante." template="_OFaZGibfEeWDoMiQXiXZDQ">
+        <eingabeelementeigenschaften key="_upDzahsLEeWeoYGlWqgNWQ">
+          <value href="platform:/plugin/insure.infoservice.daten/src/main/resources/infoservice.insure#_2ASSStO_EeSVoOolBb6ZYQ"/>
+        </eingabeelementeigenschaften>
+      </prototypes>
+      <prototypes xsi:type="feldsteuerung:TemplateFeldelementeigenschaften" modelElementId="_65yZGibbEeWDoMiQXiXZDQ" name="Motorvariante waehlen" beschreibung="Feldelementeigenschaften fuer die Auswahl der Motorvariante." template="_OFaZGibfEeWDoMiQXiXZDQ">
+        <eingabeelementeigenschaften key="_CdIv-hsOEeWeoYGlWqgNWQ">
+          <value href="platform:/plugin/insure.infoservice.daten/src/main/resources/infoservice.insure#_2ASSStO_EeSVoOolBb6ZYQ"/>
+        </eingabeelementeigenschaften>
+      </prototypes>
+      <prototypes xsi:type="feldsteuerung:TemplateFeldelementeigenschaften" modelElementId="_R1-rOibgEeWDoMiQXiXZDQ" name="Zusammenfassung" beschreibung="Feldelementeigenschaften fuer die Zusammenfassung der Bestellung." template="_OFaZGibfEeWDoMiQXiXZDQ">
+        <steuerelementeigenschaften key="_LgqwjRsPEeWeoYGlWqgNWQ">
+          <value href="platform:/plugin/insure.infoservice.daten/src/main/resources/infoservice.insure#_W312d9RiEeSM0uBkjWoRCg"/>
+        </steuerelementeigenschaften>
+      </prototypes>
+      <prototypes xsi:type="feldsteuerung:StandardFeldelementeigenschaften" modelElementId="_p2lZvqQBEeWbN4B32j-AcQ" name="Standard Bearbeitung">
+        <standardEingabeelementeigenschaft href="platform:/plugin/insure.infoservice.daten/src/main/resources/infoservice.insure#_zaTuitO_EeSVoOolBb6ZYQ"/>
+        <standardSteuerelementeigenschaft href="platform:/plugin/insure.infoservice.daten/src/main/resources/infoservice.insure#_W312d9RiEeSM0uBkjWoRCg"/>
+      </prototypes>
+      <prototypes xsi:type="feldsteuerung:TemplateFeldelementeigenschaften" modelElementId="_7KPIIKQAEeWbN4B32j-AcQ" name="Bestellung erfassen" beschreibung="" template="_p2lZvqQBEeWbN4B32j-AcQ">
+        <eingabeelementeigenschaften key="_X5KrUKSYEeWkAL6LixI-yg">
+          <value href="platform:/plugin/insure.infoservice.daten/src/main/resources/infoservice.insure#_2ASSStO_EeSVoOolBb6ZYQ"/>
+        </eingabeelementeigenschaften>
+        <eingabeelementeigenschaften key="_bTPlgKSYEeWkAL6LixI-yg">
+          <value href="platform:/plugin/insure.infoservice.daten/src/main/resources/infoservice.insure#_2ASSStO_EeSVoOolBb6ZYQ"/>
+        </eingabeelementeigenschaften>
+        <eingabeelementeigenschaften key="_pjYqIKSYEeWkAL6LixI-yg">
+          <value href="platform:/plugin/insure.infoservice.daten/src/main/resources/infoservice.insure#_2ASSStO_EeSVoOolBb6ZYQ"/>
+        </eingabeelementeigenschaften>
+        <eingabeelementeigenschaften key="_pQYOkaSYEeWkAL6LixI-yg">
+          <value href="platform:/plugin/insure.infoservice.daten/src/main/resources/infoservice.insure#_2ASSStO_EeSVoOolBb6ZYQ"/>
+        </eingabeelementeigenschaften>
+        <eingabeelementeigenschaften key="_prZWoaSYEeWkAL6LixI-yg">
+          <value href="platform:/plugin/insure.infoservice.daten/src/main/resources/infoservice.insure#_2ASSStO_EeSVoOolBb6ZYQ"/>
+        </eingabeelementeigenschaften>
+        <steuerelementeigenschaften key="_-RDG0KSqEeWIjuzXhc4cvw">
+          <value href="platform:/plugin/insure.infoservice.daten/src/main/resources/infoservice.insure#_dP-dTNRiEeSM0uBkjWoRCg"/>
+        </steuerelementeigenschaften>
+      </prototypes>
+      <prototypes xsi:type="feldsteuerung:StandardFeldelementeigenschaften" modelElementId="_yqcAM6SWEeWkAL6LixI-yg" name="Standard Beauskunftung">
+        <standardEingabeelementeigenschaft href="platform:/plugin/insure.infoservice.daten/src/main/resources/infoservice.insure#_u9rLKtO_EeSVoOolBb6ZYQ"/>
+        <standardSteuerelementeigenschaft href="platform:/plugin/insure.infoservice.daten/src/main/resources/infoservice.insure#_dP-dTNRiEeSM0uBkjWoRCg"/>
+      </prototypes>
+      <prototypes xsi:type="feldsteuerung:TemplateFeldelementeigenschaften" modelElementId="_YQ8un6SXEeWkAL6LixI-yg" name="Bestellung beauskunften" template="_yqcAM6SWEeWkAL6LixI-yg">
+        <steuerelementeigenschaften key="_-RDG0KSqEeWIjuzXhc4cvw">
+          <value href="platform:/plugin/insure.infoservice.daten/src/main/resources/infoservice.insure#_W312d9RiEeSM0uBkjWoRCg"/>
+        </steuerelementeigenschaften>
+        <steuerelementeigenschaften key="_NQ-3nRsPEeWeoYGlWqgNWQ">
+          <value href="platform:/plugin/insure.infoservice.daten/src/main/resources/infoservice.insure#_dP-dTNRiEeSM0uBkjWoRCg"/>
+        </steuerelementeigenschaften>
+        <steuerelementeigenschaften key="_LgqwjRsPEeWeoYGlWqgNWQ">
+          <value href="platform:/plugin/insure.infoservice.daten/src/main/resources/infoservice.insure#_dP-dTNRiEeSM0uBkjWoRCg"/>
+        </steuerelementeigenschaften>
+      </prototypes>
+      <prototypes xsi:type="feldsteuerung:TemplateFeldelementeigenschaften" modelElementId="_3zieCbVXEeWaM_Gy2tpIdw" name="Modellvariante Polo" template="_7KPIIKQAEeWbN4B32j-AcQ">
+        <eingabeelementeigenschaften key="_xXdBALVWEeWaM_Gy2tpIdw">
+          <value href="platform:/plugin/insure.infoservice.daten/src/main/resources/infoservice.insure#_5vjZWtO_EeSVoOolBb6ZYQ"/>
+        </eingabeelementeigenschaften>
+        <eingabeelementeigenschaften key="_s0z8QLVWEeWaM_Gy2tpIdw">
+          <value href="platform:/plugin/insure.infoservice.daten/src/main/resources/infoservice.insure#_5vjZWtO_EeSVoOolBb6ZYQ"/>
+        </eingabeelementeigenschaften>
+        <eingabeelementeigenschaften key="_bbMSsLX3EeW36orvhsreAw">
+          <value href="platform:/plugin/insure.infoservice.daten/src/main/resources/infoservice.insure#_5vjZWtO_EeSVoOolBb6ZYQ"/>
+        </eingabeelementeigenschaften>
+        <eingabeelementeigenschaften key="_rGDCALX3EeW36orvhsreAw">
+          <value href="platform:/plugin/insure.infoservice.daten/src/main/resources/infoservice.insure#_u9rLKtO_EeSVoOolBb6ZYQ"/>
+        </eingabeelementeigenschaften>
+      </prototypes>
+      <prototypes xsi:type="feldsteuerung:TemplateFeldelementeigenschaften" modelElementId="_pg9kcLYAEeWdn_yy1bzARA" name="Modellvariante Up" template="_7KPIIKQAEeWbN4B32j-AcQ">
+        <eingabeelementeigenschaften key="_rGDCALX3EeW36orvhsreAw">
+          <value href="platform:/plugin/insure.infoservice.daten/src/main/resources/infoservice.insure#_5vjZWtO_EeSVoOolBb6ZYQ"/>
+        </eingabeelementeigenschaften>
+      </prototypes>
+    </repositories>
+    <repositories modelElementId="_669iYBsOEeWeoYGlWqgNWQ" name="steuerelemente" beschreibung="Definiert Steuerelemente." pattern="Repository|Steuerelement">
+      <repositories modelElementId="_DyhY8BsPEeWeoYGlWqgNWQ" name="aktion" beschreibung="Definiert Steuerlemente fuer Aktionen." pattern="Repository|Steuerelement">
+        <enumerations xsi:type="feldsteuerung:Steuerelement" modelElementId="_Givd_RsPEeWeoYGlWqgNWQ" name="ABBRECHEN" beschreibung="Bricht eine Bearbeitung ab."/>
+        <enumerations xsi:type="feldsteuerung:Steuerelement" modelElementId="_I-hjwRsPEeWeoYGlWqgNWQ" name="BEARBEITEN" beschreibung="Startet eine Bearbeitung."/>
+        <enumerations xsi:type="feldsteuerung:Steuerelement" modelElementId="_KhAqMRsPEeWeoYGlWqgNWQ" name="BEENDEN" beschreibung="Beendet einen Vorgang."/>
+        <enumerations xsi:type="feldsteuerung:Steuerelement" modelElementId="_LgqwjRsPEeWeoYGlWqgNWQ" name="FREIGEBEN" beschreibung="Gibt eine Bearbeitung frei."/>
+        <enumerations xsi:type="feldsteuerung:Steuerelement" modelElementId="_NQ-3nRsPEeWeoYGlWqgNWQ" name="SPEICHERN" beschreibung="Speichert eine Bearbeitung."/>
+        <enumerations xsi:type="feldsteuerung:Steuerelement" modelElementId="_OlhBnRsPEeWeoYGlWqgNWQ" name="UEBERSICHT" beschreibung="Ruft die Uebersichtsseite auf."/>
+        <enumerations xsi:type="feldsteuerung:Steuerelement" modelElementId="_QTOgnRsPEeWeoYGlWqgNWQ" name="VERWERFEN" beschreibung="Verwirft eine Bearbeitung."/>
+      </repositories>
+      <repositories modelElementId="_8je9kqQBEeWbN4B32j-AcQ" name="vertragspartner" pattern="Repository|Steuerelement">
+        <enumerations xsi:type="feldsteuerung:Steuerelement" modelElementId="_AY6XA6QCEeWbN4B32j-AcQ" name="VERTRAGSPARTNER_ANLEGEN"/>
+        <enumerations xsi:type="feldsteuerung:Steuerelement" modelElementId="_AY6XBKQCEeWbN4B32j-AcQ" name="VERTRAGSPARTNER_EDITIEREN"/>
+        <enumerations xsi:type="feldsteuerung:Steuerelement" modelElementId="_AY6XBaQCEeWbN4B32j-AcQ" name="VERTRAGSPARTNER_LOESCHEN"/>
+      </repositories>
+      <repositories modelElementId="_Zkp4pKQAEeWbN4B32j-AcQ" name="bestellpositionen" pattern="Repository|Steuerelement">
+        <enumerations xsi:type="feldsteuerung:Steuerelement" modelElementId="_cKiV86QAEeWbN4B32j-AcQ" name="BESTELLPOSITIONEN_ANLEGEN"/>
+        <enumerations xsi:type="feldsteuerung:Steuerelement" modelElementId="_esxpAaQAEeWbN4B32j-AcQ" name="BESTELLPOSITIONEN_EDITIEREN"/>
+        <enumerations xsi:type="feldsteuerung:Steuerelement" modelElementId="_e1ZZgaQAEeWbN4B32j-AcQ" name="BESTELLPOSITIONEN_LOESCHEN"/>
+        <enumerations xsi:type="feldsteuerung:Steuerelement" modelElementId="_-RDG0KSqEeWIjuzXhc4cvw" name="BESTELLPOSITIONEN_BEAUSKUNFTEN"/>
+      </repositories>
+    </repositories>
+    <repositories modelElementId="_UqCEcBsWEeWeoYGlWqgNWQ" name="steuerelementeigenschaften" beschreibung="Steuerelementeigenschaften sind im Basismodell definiert." pattern="Repository|Steuerelementeigenschaft"/>
+    <prototypes xsi:type="feldsteuerung:Feldsteuerung" modelElementId="_KXNjOBsREeWeoYGlWqgNWQ" name="Bestellsystem" beschreibung="Feldsteuerung des Bestellsystems." identifier="_L3lJzBsREeWeoYGlWqgNWQ">
+      <feldelementeigenschaften value="_zt5SyibeEeWDoMiQXiXZDQ">
+        <key xsi:type="enums:Bearbeitung" href="platform:/resource/domain-reference-daten/src/main/resources/domain-reference.insure#_W7JY0CSVEeW9loX9FhD7RA"/>
+      </feldelementeigenschaften>
+      <feldelementeigenschaften value="_65yZGibbEeWDoMiQXiXZDQ">
+        <key xsi:type="enums:Bearbeitung" href="platform:/resource/domain-reference-daten/src/main/resources/domain-reference.insure#_XFbWMCSVEeW9loX9FhD7RA"/>
+      </feldelementeigenschaften>
+      <feldelementeigenschaften value="_R1-rOibgEeWDoMiQXiXZDQ">
+        <key xsi:type="enums:Bearbeitung" href="platform:/resource/domain-reference-daten/src/main/resources/domain-reference.insure#_19qOoSSVEeW9loX9FhD7RA"/>
+      </feldelementeigenschaften>
+      <feldelementeigenschaften value="_7KPIIKQAEeWbN4B32j-AcQ">
+        <key xsi:type="enums:Bearbeitung" href="platform:/resource/domain-reference-daten/src/main/resources/domain-reference.insure#_38bjdRNGEeW8fKl0VVSZZA"/>
+      </feldelementeigenschaften>
+      <feldelementeigenschaften value="_YQ8un6SXEeWkAL6LixI-yg">
+        <key xsi:type="enums:Bearbeitung" href="platform:/resource/domain-reference-daten/src/main/resources/domain-reference.insure#_SLi2hKSXEeWkAL6LixI-yg"/>
+      </feldelementeigenschaften>
+      <feldelementeigenschaften value="_3zieCbVXEeWaM_Gy2tpIdw">
+        <key xsi:type="konfiguration:ModellIdentifier" href="platform:/resource/domain-reference-daten/src/main/resources/domain-reference.insure#_HjTKFUZnEeWAtMexrdobGg"/>
+      </feldelementeigenschaften>
+      <feldelementeigenschaften value="_pg9kcLYAEeWdn_yy1bzARA">
+        <key xsi:type="konfiguration:ModellIdentifier" href="platform:/resource/domain-reference-daten/src/main/resources/domain-reference.insure#_BBRAdUZnEeWAtMexrdobGg"/>
+      </feldelementeigenschaften>
+    </prototypes>
+    <enumerations xsi:type="feldsteuerung:FeldsteuerungIdentifier" modelElementId="_L3lJzBsREeWeoYGlWqgNWQ" name="Bestellsystem" beschreibung="Feldsteuerung des Bestellsystems." key="2"/>
+  </repositories>
+  <repositories modelElementId="_DZ_dIAO2EeW-RavUVwMeSA" name="maskensteuerung" beschreibung="Definiert die Eigenschaften der Maskensteuerung." pattern="Repository|Maskensteuerung.*">
+    <repositories modelElementId="_HWFfQAO2EeW-RavUVwMeSA" name="masken" beschreibung="Definiert Masken." pattern="Repository|Maske">
+      <enumerations xsi:type="maskensteuerung:Maske" modelElementId="_jrSksBsTEeWeoYGlWqgNWQ" name="UEBERSICHT" beschreibung="Praesentiert die Uebersichtsseite."/>
+      <enumerations xsi:type="maskensteuerung:Maske" modelElementId="_ISIAUSSdEeW9loX9FhD7RA" name="AUSSTATTUNGSVARIANTE_WAEHLEN" beschreibung="Maske fuer die Auswahl der Ausstattungsvariante."/>
+      <enumerations xsi:type="maskensteuerung:Maske" modelElementId="_Nn05sSSdEeW9loX9FhD7RA" name="MOTORVARIANTE_WAEHLEN" beschreibung="Maske fuer die Auswahl der Motorvariante."/>
+      <enumerations xsi:type="maskensteuerung:Maske" modelElementId="_f4G94SSeEeW9loX9FhD7RA" name="ZUSAMMENFASSUNG" beschreibung="Maske fuer die Zusammenfassung einer Konfiguration."/>
+    </repositories>
+    <repositories modelElementId="_ndfasCSeEeW9loX9FhD7RA" name="maskenablaeufe" beschreibung="Definiert Maskenablaeufe." pattern="Repository|Maskenablauf">
+      <prototypes xsi:type="maskensteuerung:Maskenablauf" modelElementId="_qfw5DySeEeW9loX9FhD7RA" name="Uebersicht" beschreibung="Maskenablauf fuer die Uebersichtsseite." masken="_jrSksBsTEeWeoYGlWqgNWQ"/>
+      <prototypes xsi:type="maskensteuerung:Maskenablauf" modelElementId="_0YvJTySeEeW9loX9FhD7RA" name="Konfiguration" beschreibung="Maskenablauf fuer das Bearbeiten einer Konfiguration." masken="_ISIAUSSdEeW9loX9FhD7RA _Nn05sSSdEeW9loX9FhD7RA _f4G94SSeEeW9loX9FhD7RA"/>
+      <prototypes xsi:type="maskensteuerung:Maskenablauf" modelElementId="_tXAv_ksLEeWP9cXbT3mB8Q" name="Auto Steps" masken="_9TW_UEsIEeWz3u1ncdj49g _FdDqMUsJEeWz3u1ncdj49g _Fl3n8UsJEeWz3u1ncdj49g _IGUygUsJEeWz3u1ncdj49g _JZd1YUsJEeWz3u1ncdj49g _K3QCAUsJEeWz3u1ncdj49g _MwHoIUsJEeWz3u1ncdj49g"/>
+      <prototypes xsi:type="maskensteuerung:Maskenablauf" modelElementId="_Nws_pX1eEeWfO6ct6MKyww" name="Bestellerfassung" beschreibung="Maskenablauf der Bestellerfassung." masken="_dwX-U31dEeWfO6ct6MKyww _qiJAJ31dEeWfO6ct6MKyww _uJaBx31dEeWfO6ct6MKyww _xn5h531dEeWfO6ct6MKyww"/>
+    </repositories>
+    <repositories modelElementId="_4B8v8EsIEeWz3u1ncdj49g" name="autoconfigurationsteps" pattern="Repository|Maske">
+      <enumerations xsi:type="maskensteuerung:Maske" modelElementId="_9TW_UEsIEeWz3u1ncdj49g" name="SELECT_MODEL"/>
+      <enumerations xsi:type="maskensteuerung:Maske" modelElementId="_FdDqMUsJEeWz3u1ncdj49g" name="SELECT_AUSSTATTUNGSVARIANTE"/>
+      <enumerations xsi:type="maskensteuerung:Maske" modelElementId="_Fl3n8UsJEeWz3u1ncdj49g" name="SELECT_MOTOREN"/>
+      <enumerations xsi:type="maskensteuerung:Maske" modelElementId="_IGUygUsJEeWz3u1ncdj49g" name="SELECT_FARBEN"/>
+      <enumerations xsi:type="maskensteuerung:Maske" modelElementId="_JZd1YUsJEeWz3u1ncdj49g" name="SELECT_FELGEN"/>
+      <enumerations xsi:type="maskensteuerung:Maske" modelElementId="_K3QCAUsJEeWz3u1ncdj49g" name="SELECT_AUSSTATTUNG"/>
+      <enumerations xsi:type="maskensteuerung:Maske" modelElementId="_MwHoIUsJEeWz3u1ncdj49g" name="WUNCHFAHRZEUG" beschreibung=""/>
+    </repositories>
+    <repositories modelElementId="_1JengH1cEeWfO6ct6MKyww" name="bestellvorgangmasken" pattern="Repository|Maske">
+      <enumerations xsi:type="maskensteuerung:Maske" modelElementId="_dwX-U31dEeWfO6ct6MKyww" name="VERTRAGSPARTNER_ERFASSEN" beschreibung="Maske, um die Vertragspartner zu erfassen."/>
+      <enumerations xsi:type="maskensteuerung:Maske" modelElementId="_qiJAJ31dEeWfO6ct6MKyww" name="BESTELLPOSITIONEN_ERFASSEN" beschreibung="Maske, um die Bestellpositionen zu erfassen."/>
+      <enumerations xsi:type="maskensteuerung:Maske" modelElementId="_uJaBx31dEeWfO6ct6MKyww" name="RABATTE_ERFASSEN" beschreibung="Maske, um die Rabatte zu erfassen."/>
+      <enumerations xsi:type="maskensteuerung:Maske" modelElementId="_xn5h531dEeWfO6ct6MKyww" name="ZUSAMMENFASSUNG_BESTELLUNG" beschreibung="Praesentiert eine Uebersicht ueber die Bestellung."/>
+    </repositories>
+    <prototypes xsi:type="maskensteuerung:Maskensteuerung" modelElementId="_vWpN_xsSEeWeoYGlWqgNWQ" name="Bestellsystem" beschreibung="Maskensteuerung des Bestellsystems." identifier="_q7EakRsSEeWeoYGlWqgNWQ" standardMaskenablauf="_0YvJTySeEeW9loX9FhD7RA">
+      <maskenablaeufe value="_0YvJTySeEeW9loX9FhD7RA">
+        <key xsi:type="enums:Bearbeitung" href="platform:/resource/domain-reference-daten/src/main/resources/domain-reference.insure#_3RtMQSScEeW9loX9FhD7RA"/>
+      </maskenablaeufe>
+    </prototypes>
+    <prototypes xsi:type="maskensteuerung:Maskensteuerung" modelElementId="_b48yAUsVEeWXrpvW4temmQ" name="Auto Configuration Steps" beschreibung="Maskensteuerung des Bestellsystems." identifier="_BcbFcUsUEeWXrpvW4temmQ" standardMaskenablauf="_tXAv_ksLEeWP9cXbT3mB8Q">
+      <maskenablaeufe value="_tXAv_ksLEeWP9cXbT3mB8Q">
+        <key xsi:type="enums:Bearbeitung" href="platform:/resource/domain-reference-daten/src/main/resources/domain-reference.insure#_3RtMQSScEeW9loX9FhD7RA"/>
+      </maskenablaeufe>
+    </prototypes>
+    <prototypes xsi:type="maskensteuerung:Maskensteuerung" modelElementId="_-QvRtn1dEeWfO6ct6MKyww" name="Bestellerfassung" beschreibung="Maskensteuerung der Bestellerfassung." identifier="_BPQ4WH1eEeWfO6ct6MKyww" standardMaskenablauf="_Nws_pX1eEeWfO6ct6MKyww">
+      <maskenablaeufe value="_Nws_pX1eEeWfO6ct6MKyww">
+        <key xsi:type="enums:Bearbeitung" href="platform:/resource/domain-reference-daten/src/main/resources/domain-reference.insure#_38bjdRNGEeW8fKl0VVSZZA"/>
+      </maskenablaeufe>
+    </prototypes>
+    <enumerations xsi:type="maskensteuerung:MaskensteuerungIdentifier" modelElementId="_q7EakRsSEeWeoYGlWqgNWQ" name="Bestellsystem" beschreibung="Maskensteuerung des Bestellsystems." key="2"/>
+    <enumerations xsi:type="maskensteuerung:MaskensteuerungIdentifier" modelElementId="_BcbFcUsUEeWXrpvW4temmQ" name="AutoKonfiguration" beschreibung="Steps auf auto konfiguration system" key="3"/>
+    <enumerations xsi:type="maskensteuerung:MaskensteuerungIdentifier" modelElementId="_BPQ4WH1eEeWfO6ct6MKyww" name="Bestellerfassung" beschreibung="Maskensteuerung der Bestellerfassung." key="4"/>
+  </repositories>
+  <repositories modelElementId="_rrPY8A2yEeW1I-zmDKlMjg" name="schnittstellensteuerung" beschreibung="Definiert die Eigenschaften der Schnittstellensteuerung." pattern="Repository|Schnittstellensteuerung.*">
+    <repositories modelElementId="_gO2zwDBlEeWmwo5nRsnN_A" name="belieferungsbedingungen" beschreibung="Definiert Schnittstellenbelieferungsbedingungen." pattern="Repository|Schnittstellenbelieferungsbedingung">
+      <functions xsi:type="schnittstellensteuerung:Schnittstellenbelieferungsbedingung" modelElementId="_l6xN5jBlEeWmwo5nRsnN_A" name="Produktionsanlage" beschreibung="Belieferungsbedingung der Schnittstelle Produktionsanlage."/>
+    </repositories>
+    <repositories modelElementId="_zpVbcA2zEeW1I-zmDKlMjg" name="schnittstellen" beschreibung="Definiert Schnittstellen." pattern="Schnittstelle">
+      <enumerations xsi:type="schnittstellensteuerung:Schnittstelle" modelElementId="_ET3fRg20EeW1I-zmDKlMjg" name="PRODUKTIONSANLAGE" beschreibung="Schnittstelle fuer die Kommunikation mit Produktionsanlagen."/>
+    </repositories>
+    <repositories modelElementId="_nZ0PgNOoEeSVoOolBb6ZYQ" name="schnittstellenzuordnung" beschreibung="Definiert Schnittstellenzuordnungen." pattern="Repository|Schnittstellenzuordnung">
+      <prototypes xsi:type="schnittstellensteuerung:Schnittstellenzuordnung" modelElementId="_w3xqBRNFEeWITutlOt2w1g" name="Bestellung erfassen" beschreibung="Schnittstellenzuordnung fuer das Erfassen von Bestellungen.">
+        <kontext xsi:type="enums:Bearbeitung" href="platform:/resource/domain-reference-daten/src/main/resources/domain-reference.insure#_38bjdRNGEeW8fKl0VVSZZA"/>
+        <konfigurationen modelElementId="_0iPwqhNFEeWITutlOt2w1g" schnittstelle="_ET3fRg20EeW1I-zmDKlMjg"/>
+      </prototypes>
+      <prototypes xsi:type="schnittstellensteuerung:Schnittstellenzuordnung" modelElementId="_RgH_xRNHEeW8fKl0VVSZZA" name="Highline" beschreibung="Schnittstellenzuordnung fuer die Ausstattungsvariante Highline.">
+        <kontext xsi:type="konfiguration:AusstattungsvarianteIdentifier" href="platform:/resource/domain-reference-daten/src/main/resources/domain-reference.insure#_KJfq-UZ5EeWfcqNePpKGZg"/>
+        <konfigurationen modelElementId="_UCXTChNHEeW8fKl0VVSZZA" schnittstelle="_ET3fRg20EeW1I-zmDKlMjg"/>
+      </prototypes>
+      <prototypes xsi:type="schnittstellensteuerung:Schnittstellenzuordnung" modelElementId="_-SVWIBQkEeWilJG-sSQU0w" name="Comfortline" beschreibung="Schnittstellenzuordnung fuer die Ausstattungsvariante Comfortline.">
+        <kontext xsi:type="konfiguration:AusstattungsvarianteIdentifier" href="platform:/resource/domain-reference-daten/src/main/resources/domain-reference.insure#_FVctR0Z5EeWfcqNePpKGZg"/>
+        <konfigurationen modelElementId="_-SV9MBQkEeWilJG-sSQU0w" schnittstelle="_ET3fRg20EeW1I-zmDKlMjg"/>
+      </prototypes>
+      <prototypes xsi:type="schnittstellensteuerung:Schnittstellenzuordnung" modelElementId="_D49AYhQlEeWilJG-sSQU0w" name="Trendline" beschreibung="Schnittstellenzuordnung fuer die Ausstattungsvariante Trendline.">
+        <kontext xsi:type="konfiguration:AusstattungsvarianteIdentifier" href="platform:/resource/domain-reference-daten/src/main/resources/domain-reference.insure#_gyyop0Z4EeWfcqNePpKGZg"/>
+        <konfigurationen modelElementId="_D49AYxQlEeWilJG-sSQU0w" schnittstelle="_ET3fRg20EeW1I-zmDKlMjg"/>
+      </prototypes>
+    </repositories>
+    <prototypes xsi:type="schnittstellensteuerung:Schnittstellensteuerung" modelElementId="_uXfMY9OoEeSVoOolBb6ZYQ" name="Bestellsystem" beschreibung="Maskensteuerung des Bestellsystems." identifier="_ysoAp9OoEeSVoOolBb6ZYQ">
+      <schnittstellenversorgungen value="_RgH_xRNHEeW8fKl0VVSZZA">
+        <key xsi:type="konfiguration:AusstattungsvarianteIdentifier" href="platform:/resource/domain-reference-daten/src/main/resources/domain-reference.insure#_aQjON0Z5EeWfcqNePpKGZg"/>
+      </schnittstellenversorgungen>
+      <schnittstellenversorgungen value="_-SVWIBQkEeWilJG-sSQU0w">
+        <key xsi:type="konfiguration:AusstattungsvarianteIdentifier" href="platform:/resource/domain-reference-daten/src/main/resources/domain-reference.insure#_fgYJF0Z5EeWfcqNePpKGZg"/>
+      </schnittstellenversorgungen>
+      <schnittstellenversorgungen value="_D49AYhQlEeWilJG-sSQU0w">
+        <key xsi:type="konfiguration:AusstattungsvarianteIdentifier" href="platform:/resource/domain-reference-daten/src/main/resources/domain-reference.insure#_tYRF90Z5EeWfcqNePpKGZg"/>
+      </schnittstellenversorgungen>
+      <belieferungsbedingungen key="_ET3fRg20EeW1I-zmDKlMjg" value="_l6xN5jBlEeWmwo5nRsnN_A"/>
+    </prototypes>
+    <enumerations xsi:type="schnittstellensteuerung:SchnittstellensteuerungIdentifier" modelElementId="_ysoAp9OoEeSVoOolBb6ZYQ" name="Bestellsystem" beschreibung="Schnittstellensteuerung des Bestellsystems." key="2"/>
+  </repositories>
+</core:RootRepository>

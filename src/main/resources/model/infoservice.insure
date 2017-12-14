@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<core:RootRepository xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:core="http://insure/core" xmlns:feldsteuerung="http://insure/infoservice/feldsteuerung" xmlns:maskensteuerung="http://insure/infoservice/maskensteuerung" xmlns:schnittstellensteuerung="http://insure/infoservice/schnittstellensteuerung" modelElementId="_5k4ZYNMGEeSnpaIpElbjhw" name="infoservice" beschreibung="Basisdatenmodell des Infoservice.">
+  <repositories modelElementId="_cd6hcNOOEeS5daQY3OF6cg" name="feldsteuerung" beschreibung="Definiert die Eigenschaften der Feldsteuerung." pattern="Repository|Feldsteuerung.*">
+    <repositories modelElementId="_zn9x8NOpEeSVoOolBb6ZYQ" name="eingabeelemente" beschreibung="Eingabeelemente werden erst in der Zieldomaene definiert." pattern="Repository|Eingabeelement"/>
+    <repositories modelElementId="_3XCrwNOpEeSVoOolBb6ZYQ" name="eingabeelementeigenschaften" beschreibung="Definiert Basiseingabeelementeigenschaften." pattern="Eingabeelementeigenschaft">
+      <enumerations xsi:type="feldsteuerung:Eingabeelementeigenschaft" modelElementId="_u9rLKtO_EeSVoOolBb6ZYQ" name="SICHTBAR" beschreibung="Eigenschaft fuer Eingabeelemente, die sichtbar sind." sichtbar="true"/>
+      <enumerations xsi:type="feldsteuerung:Eingabeelementeigenschaft" modelElementId="_zaTuitO_EeSVoOolBb6ZYQ" name="SICHTBAR_EDITIERBAR" beschreibung="Eigenschaft fuer Eingabeelemente, die sichtbar und editierbar sind." sichtbar="true" editierbar="true"/>
+      <enumerations xsi:type="feldsteuerung:Eingabeelementeigenschaft" modelElementId="_2ASSStO_EeSVoOolBb6ZYQ" name="SICHTBAR_EDITIERBAR_NOTWENDIG" beschreibung="Eigenschaft fuer Eingabeelemente, die sichtbar, editierbar und notwendig sind." sichtbar="true" editierbar="true" notwendig="true"/>
+      <enumerations xsi:type="feldsteuerung:Eingabeelementeigenschaft" modelElementId="_5vjZWtO_EeSVoOolBb6ZYQ" name="UNSICHTBAR" beschreibung="Eigenschaft fuer Eingabeelemente, die nicht sichtbar sind."/>
+      <enumerations xsi:type="feldsteuerung:Eingabeelementeigenschaft" modelElementId="_8DP6StO_EeSVoOolBb6ZYQ" name="UNSICHTBAR_EDITIERBAR" beschreibung="Eigenschaft fuer Eingabeelemente, die nicht sichtbar, aber editierbar sind." editierbar="true"/>
+      <enumerations xsi:type="feldsteuerung:Eingabeelementeigenschaft" modelElementId="__hrI-tO_EeSVoOolBb6ZYQ" name="UNSICHTBAR_EDITIERBAR_NOTWENDIG" beschreibung="Eigenschaft fuer Eingabeelemente, die nicht sichtbar, aber editierbar und notwendig sind." editierbar="true" notwendig="true"/>
+    </repositories>
+    <repositories modelElementId="_7ZqMoNOpEeSVoOolBb6ZYQ" name="feldelementeigenschaften" beschreibung="Feldelementeigenschaften werden erst in der Zieldomaene definiert." pattern="Repository"/>
+    <repositories modelElementId="_-j1CkNOpEeSVoOolBb6ZYQ" name="steuerelemente" beschreibung="Steuerelemente werden erst in der Zieldomaene definiert." pattern="Steuerelement"/>
+    <repositories modelElementId="_BSH00NOqEeSVoOolBb6ZYQ" name="steuerelementeigenschaften" beschreibung="Definiert Basissteuerelementeigenschaften." pattern="Steuerelementeigenschaft">
+      <enumerations xsi:type="feldsteuerung:Steuerelementeigenschaft" modelElementId="_W312d9RiEeSM0uBkjWoRCg" name="SICHTBAR_AKTIVIERT" beschreibung="Eigenschaft fuer Steuerelemente, die sichtbar und aktiviert sind." sichtbar="true" aktiviert="true"/>
+      <enumerations xsi:type="feldsteuerung:Steuerelementeigenschaft" modelElementId="_bBArXNRiEeSM0uBkjWoRCg" name="SICHTBAR_DEAKTIVIERT" beschreibung="Eigenschaft fuer Steuerelemente, die sichtbar und nicht aktiviert sind." sichtbar="true"/>
+      <enumerations xsi:type="feldsteuerung:Steuerelementeigenschaft" modelElementId="_dP-dTNRiEeSM0uBkjWoRCg" name="UNSICHTBAR" beschreibung="Eigenschaft fuer Steuerelemente, die unsichtbar sind."/>
+    </repositories>
+    <prototypes xsi:type="feldsteuerung:Feldsteuerung" modelElementId="_FONP99OqEeSVoOolBb6ZYQ" name="Standard" beschreibung="Standardfeldsteuerung." identifier="_cXbvSNPHEeSVoOolBb6ZYQ"/>
+    <enumerations xsi:type="feldsteuerung:FeldsteuerungIdentifier" modelElementId="_cXbvSNPHEeSVoOolBb6ZYQ" name="Standard" beschreibung="Standardfeldsteuerung." key="1"/>
+  </repositories>
+  <repositories modelElementId="_RVYvANOoEeSVoOolBb6ZYQ" name="maskensteuerung" beschreibung="Definiert die Eigenschaften der Maskensteuerung." pattern="Repository|Maskensteuerung.*">
+    <repositories modelElementId="_iltx4NOpEeSVoOolBb6ZYQ" name="masken" beschreibung="Masken werden erst in der Zieldomaene definiert." pattern="Repository|Maske"/>
+    <repositories modelElementId="_gKCWUDRkEeWApPGqjuMTGA" name="maskenablaufe" beschreibung="Maskenablaeufe werden erst in der Zieldomaene definiert." pattern="Repository|Maskenablauf"/>
+    <prototypes xsi:type="maskensteuerung:Maskensteuerung" modelElementId="_oMlTzdOpEeSVoOolBb6ZYQ" name="Standard" beschreibung="Standardmaskensteuerung." identifier="_iI5XgNPHEeSVoOolBb6ZYQ"/>
+    <enumerations xsi:type="maskensteuerung:MaskensteuerungIdentifier" modelElementId="_iI5XgNPHEeSVoOolBb6ZYQ" name="Standard" beschreibung="Standardmaskensteuerung." key="1"/>
+  </repositories>
+  <repositories modelElementId="_FJjWcNMHEeSnpaIpElbjhw" name="schnittstellensteuerung" beschreibung="Definiert die Eigenschaften der Schnittstellensteuerung." pattern="Repository|Schnittstellensteuerung.*">
+    <repositories modelElementId="_BKEowDRlEeWApPGqjuMTGA" name="belieferungsbedingungen" beschreibung="Belieferungsbedingungen werden erst in der Zieldomaene definiert." pattern="Repository|Schnittstellenbelieferungsbedingung"/>
+    <repositories modelElementId="_gKo-MNMHEeSnpaIpElbjhw" name="schnittstellen" beschreibung="Definiert Basisschnittstellen." pattern="Repository|Schnittstelle">
+      <enumerations xsi:type="schnittstellensteuerung:Schnittstelle" modelElementId="_RZcRRtO_EeSVoOolBb6ZYQ" name="BESTANDSZUORDNUNG" beschreibung="Schnittstelle zur Bestandszuordnung."/>
+      <enumerations xsi:type="schnittstellensteuerung:Schnittstelle" modelElementId="_jFBExtMHEeSnpaIpElbjhw" name="DRUCK" beschreibung="Schnittstelle zum Drucksystem."/>
+      <enumerations xsi:type="schnittstellensteuerung:Schnittstelle" modelElementId="_lyv2VtMHEeSnpaIpElbjhw" name="EXKASSO" beschreibung="Schnittstelle zum Exkassosystem."/>
+      <enumerations xsi:type="schnittstellensteuerung:Schnittstelle" modelElementId="_knEGVtMHEeSnpaIpElbjhw" name="INKASSO" beschreibung="Schnittstelle zum Inkassosystem."/>
+      <enumerations xsi:type="schnittstellensteuerung:Schnittstelle" modelElementId="_a7mkBtO_EeSVoOolBb6ZYQ" name="PARTNER" beschreibung="Schnittstelle zum Partner-System."/>
+      <enumerations xsi:type="schnittstellensteuerung:Schnittstelle" modelElementId="_dQTKhtO_EeSVoOolBb6ZYQ" name="PROVISION" beschreibung="Schnittstelle zur Provisionierung."/>
+    </repositories>
+    <repositories modelElementId="_KE2ycTRlEeWApPGqjuMTGA" name="schnittstellenzuordnungen" beschreibung="Schnittstellenzuordnungen werden erst in der Zieldomaene definiert." pattern="Repository|Schnittstellenzuordnung"/>
+    <prototypes xsi:type="schnittstellensteuerung:Schnittstellensteuerung" modelElementId="_bCozoSbWEeWomoMrx8bFIQ" name="Standard" beschreibung="Standardschnittstellensteuerung." identifier="_h-hApibWEeWomoMrx8bFIQ"/>
+    <enumerations xsi:type="schnittstellensteuerung:SchnittstellensteuerungIdentifier" modelElementId="_h-hApibWEeWomoMrx8bFIQ" name="Standard" beschreibung="Standardschnittstellensteuerung." key="1"/>
+  </repositories>
+</core:RootRepository>

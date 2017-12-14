@@ -1,8 +1,11 @@
 package handler;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.Reader;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.nio.file.Files;
@@ -25,6 +28,13 @@ import org.eclipse.equinox.app.IApplication;
 import org.eclipse.equinox.app.IApplicationContext;
 import org.osgi.framework.Bundle;
 
+import insure.core.impl.Repository;
+import insure.infoservice.feldsteuerung.impl.Eingabeelement;
+import insure.infoservice.feldsteuerung.impl.Eingabeelementeigenschaft;
+import insure.infoservice.feldsteuerung.impl.Feldsteuerung;
+import insure.infoservice.feldsteuerung.impl.Steuerelement;
+import insure.infoservice.feldsteuerung.impl.Steuerelementeigenschaft;
+import insure.infoservice.feldsteuerung.impl.TemplateFeldelementeigenschaften;
 import parser.PrintObjects;
 import parser.XmlParser;
 
@@ -32,9 +42,13 @@ import parser.XmlParser;
 
 public class StartUp implements IApplication {
 
+    private XmlParser parser;
+
     @Override
     public Object start(IApplicationContext context) throws Exception {
-        init("insure.core.modell", "insure.infoservice.daten", "/src/main/resources/infoservice.insure", "model/core.xsd", "insure.core.impl");
+
+        // init("insure.core.modell", "de.adesso.ais.insure-parser", "/src/main/resources/model/infoservice.insure", "model/core.xsd", "insure.core.impl");
+        init("insure.core.modell", "de.adesso.ais.insure-parser", "/src/main/resources/model/infoservice-reference.insure", "model/core.xsd", "insure.core.impl");
         return IApplication.EXIT_OK;
 
     }
@@ -45,15 +59,23 @@ public class StartUp implements IApplication {
 
     }
 
+    @SuppressWarnings("static-access")
     public void init(String xsdBundleName, String xmlBundleName, String xmlpath, String xsdpath, String packageName) {
+        Class<?>[] elementClasses = { Eingabeelementeigenschaft.class, Feldsteuerung.class,
+                Eingabeelement.class, Steuerelement.class,
+                Steuerelementeigenschaft.class, Repository.class, TemplateFeldelementeigenschaften.class, };
         Bundle xsdbundle = Platform.getBundle(xsdBundleName);
         Bundle xmlbundle = Platform.getBundle(xmlBundleName);
+        System.out.println(xmlbundle);
+
         URL xmlURL = xmlbundle.getEntry(xmlpath);
         File xmlfile = null;
         URL xsdURL = xsdbundle.getEntry(xsdpath);
         File xsdfile = null;
+        Reader xml = null;
         try {
             xmlfile = new File(FileLocator.toFileURL(xmlURL).toURI());
+            xml = new InputStreamReader(new FileInputStream(xmlfile), "UTF-8");
             xsdfile = new File(FileLocator.toFileURL(xsdURL).toURI());
         } catch (URISyntaxException e1) {
             e1.printStackTrace();
@@ -62,13 +84,12 @@ public class StartUp implements IApplication {
         }
         try {
             URL packageURL = xsdbundle.getEntry("/src/insure/core/impl");
-            System.out.println(packageURL);
-            XmlParser.parseXml(xsdfile.getPath(),
+            XmlParser parser = new XmlParser();
+            parser.parseXml(xsdfile.getPath(),
                 xmlfile.getPath(), "UTF-8", xsdBundleName, packageName,
                 new PrintObjects());
-        } catch (IOException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
+            // XmlParser parser = new XmlParser();
+            // parser.parseXml(xml, elementClasses, new PrintObjects());
         } catch (Exception e) {
             // TODO Auto-generated catch block
             e.printStackTrace();

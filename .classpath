@@ -6,5 +6,7 @@
 	<classpathentry excluding="main/java/|main/resources/|test/" kind="src" path="src"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
 	<classpathentry kind="con" path="org.eclipse.pde.core.requiredPlugins"/>
-	<classpathentry kind="output" path="bin"/>
+	<classpathentry kind="lib" path="C:/Users/Mpouma/Documents/eclipselink/jlib/moxy/jaxb-core_2.2.11.v201407311112.jar"/>
+	<classpathentry kind="lib" path="C:/Users/Mpouma/Documents/eclipselink/jlib/moxy/jaxb-xjc_2.2.11.v201407311112.jar"/>
+	<classpathentry kind="output" path="target/classes"/>
 </classpath>
