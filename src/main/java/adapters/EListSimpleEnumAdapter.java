@@ -6,7 +6,6 @@ import java.util.List;
 
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
-import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.adapters.XmlAdapter;
 import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 
@@ -37,7 +36,7 @@ public class EListSimpleEnumAdapter extends XmlAdapter<AdaptedSimpleEnumEList, E
     @XmlAccessorType(XmlAccessType.FIELD)
     public static class AdaptedSimpleEnumEList {
 
-        @XmlElement(name = "eingabeelement")
+
         @XmlJavaTypeAdapter(SimpleEnumAdapter.class)
         List<ISimpleEnum> enumerations = new ArrayList<ISimpleEnum>();
 

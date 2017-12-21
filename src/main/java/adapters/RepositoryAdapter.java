@@ -1,11 +1,14 @@
 package adapters;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlAttribute;
-import javax.xml.bind.annotation.XmlElementRef;
+import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.adapters.XmlAdapter;
 import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
-
-import org.eclipse.emf.common.util.EList;
 
 import adapters.RepositoryAdapter.AdaptedRepository;
 import insure.core.IPrototype;
@@ -14,13 +17,14 @@ import insure.core.ISimpleEnum;
 import insure.core.impl.Function;
 import insure.core.impl.Repository;
 
+public class RepositoryAdapter extends XmlAdapter<AdaptedRepository, IRepository> {
 
-public class RepositoryAdapter extends XmlAdapter<AdaptedRepository, Repository> {
-
-    // @XmlAccessorType(XmlAccessType.FIELD)
+    @XmlAccessorType(XmlAccessType.FIELD)
     public static class AdaptedRepository {
+
         @XmlAttribute(name = "pattern")
         public String pattern;
+
         @XmlAttribute(name = "beschreibung")
         public String beschreibung;
         @XmlAttribute(name = "name")
@@ -28,17 +32,20 @@ public class RepositoryAdapter extends XmlAdapter<AdaptedRepository, Repository>
         @XmlAttribute(name = "modelElementId")
         public String modelElementId;
 
-        @XmlJavaTypeAdapter(EListRepositoryAdapter.class)
-        public EList<IRepository> repositories;
+        @XmlElement
+        @XmlJavaTypeAdapter(RepositoryAdapter.class)
+        public List<IRepository> repositories;
 
-        @XmlJavaTypeAdapter(EListPrototypeAdapter.class)
-        public EList<IPrototype> prototypes;
+        @XmlElement(name = "prototypes")
+        @XmlJavaTypeAdapter(PrototypeAdapter.class)
+        public List<IPrototype> prototypes;
 
-        @XmlElementRef()
-        public EList<Function> functions;
+        @XmlElement
+        public List<Function> functions;
 
-        @XmlJavaTypeAdapter(EListSimpleEnumAdapter.class)
-        public EList<ISimpleEnum> enumerations;
+        @XmlElement(name = "enumerations")
+        @XmlJavaTypeAdapter(SimpleEnumAdapter.class)
+        public List<ISimpleEnum> enumerations;
 
         public void setPattern(String value) {
             pattern = value;
@@ -72,76 +79,87 @@ public class RepositoryAdapter extends XmlAdapter<AdaptedRepository, Repository>
             return name;
         }
 
-        public void setRepositories(EList<IRepository> repos) {
+        public void setRepositories(List<IRepository> repos) {
             this.repositories = repos;
         }
 
-        public void setPrototypes(EList<IPrototype> protos) {
+        public void setPrototypes(List<IPrototype> protos) {
             this.prototypes = protos;
         }
 
-        public void setFunctions(EList<Function> funct) {
+        public void setFunctions(List<Function> funct) {
             this.functions = funct;
         }
 
-        public void setEnumerations(EList<ISimpleEnum> enums) {
+        public void setEnumerations(List<ISimpleEnum> enums) {
             this.enumerations = enums;
         }
 
-        public EList<IRepository> getRepositories() {
+        public List<IRepository> getRepositories() {
+            if(repositories==null){
+                return new ArrayList<IRepository>();
+            }
             return repositories;
         }
 
-        public EList<IPrototype> getPrototypes() {
-
+        public List<IPrototype> getPrototypes() {
+            if (prototypes == null) {
+                return new ArrayList<IPrototype>();
+            }
             return prototypes;
         }
 
-        public EList<Function> getFunctions() {
+        public List<Function> getFunctions() {
             return functions;
         }
 
-        public EList<ISimpleEnum> getEnumerations() {
-
+        public List<ISimpleEnum> getEnumerations() {
+            if (enumerations == null) {
+                return new ArrayList<ISimpleEnum>();
+            }
             return enumerations;
         }
 
     }
 
     @Override
-    public Repository unmarshal(AdaptedRepository v) throws Exception {
+    public IRepository unmarshal(AdaptedRepository v) throws Exception {
+
         Repository repo = new Repository();
         repo.setBeschreibung(v.getBeschreibung());
         repo.setModelElementId(v.getModelElementId());
         repo.setBeschreibung(v.getBeschreibung());
         repo.setName(v.getName());
         repo.setPattern(v.getPattern());
-        for (IRepository r : v.getRepositories())
-            repo.add(r);
-        for (ISimpleEnum en : v.getEnumerations())
-            repo.add(en);
+        if (v.getRepositories() != null) {
+            for (IRepository r : v.getRepositories()) {
+                repo.add(r);
 
-        for (IPrototype prot : v.getPrototypes())
-            repo.add(prot);
+            }
+        }
+        if (v.getEnumerations() != null) {
+            for (ISimpleEnum en : v.getEnumerations()) {
 
-        for (Function func : v.getFunctions())
-            repo.add(func);
+                repo.add(en);
+            }
+        }
+        if (v.getPrototypes() != null) {
+            for (IPrototype prot : v.getPrototypes()) {
+                repo.add(prot);
+            }
+        }
+        if (v.getFunctions() != null) {
+            for (Function func : v.getFunctions())
+                repo.add(func);
+        }
 
         return repo;
     }
 
     @Override
-    public AdaptedRepository marshal(Repository v) throws Exception {
-        AdaptedRepository adaptedrepo = new AdaptedRepository();
-        adaptedrepo.setName(v.getName());
-        adaptedrepo.setModelElementId(v.getModelElementId());
-        adaptedrepo.setPattern(v.getPattern());
-        adaptedrepo.setBeschreibung(v.getBeschreibung());
-        adaptedrepo.setName(v.getName());
-        // ADAPTEDREPO.SETENUMERATIONS(V.GETENUMERATIONS());
-        // ADAPTEDREPO.SETPROTOTYPES(V.GETPROTOTYPES());
+    public AdaptedRepository marshal(IRepository v) throws Exception {
 
-        return adaptedrepo;
+        return null;
 
     }
 

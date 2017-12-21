@@ -4,8 +4,7 @@ import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
-import javax.xml.bind.annotation.XmlElementRef;
-import javax.xml.bind.annotation.XmlID;
+import javax.xml.bind.annotation.XmlIDREF;
 import javax.xml.bind.annotation.adapters.XmlAdapter;
 import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 
@@ -25,12 +24,11 @@ import insure.infoservice.feldsteuerung.impl.Feldsteuerung;
 import insure.infoservice.feldsteuerung.impl.FeldsteuerungIdentifier;
 import insure.infoservice.feldsteuerung.impl.StandardFeldelementeigenschaften;
 import insure.infoservice.feldsteuerung.impl.Steuerelementeigenschaft;
-import insure.infoservice.feldsteuerung.impl.TemplateFeldelementeigenschaften;
 
 public class PrototypeAdapter extends XmlAdapter<AdaptedPrototype, IPrototype> {
-    // @XmlRootElement(name = "prototypes")
+
     @XmlAccessorType(XmlAccessType.FIELD)
-    public static class AdaptedPrototype {
+    public static class AdaptedPrototype extends AdaptedClass {
 
         public AdaptedPrototype() {
 
@@ -62,14 +60,6 @@ public class PrototypeAdapter extends XmlAdapter<AdaptedPrototype, IPrototype> {
 
         public void setBeschreibung(String beschreibung) {
             this.beschreibung = beschreibung;
-        }
-
-        public String getModelElementId() {
-            return modelElementId;
-        }
-
-        public void setModelElementId(String modelElementId) {
-            this.modelElementId = modelElementId;
         }
 
         public String getName() {
@@ -119,26 +109,47 @@ public class PrototypeAdapter extends XmlAdapter<AdaptedPrototype, IPrototype> {
         @XmlAttribute
         public String beschreibung;
         @XmlAttribute
-        @XmlID
-        public String modelElementId;
+        public String type;
+
+        public String getType() {
+            return type;
+        }
+
+        public void setType(String type) {
+            this.type = type;
+        }
 
         @XmlAttribute(name = "name")
         public String name;
 
-        @XmlElement(name = "template", type = Feldelementeigenschaften.class)
+        @XmlIDREF
+        @XmlAttribute(name = "template")
+        @XmlJavaTypeAdapter(PrototypeAdapter.class)
         public Feldelementeigenschaften template;
 
-        @XmlElementRef(name = "standardEingabeelementeigenschaft", type = Eingabeelementeigenschaft.class)
+        public Eingabeelementeigenschaft getStandadEingabeelementeigenschaft() {
+            return standadEingabeelementeigenschaft;
+        }
+
+        public void setStandadEingabeelementeigenschaft(Eingabeelementeigenschaft standadEingabeelementeigenschaft) {
+            this.standadEingabeelementeigenschaft = standadEingabeelementeigenschaft;
+        }
+
+        @XmlElement(name = "standardEingabeelementeigenschaft")
+        @XmlJavaTypeAdapter(ModelElementAdapter.class)
         protected Eingabeelementeigenschaft standadEingabeelementeigenschaft;
 
-        @XmlElementRef(name = "standardSteuerelementeigenschaft", type = Steuerelementeigenschaft.class)
+        @XmlElement(name = "standardSteuerelementeigenschaft")
+        @XmlJavaTypeAdapter(ModelElementAdapter.class)
         protected Steuerelementeigenschaft standardSteuerelementeigenschaft;
 
         // @XmlElement(name = "feldelementeigenschaften")
         @XmlJavaTypeAdapter(EListFeldelementeigenschafzuordnungAdapter.class)
         protected EList<IFeldelementeigenschaftenzuordnung> feldelementeigenschaften;
 
-        @XmlElement(name = "identifier", type = FeldsteuerungIdentifier.class)
+        @XmlIDREF
+        @XmlAttribute
+        @XmlJavaTypeAdapter(SimpleEnumAdapter.class)
         public FeldsteuerungIdentifier identifier;
 
         public Object getStandardEingabeelementeigenschaft() {
@@ -155,45 +166,58 @@ public class PrototypeAdapter extends XmlAdapter<AdaptedPrototype, IPrototype> {
             return null;
         }
 
-        if (null != v.getTemplate()) {
-            System.out.println("mnvbmv");
-            TemplateFeldelementeigenschaften temp = new TemplateFeldelementeigenschaften();
-            temp.setBeschreibung(v.getBeschreibung());
-            temp.setName(v.getName());
-            temp.setModelElementId(v.getModelElementId());
-            temp.setTemplate(v.getTemplate());
-            temp.getSteuerelementeigenschaften().addAll(v.getSteuerelementeigenschaften());
-            temp.getEingabeelementeigenschaften().addAll(v.getEingabeelementeigenschaften());
-            return temp;
+        // if (v.getType().contains("template")) {
+        // String temphref = v.getTemplate();
+        // temphref = (temphref.substring(temphref.lastIndexOf("#")));
+        //
+        // if (lookup.containsKey(temphref)) {
+        // Feldelementeigenschaften ref = (Feldelementeigenschaften) lookup.get(temphref);
+        // TemplateFeldelementeigenschaften temp = new TemplateFeldelementeigenschaften();
+        // temp.setBeschreibung(v.getBeschreibung());
+        // temp.setName(v.getName());
+        // temp.setModelElementId(v.getModelElementId());
+        // temp.setTemplate(ref);
+        // temp.getSteuerelementeigenschaften().addAll(v.getSteuerelementeigenschaften());
+        // temp.getEingabeelementeigenschaften().addAll(v.getEingabeelementeigenschaften());
+        // lookup.put(temp.getModelElementId(), temp);
+        //
+        // return temp;
+        //
+        // }
+        // }
 
-        }
-
-        if (null != v.getStandardEingabeelementeigenschaft() || null != v.getStandardSteuerelementeigenschaft()) {
-            System.out.println("yy");
+        if (v.getType().contains("StandardFeldelementeigenschaften")) {
             StandardFeldelementeigenschaften std = new StandardFeldelementeigenschaften();
             std.setBeschreibung(v.getBeschreibung());
             std.setName(v.getName());
             std.setModelElementId(v.getModelElementId());
-            std.setStandardEingabeelementeigenschaft((IEingabeelementeigenschaft) v.getStandardEingabeelementeigenschaft());
-            std.setStandardSteuerelementeigenschaft(v.getStandardSteuerelementeigenschaft());
-            std.getSteuerelementeigenschaften().addAll(v.getSteuerelementeigenschaften());
-            std.getEingabeelementeigenschaften().addAll(v.getEingabeelementeigenschaften());
+            std.setStandardEingabeelementeigenschaft(
+                (IEingabeelementeigenschaft) v.getStandardEingabeelementeigenschaft() != null ? (IEingabeelementeigenschaft) v.getStandardEingabeelementeigenschaft() : null);
+            std.setStandardSteuerelementeigenschaft(v.getStandardSteuerelementeigenschaft() != null ? v.getStandardSteuerelementeigenschaft() : null);
+            std.getSteuerelementeigenschaften().addAll(v.getSteuerelementeigenschaften() != null ? v.getSteuerelementeigenschaften() : null);
+            std.getEingabeelementeigenschaften().addAll(v.getEingabeelementeigenschaften() != null ? v.getEingabeelementeigenschaften() : null);
             return std;
 
         }
-        if (null != v.getIdentifier()) {
-            System.out.println("dede");
+
+        if (v.getType().endsWith("Feldsteuerung")) {
             Feldsteuerung feldst = new Feldsteuerung();
             feldst.setBeschreibung(v.getBeschreibung());
             feldst.setName(v.getName());
             feldst.setModelElementId(v.getModelElementId());
-            feldst.getFeldelementeigenschaften().addAll(v.getFeldelementeigenschaften());
-            feldst.setIdentifier(v.getIdentifier());
+            if (v.getFeldelementeigenschaften() != null)
+                feldst.getFeldelementeigenschaften().addAll(v.getFeldelementeigenschaften());
+            if (v.getIdentifier() != null) {
+                feldst.setIdentifier(v.getIdentifier());
+                return feldst;
+
+            }
+
             return feldst;
 
         }
 
-        if (v.getEingabeelementeigenschaften() != null || v.getSteuerelementeigenschaften() != null) {
+        if (v.getType().contains(":Feldelementeigenschaften")) {
             System.out.println("merrrde");
             Feldelementeigenschaften feldeig = new Feldelementeigenschaften();
             feldeig.setBeschreibung(v.getBeschreibung());

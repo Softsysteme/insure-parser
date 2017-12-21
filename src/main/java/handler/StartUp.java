@@ -1,16 +1,18 @@
 package handler;
 
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
+import java.io.FileReader;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.Reader;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.nio.file.Files;
-import java.util.HashMap;
-import java.util.Map;
 
 import org.eclipse.core.runtime.FileLocator;
 import org.eclipse.core.runtime.Platform;
@@ -19,7 +21,6 @@ import org.eclipse.emf.common.util.URI;
 import org.eclipse.emf.ecore.resource.Resource;
 import org.eclipse.emf.ecore.resource.ResourceSet;
 import org.eclipse.emf.ecore.resource.impl.ResourceSetImpl;
-import org.eclipse.emf.ecore.xmi.XMIResource;
 import org.eclipse.emf.ecore.xmi.XMLResource;
 import org.eclipse.emf.ecore.xmi.impl.GenericXMLResourceFactoryImpl;
 import org.eclipse.emf.ecore.xmi.impl.XMIResourceFactoryImpl;
@@ -28,10 +29,17 @@ import org.eclipse.equinox.app.IApplication;
 import org.eclipse.equinox.app.IApplicationContext;
 import org.osgi.framework.Bundle;
 
+import insure.core.IPrototype;
+import insure.core.IRepository;
+import insure.core.ISimpleEnum;
 import insure.core.impl.Repository;
+import insure.core.impl.RootRepository;
 import insure.infoservice.feldsteuerung.impl.Eingabeelement;
 import insure.infoservice.feldsteuerung.impl.Eingabeelementeigenschaft;
+import insure.infoservice.feldsteuerung.impl.Feldelementeigenschaften;
 import insure.infoservice.feldsteuerung.impl.Feldsteuerung;
+import insure.infoservice.feldsteuerung.impl.FeldsteuerungIdentifier;
+import insure.infoservice.feldsteuerung.impl.StandardFeldelementeigenschaften;
 import insure.infoservice.feldsteuerung.impl.Steuerelement;
 import insure.infoservice.feldsteuerung.impl.Steuerelementeigenschaft;
 import insure.infoservice.feldsteuerung.impl.TemplateFeldelementeigenschaften;
@@ -46,50 +54,58 @@ public class StartUp implements IApplication {
 
     @Override
     public Object start(IApplicationContext context) throws Exception {
-
+        String[] xmlPaths = new String[] { "/src/main/resources/model/infoservice-reference.insure", "/src/main/resources/model/infoservice.insure" };
         // init("insure.core.modell", "de.adesso.ais.insure-parser", "/src/main/resources/model/infoservice.insure", "model/core.xsd", "insure.core.impl");
-        init("insure.core.modell", "de.adesso.ais.insure-parser", "/src/main/resources/model/infoservice-reference.insure", "model/core.xsd", "insure.core.impl");
+        init("insure.core.modell", "de.adesso.ais.insure-parser", xmlPaths);
         return IApplication.EXIT_OK;
 
     }
 
     @Override
     public void stop() {
-        // TODO Auto-generated method stub
+        // TODO Auto-generated msethod stub
 
     }
 
-    @SuppressWarnings("static-access")
-    public void init(String xsdBundleName, String xmlBundleName, String xmlpath, String xsdpath, String packageName) {
-        Class<?>[] elementClasses = { Eingabeelementeigenschaft.class, Feldsteuerung.class,
-                Eingabeelement.class, Steuerelement.class,
-                Steuerelementeigenschaft.class, Repository.class, TemplateFeldelementeigenschaften.class, };
-        Bundle xsdbundle = Platform.getBundle(xsdBundleName);
+    public void init(String xsdBundleName, String xmlBundleName, String[] xmlpaths) {
+        Class<?>[] elementClasses = { Eingabeelementeigenschaft.class, Feldsteuerung.class, Feldsteuerung.class, Feldelementeigenschaften.class,
+                StandardFeldelementeigenschaften.class, FeldsteuerungIdentifier.class, Eingabeelement.class, Steuerelement.class,
+                Steuerelementeigenschaft.class, Repository.class, TemplateFeldelementeigenschaften.class, RootRepository.class };
+        // Bundle xsdbundle = Platform.getBundle(xsdBundleName);
         Bundle xmlbundle = Platform.getBundle(xmlBundleName);
-        System.out.println(xmlbundle);
+        URL[] xmlURL = new URL[xmlpaths.length];
+        File[] xmlFiles = new File[xmlpaths.length];
+        Reader[] readers = new Reader[xmlpaths.length];
+        for (int i = 0; i < xmlpaths.length; i++) {
 
-        URL xmlURL = xmlbundle.getEntry(xmlpath);
-        File xmlfile = null;
-        URL xsdURL = xsdbundle.getEntry(xsdpath);
-        File xsdfile = null;
-        Reader xml = null;
-        try {
-            xmlfile = new File(FileLocator.toFileURL(xmlURL).toURI());
-            xml = new InputStreamReader(new FileInputStream(xmlfile), "UTF-8");
-            xsdfile = new File(FileLocator.toFileURL(xsdURL).toURI());
-        } catch (URISyntaxException e1) {
-            e1.printStackTrace();
-        } catch (IOException e1) {
-            e1.printStackTrace();
+            xmlURL[i] = xmlbundle.getEntry(xmlpaths[i]);
+            try {
+                xmlFiles[i] = new File(FileLocator.toFileURL(xmlURL[i]).toURI());
+                // supressXsi(xmlfile);
+                readers[i] = new InputStreamReader(new FileInputStream(supressXsi(xmlFiles[i], "/src/main/resources/model/modified" + i)), "UTF-8");
+
+            } catch (URISyntaxException e1) {
+                e1.printStackTrace();
+            } catch (IOException e1) {
+                e1.printStackTrace();
+            }
+
         }
         try {
-            URL packageURL = xsdbundle.getEntry("/src/insure/core/impl");
             XmlParser parser = new XmlParser();
-            parser.parseXml(xsdfile.getPath(),
-                xmlfile.getPath(), "UTF-8", xsdBundleName, packageName,
-                new PrintObjects());
-            // XmlParser parser = new XmlParser();
-            // parser.parseXml(xml, elementClasses, new PrintObjects());
+            parser.parseXml(readers, elementClasses[11], new PrintObjects());
+            // System.out.println(parser.getObjects().get(0).toString() + "fdxcgvcn");"
+            for (IRepository repo : parser.getObjects().get(0).getRepositories()) {
+                System.out.println(repo.getName());
+                for (IRepository reposit : repo.getRepositories())
+                    System.out.println(reposit.toString());
+                for (IPrototype prot : repo.getPrototypes())
+                    System.out.println(prot.toString());
+                for (ISimpleEnum enu : repo.getEnumerations())
+                    System.out.println(enu.toString());
+                ;
+                // System.out.println(repo.getPrototypes().toString());
+            }
         } catch (Exception e) {
             // TODO Auto-generated catch block
             e.printStackTrace();
@@ -127,11 +143,6 @@ public class StartUp implements IApplication {
         URI uri = oldfile.isFile() ? URI.createFileURI(oldfile.getAbsolutePath()) : URI.createURI(oldpath);
 
         try {
-            // Demand load resource for this file.
-            //
-            resourcexmi = new XMIResourceImpl(uri);
-            // Map<Object, Object> options = new HashMap<Object, Object>();
-            // options.put(XMIResource.OPTION_DECLARE_XML, true);
 
             try {
                 resourcexmi.load(null);
@@ -141,15 +152,6 @@ public class StartUp implements IApplication {
             }
             System.out.println("Loaded " + uri);
 
-            // Validate the contents of the loaded resource.
-            //
-            // for (EObject eObject : resourcexmi.getContents()) {
-            // Diagnostic diagnostic = Diagnostician.INSTANCE.validate(eObject);
-            // System.out.println(eObject.toString());
-            // if (diagnostic.getSeverity() != Diagnostic.OK) {
-            // printDiagnostic(diagnostic, "");
-            // }
-            // }
         } catch (RuntimeException exception) {
             System.out.println("Problem loading " + uri);
             exception.printStackTrace();
@@ -161,23 +163,16 @@ public class StartUp implements IApplication {
             newFile.getParentFile().mkdirs();
             newFile.createNewFile();
             URI newuri = newFile.isFile() ? URI.createFileURI(newFile.getAbsolutePath()) : URI.createURI(newpath);
-            // URI newuri = URI.createURI(newpath);
+
             XMIResourceImpl resourcexml = new XMIResourceImpl(newuri);
-            // resourcexml = resourcexmi;
-            // resourcexml = (XMLResourceImpl) resourceSet.createResource(newuri);
 
             // TODO add some content here
 
             resourcexml.getContents().addAll(resourcexmi.getContents());
 
             try {
-                Map<Object, Object> options = new HashMap<Object, Object>();
-                options.put(XMIResource.OPTION_SUPPRESS_XMI, true);
-                // options.put(XMLResource.OPTION_PROCESS_DANGLING_HREF, true);
-                options.put(XMIResource.OPTION_PROCESS_DANGLING_HREF_RECORD, "RECORD");
-                // options.put(XMLResource.OPTION_DECLARE_XML, true);
-                // options.put(XMIResource.OPTION_ANY_SIMPLE_TYPE, true);
-                resourcexml.save(new FileOutputStream(newFile.getAbsolutePath()), options);
+
+                resourcexml.save(new FileOutputStream(newFile.getAbsolutePath()), null);
 
             } catch (IOException e) {
                 java.lang.System.out.print("no");
@@ -188,6 +183,65 @@ public class StartUp implements IApplication {
             System.out.println("Problem loading new resource");
             exception.printStackTrace();
         }
+    }
+
+    public File supressXsi(File inputXML, String outputPath) {
+
+        BufferedReader br = null;
+        String newString = "";
+        StringBuilder strTotale = new StringBuilder();
+        try {
+
+            FileReader reader = new FileReader(inputXML);
+            String search = "xsi:type";
+
+            br = new BufferedReader(reader);
+            while ((newString = br.readLine()) != null) {
+                newString = newString.replaceAll(search, "type");
+                strTotale.append(newString + '\n');
+            }
+
+        } catch (IOException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        } // calls it
+        finally {
+            try {
+                br.close();
+            } catch (IOException e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+            }
+        }
+
+        File outputFile = new File(outputPath);
+        BufferedWriter writer = null;
+        try {
+            writer = new BufferedWriter(new FileWriter(outputFile));
+            writer.write(strTotale.toString());
+        } catch (IOException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        } finally {
+            if (writer != null)
+                try {
+                    writer.close();
+                } catch (IOException e) {
+                    // TODO Auto-generated catch block
+                    e.printStackTrace();
+                }
+        }
+
+        // try {
+        //
+        // // outputFile.getParentFile().mkdirs();
+        // // outputFile.createNewFile();
+        // } catch (RuntimeException | IOException exception) {
+        // System.out.println("Problem loading new resource");
+        // exception.printStackTrace();
+        // }
+
+        return outputFile;
     }
 
     protected static void printDiagnostic(Diagnostic diagnostic, String indent) {
