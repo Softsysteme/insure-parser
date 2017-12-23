@@ -23,6 +23,8 @@ import javax.xml.validation.Validator;
 
 import org.xml.sax.SAXException;
 
+import adapters.SuperRoot;
+import insure.core.IRepository;
 import insure.core.impl.RootRepository;
 
 /**
@@ -59,7 +61,7 @@ public class XmlParser {
      *            Callback-Objekt fuer die Verarbeitung der einzelnen Elemente
      * @return Anzahl der gefundenen Elemente
      */
-    public long parseXml(Reader[] readers, Class<?> elementClasses, objectVerarbeitung overab)
+    public long parseXml(Reader reader, Class<?> elementClasses, objectVerarbeitung overab)
             throws XMLStreamException, JAXBException {
         // StAX:
         EventFilter startElementFilter = new EventFilter() {
@@ -70,11 +72,12 @@ public class XmlParser {
         };
         long anzahlElem = 0;
         XMLInputFactory staxFactory = XMLInputFactory.newInstance();
-        XMLEventReader staxReader = staxFactory.createXMLEventReader(readers[0]);
+        XMLEventReader staxReader = staxFactory.createXMLEventReader(reader);
         XMLEventReader staxFiltRd = staxFactory.createFilteredReader(staxReader, startElementFilter);
         JAXBContext jaxbContext = JAXBContext.newInstance(elementClasses);
         Unmarshaller unmarshaller = jaxbContext.createUnmarshaller();
         unmarshaller.setEventHandler(new DefaultValidationEventHandler());
+        // staxFiltRd.nextEvent();
         // Parsing:
         Object element = unmarshaller.unmarshal(staxReader, elementClasses);
 
@@ -83,7 +86,20 @@ public class XmlParser {
         }
 
         overab.verarbeite(element);
-        objects.add((RootRepository) element);
+        for (RootRepository root : ((SuperRoot) element).getSuperRoot()) {
+            for (IRepository repo : root.getRepositories()) {
+                System.out.println(repo.toString());
+                System.out.println(repo.getEnumerations().toString());
+                System.out.println(repo.getPrototypes().toString());
+                for (IRepository r : repo.getRepositories()) {
+                    System.out.println(r.toString());
+                    System.out.println(r.getEnumerations().toString());
+                    System.out.println(r.getPrototypes().toString());
+                }
+            }
+
+            objects.add(root);
+        }
         return anzahlElem++;
 
     }

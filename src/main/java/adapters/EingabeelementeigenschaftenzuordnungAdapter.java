@@ -2,9 +2,11 @@ package adapters;
 
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlIDREF;
 import javax.xml.bind.annotation.adapters.XmlAdapter;
+import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 
 import adapters.EingabeelementeigenschaftenzuordnungAdapter.AdaptedEingabeelementeigenschaftzuordnung;
 import insure.infoservice.feldsteuerung.IEingabeelementeigenschaftenzuordnung;
@@ -16,12 +18,13 @@ public class EingabeelementeigenschaftenzuordnungAdapter extends XmlAdapter<Adap
     @XmlAccessorType(XmlAccessType.FIELD)
     public static class AdaptedEingabeelementeigenschaftzuordnung {
 
-        // @XmlValue
+        @XmlAttribute
         @XmlIDREF
+        @XmlJavaTypeAdapter(SimpleEnumAdapter.class)
         public Eingabeelement key;
 
-        @XmlElement(name = "value", required = true)
-        @XmlIDREF
+        @XmlElement(name = "value")
+        @XmlJavaTypeAdapter(SimpleEnumAdapter.class)
         public Eingabeelementeigenschaft value;
 
         public Eingabeelement getKey() {

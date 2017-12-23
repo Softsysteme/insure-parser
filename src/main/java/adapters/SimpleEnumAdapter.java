@@ -28,6 +28,7 @@ public class SimpleEnumAdapter extends XmlAdapter<AdaptedSimpleEnum, ISimpleEnum
             nameSpaceMap.put("enums_1", "insure.domain.");
             nameSpaceMap.put("feldsteuerung", "insure.infoservice.");
         }
+
         public String getHref() {
             return href;
         }
@@ -158,35 +159,7 @@ public class SimpleEnumAdapter extends XmlAdapter<AdaptedSimpleEnum, ISimpleEnum
 
     @Override
     public ISimpleEnum unmarshal(AdaptedSimpleEnum v) throws Exception {
-
         AdaptedSimpleEnum adapted = (AdaptedSimpleEnum) v;
-        // if (null == adapted) {
-        // return null;
-        // }
-        // String href = adapted.getHref();
-        // if (adapted.getName() == null && adapted.getBeschreibung() == null && adapted.getModelElementId() == null) {
-        // if (href != null) {
-        // href = (href.substring(href.lastIndexOf("#")));
-        // System.out.println(href + lookup.containsKey(href));
-        // if (lookup.containsKey(href)) {
-        // ISimpleEnum ref = (ISimpleEnum) lookup.get(href);
-        // if (ref instanceof Eingabeelementeigenschaft) {
-        // return (Eingabeelementeigenschaft) ref;
-        // }
-        // if (ref instanceof Steuerelementeigenschaft) {
-        // return (Steuerelementeigenschaft) ref;
-        // }
-        // if (ref instanceof Steuerelement) {
-        // return (Steuerelement) ref;
-        // }
-        // if (ref instanceof Eingabeelement) {
-        // return (Eingabeelement) ref;
-        // }
-        //
-        // }
-        // }
-        //
-        // }
 
         if (adapted.getType() != null) {
             if (adapted.getKey() != null && !adapted.getType().contains("MaskensteuerungIdentifier") && !adapted.getType().contains("SchnittstellensteuerungIdentifier")) {
@@ -205,46 +178,48 @@ public class SimpleEnumAdapter extends XmlAdapter<AdaptedSimpleEnum, ISimpleEnum
                 return ident;
 
             }
+            if (!v.getType().contains("maskensteuerung") && !v.getType().contains("schnittstellensteuerun")) {
 
-            if (adapted.getType().contains("Steuerelementeigenschaft")) {
-                Steuerelementeigenschaft eig = new Steuerelementeigenschaft();
-                eig.setBeschreibung(adapted.getBeschreibung());
-                eig.setName(adapted.getName());
-                eig.setModelElementId(adapted.getModelElementId());
-                eig.setAktiviert(adapted.isAktiviert() != null ? adapted.isAktiviert() : false);
-                eig.setSichtbar(adapted.isSichtbar() != null ? adapted.isSichtbar() : false);
-                return eig;
-            }
+                if (adapted.getType().contains("Steuerelementeigenschaft")) {
+                    Steuerelementeigenschaft eig = new Steuerelementeigenschaft();
+                    eig.setBeschreibung(adapted.getBeschreibung());
+                    eig.setName(adapted.getName());
+                    eig.setModelElementId(adapted.getModelElementId());
+                    eig.setAktiviert(adapted.isAktiviert() != null ? adapted.isAktiviert() : false);
+                    eig.setSichtbar(adapted.isSichtbar() != null ? adapted.isSichtbar() : false);
+                    return eig;
+                }
 
-            if (adapted.getType().endsWith("Steuerelement")) {
-                Steuerelement steuer = new Steuerelement();
-                steuer.setBeschreibung(adapted.getBeschreibung());
-                steuer.setName(adapted.getName());
-                steuer.setModelElementId(adapted.getModelElementId());
+                if (adapted.getType().endsWith("Steuerelement")) {
+                    Steuerelement steuer = new Steuerelement();
+                    steuer.setBeschreibung(adapted.getBeschreibung());
+                    steuer.setName(adapted.getName());
+                    steuer.setModelElementId(adapted.getModelElementId());
 
-                return steuer;
-            }
+                    return steuer;
+                }
 
-            if (v.getType().endsWith("eingabeelement")) {
-                Eingabeelement eing = new Eingabeelement();
-                eing.setBeschreibung(adapted.getBeschreibung());
-                eing.setName(adapted.getName());
-                eing.setModelElementId(adapted.getModelElementId());
+                if (v.getType().endsWith("eingabeelement")) {
+                    Eingabeelement eing = new Eingabeelement();
+                    eing.setBeschreibung(adapted.getBeschreibung());
+                    eing.setName(adapted.getName());
+                    eing.setModelElementId(adapted.getModelElementId());
 
-                return eing;
-            }
+                    return eing;
+                }
 
-            if (adapted.getType().contains("Eingabeelementeigenschaft")) {
-                Eingabeelementeigenschaft eig = new Eingabeelementeigenschaft();
-                eig.setBeschreibung(adapted.getBeschreibung());
-                eig.setName(adapted.getName());
-                eig.setModelElementId(adapted.getModelElementId());
-                eig.setEditierbar(adapted.isEditierbar() != null ? adapted.isEditierbar() : false);
-                eig.setSichtbar(adapted.isSichtbar() != null ? adapted.isSichtbar() : false);
-                eig.setNotwendig(adapted.isNotwendig() != null ? adapted.isNotwendig() : false);
+                if (adapted.getType().contains("Eingabeelementeigenschaft")) {
+                    Eingabeelementeigenschaft eig = new Eingabeelementeigenschaft();
+                    eig.setBeschreibung(adapted.getBeschreibung());
+                    eig.setName(adapted.getName());
+                    eig.setModelElementId(adapted.getModelElementId());
+                    eig.setEditierbar(adapted.isEditierbar() != null ? adapted.isEditierbar() : false);
+                    eig.setSichtbar(adapted.isSichtbar() != null ? adapted.isSichtbar() : false);
+                    eig.setNotwendig(adapted.isNotwendig() != null ? adapted.isNotwendig() : false);
 
-                return eig;
+                    return eig;
 
+                }
             }
         }
 
