@@ -23,10 +23,11 @@ Require-Bundle: org.eclipse.xsd.ecore.exporter;bundle-version="[2.5.0,3.0.0)";re
  org.eclipse.emf.exporter;bundle-version="[2.7.0,3.0.0)",
  de.adesso.ais.insure-parser,
  org.apache.ant;bundle-version="[1.0.0,2.0.0)",
- insure.core.modell;bundle-version="1.6.0",
- insure.domain.modell;bundle-version="1.0.0",
+ insure.core.modell;bundle-version="[1.6.0,1.7.0)",
+ insure.infoservice.daten;bundle-version="1.6.0",
+ de.adesso.ais.domainreference.modell;bundle-version="1.6.0",
  insure.infoservice.modell;bundle-version="1.6.0",
- insure.infoservice.daten;bundle-version="1.6.0"
+ insure.domain.modell;bundle-version="[1.6.0,1.7.0)"
 Import-package: adapters,
  org.eclipse.emf.ecore.resource
 Bundle-ActivationPolicy: lazy

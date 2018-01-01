@@ -1,4 +1,4 @@
-package java;
+package utils;
 
 public class XmlToJavaParserMitStaxUndJaxbTest {
 

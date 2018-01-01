@@ -7,35 +7,42 @@ import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlID;
-import javax.xml.bind.annotation.XmlRootElement;
+import javax.xml.bind.annotation.adapters.XmlAdapter;
 import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 
+import adapters.RootRepositoryAdapter.AdaptedRootRepository;
 import insure.core.IRepository;
+import insure.core.IRootRepository;
+import insure.core.impl.RootRepository;
 
-    @XmlRootElement(name = "RootRepository")
+public class RootRepositoryAdapter extends XmlAdapter<AdaptedRootRepository, IRootRepository> {
+
     @XmlAccessorType(XmlAccessType.FIELD)
-    public  class AdaptedRootRepository {
-        @XmlAttribute(name = "basePackage")
-        public String basePackage;
+    public static class AdaptedRootRepository {
+
+        @XmlAttribute(name = "pattern")
+        public String pattern;
+
         @XmlAttribute(name = "beschreibung")
         public String beschreibung;
         @XmlAttribute(name = "name")
         public String name;
-
         @XmlID
         @XmlAttribute(name = "modelElementId")
         public String modelElementId;
+        @XmlAttribute(name = "basePackage")
+        public String basePackage;
 
 
         @XmlJavaTypeAdapter(RepositoryAdapter.class)
         public List<IRepository> repositories;
 
-        public String getBasePackage() {
-            return basePackage;
+        public void setPattern(String value) {
+            pattern = value;
         }
 
-        public void setBasePackage(String basePackage) {
-            this.basePackage = basePackage;
+        public String getPattern() {
+            return pattern;
         }
 
         public void setBeschreibung(String value) {
@@ -73,6 +80,34 @@ import insure.core.IRepository;
             return repositories;
         }
 
+        public String getBasePackage() {
+            return basePackage;
+        }
 
+        public void setBasePackage(String basePackage) {
+            this.basePackage = basePackage;
+        }
+
+    }
+
+    @Override
+    public IRootRepository unmarshal(AdaptedRootRepository v) throws Exception {
+        RootRepository repo = new RootRepository();
+        repo.setModelElementId(v.getModelElementId());
+        repo.setBeschreibung(v.getBeschreibung() != null ? v.getBeschreibung() : null);
+        repo.setName(v.getName() != null ? v.getName() : null);
+        repo.setBasePackage(v.getBasePackage() != null ? v.getBasePackage() : null);
+        if (v.getRepositories() != null) {
+            repo.getRepositories().addAll(v.getRepositories());
+        }
+
+        return repo;
+    }
+
+    @Override
+    public AdaptedRootRepository marshal(IRootRepository v) throws Exception {
+        return null;
+
+    }
 
 }

@@ -96,7 +96,7 @@ public class RepositoryAdapter extends XmlAdapter<AdaptedRepository, IRepository
         }
 
         public List<IRepository> getRepositories() {
-            if(repositories==null){
+            if (repositories == null) {
                 return new ArrayList<IRepository>();
             }
             return repositories;
@@ -124,7 +124,6 @@ public class RepositoryAdapter extends XmlAdapter<AdaptedRepository, IRepository
 
     @Override
     public IRepository unmarshal(AdaptedRepository v) throws Exception {
-
         Repository repo = new Repository();
         repo.setBeschreibung(v.getBeschreibung());
         repo.setModelElementId(v.getModelElementId());

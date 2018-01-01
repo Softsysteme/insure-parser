@@ -27,6 +27,8 @@ public class SimpleEnumAdapter extends XmlAdapter<AdaptedSimpleEnum, ISimpleEnum
             nameSpaceMap.put("enums", "de.adesso.ais.domainreference.");
             nameSpaceMap.put("enums_1", "insure.domain.");
             nameSpaceMap.put("feldsteuerung", "insure.infoservice.");
+            nameSpaceMap.put("konfiguration", "de.adesso.ais.domainreference.prototype.");
+
         }
 
         public String getHref() {
@@ -117,7 +119,8 @@ public class SimpleEnumAdapter extends XmlAdapter<AdaptedSimpleEnum, ISimpleEnum
         public Boolean aktiviert;
 
         @XmlAttribute(name = "key")
-        protected Integer key;
+        public Integer key;
+
         public Map<String, String> nameSpaceMap;
 
         public Map<String, String> getNameSpaceMap() {
@@ -162,11 +165,12 @@ public class SimpleEnumAdapter extends XmlAdapter<AdaptedSimpleEnum, ISimpleEnum
         AdaptedSimpleEnum adapted = (AdaptedSimpleEnum) v;
 
         if (adapted.getType() != null) {
-            if (adapted.getKey() != null && !adapted.getType().contains("MaskensteuerungIdentifier") && !adapted.getType().contains("SchnittstellensteuerungIdentifier")) {
-                if (adapted.getType().contains("insure")) {
-                    adapted.getNameSpaceMap().put(adapted.getType().substring(0, adapted.getType().indexOf(":")), "de.adesso.ais.domainreference.entity.tickets");
-                }
+            if (adapted.getType().contains("insure")) {
+                adapted.getNameSpaceMap().put(adapted.getType().substring(0, adapted.getType().indexOf(":")), "de.adesso.ais.domainreference.tickets.");
+            }
 
+            if (adapted.getKey() != null && !adapted.getType().contains("MaskensteuerungIdentifier") && !adapted.getType().contains("SchnittstellensteuerungIdentifier")
+                    && !adapted.getType().contains("insure")) {
                 Class<?> clazz = Class.forName(FullyQualifiedName(adapted.getType(), adapted.getNameSpaceMap()));
                 Constructor<?> ctor = clazz.getDeclaredConstructor();
                 EnumerationType ident = (EnumerationType) ctor.newInstance();
@@ -174,11 +178,10 @@ public class SimpleEnumAdapter extends XmlAdapter<AdaptedSimpleEnum, ISimpleEnum
                 ident.setName(adapted.getName());
                 ident.setModelElementId(adapted.getModelElementId());
                 ident.setKey(adapted.getKey() != null ? adapted.getKey() : null);
-                /// insure.domain.modell/src/insure/domain/enums/impl/Zahlweise.java
                 return ident;
 
             }
-            if (!v.getType().contains("maskensteuerung") && !v.getType().contains("schnittstellensteuerun")) {
+            if (!v.getType().contains("maskensteuerung") && !v.getType().contains("schnittstellensteuerun") && !adapted.getType().contains("insure")) {
 
                 if (adapted.getType().contains("Steuerelementeigenschaft")) {
                     Steuerelementeigenschaft eig = new Steuerelementeigenschaft();
@@ -234,6 +237,7 @@ public class SimpleEnumAdapter extends XmlAdapter<AdaptedSimpleEnum, ISimpleEnum
 
     public String FullyQualifiedName(String typefromxml, Map<String, String> map) {
         String newType = typefromxml;
+        newType = newType.replaceAll("enums_1", "enums");
         newType = newType.replaceAll(":", ".impl.");
         String h = map.get(typefromxml.substring(0, typefromxml.indexOf(":")));
         h += newType;
