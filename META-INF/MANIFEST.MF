@@ -1,13 +1,15 @@
 Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: %pluginName
-Bundle-SymbolicName: de.adesso.ais.insure-parser;singleton:=true
+Bundle-SymbolicName: insure-parser;singleton:=true
 Bundle-Version: 1.0.0.qualifier
 Bundle-ClassPath: .,
  src/main/java/JAXBandStAX/,
  src/main/java/handler/,
  bin/,
- src/main/resources/
+ src/main/resources/,
+ target/dependency/insure-core-1.6.0.jar,
+ target/dependency/insure-infoservice-gen-1.6.0-SNAPSHOT.jar
 Bundle-Vendor: %providerName
 Bundle-Localization: plugin
 Bundle-RequiredExecutionEnvironment: JavaSE-1.8
@@ -26,8 +28,8 @@ Require-Bundle: org.eclipse.xsd.ecore.exporter;bundle-version="[2.5.0,3.0.0)";re
  insure.core.modell;bundle-version="[1.6.0,1.7.0)",
  insure.infoservice.daten;bundle-version="1.6.0",
  de.adesso.ais.domainreference.modell;bundle-version="1.6.0",
- insure.infoservice.modell;bundle-version="1.6.0",
- insure.domain.modell;bundle-version="[1.6.0,1.7.0)"
+ insure.domain.modell;bundle-version="[1.6.0,1.7.0)",
+ insure.infoservice.modell;bundle-version="1.6.0"
 Import-package: adapters,
  org.eclipse.emf.ecore.resource
 Bundle-ActivationPolicy: lazy

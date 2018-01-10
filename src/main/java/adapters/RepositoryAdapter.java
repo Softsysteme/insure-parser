@@ -11,13 +11,12 @@ import javax.xml.bind.annotation.adapters.XmlAdapter;
 import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 
 import adapters.RepositoryAdapter.AdaptedRepository;
-import insure.core.IPrototype;
-import insure.core.IRepository;
-import insure.core.ISimpleEnum;
-import insure.core.impl.Function;
-import insure.core.impl.Repository;
+import insure.Function;
+import insure.Prototype;
+import insure.Repository;
+import insure.SimpleEnum;
 
-public class RepositoryAdapter extends XmlAdapter<AdaptedRepository, IRepository> {
+public class RepositoryAdapter extends XmlAdapter<AdaptedRepository, Repository> {
 
     @XmlAccessorType(XmlAccessType.FIELD)
     public static class AdaptedRepository {
@@ -34,18 +33,18 @@ public class RepositoryAdapter extends XmlAdapter<AdaptedRepository, IRepository
 
         @XmlElement
         @XmlJavaTypeAdapter(RepositoryAdapter.class)
-        public List<IRepository> repositories;
+        public List<Repository> repositories = new ArrayList<Repository>();
 
         @XmlElement(name = "prototypes")
         @XmlJavaTypeAdapter(PrototypeAdapter.class)
-        public List<IPrototype> prototypes;
+        public List<Prototype> prototypes = new ArrayList<Prototype>();
 
         @XmlElement
-        public List<Function> functions;
+        public List<Function> functions = new ArrayList<Function>();
 
         @XmlElement(name = "enumerations")
         @XmlJavaTypeAdapter(SimpleEnumAdapter.class)
-        public List<ISimpleEnum> enumerations;
+        public List<SimpleEnum> enumerations = new ArrayList<SimpleEnum>();
 
         public void setPattern(String value) {
             pattern = value;
@@ -79,11 +78,11 @@ public class RepositoryAdapter extends XmlAdapter<AdaptedRepository, IRepository
             return name;
         }
 
-        public void setRepositories(List<IRepository> repos) {
+        public void setRepositories(List<Repository> repos) {
             this.repositories = repos;
         }
 
-        public void setPrototypes(List<IPrototype> protos) {
+        public void setPrototypes(List<Prototype> protos) {
             this.prototypes = protos;
         }
 
@@ -91,72 +90,72 @@ public class RepositoryAdapter extends XmlAdapter<AdaptedRepository, IRepository
             this.functions = funct;
         }
 
-        public void setEnumerations(List<ISimpleEnum> enums) {
+        public void setEnumerations(List<SimpleEnum> enums) {
             this.enumerations = enums;
         }
 
-        public List<IRepository> getRepositories() {
+        public List<Repository> getRepositories() {
             if (repositories == null) {
-                return new ArrayList<IRepository>();
+                return new ArrayList<Repository>();
             }
             return repositories;
         }
 
-        public List<IPrototype> getPrototypes() {
+        public List<Prototype> getPrototypes() {
             if (prototypes == null) {
-                return new ArrayList<IPrototype>();
+                return new ArrayList<Prototype>();
             }
             return prototypes;
         }
 
         public List<Function> getFunctions() {
+            if (functions == null) {
+                return new ArrayList<Function>();
+            }
             return functions;
         }
 
-        public List<ISimpleEnum> getEnumerations() {
+        public List<SimpleEnum> getEnumerations() {
             if (enumerations == null) {
-                return new ArrayList<ISimpleEnum>();
+                return new ArrayList<SimpleEnum>();
             }
             return enumerations;
         }
 
     }
 
+    @SuppressWarnings("unchecked")
     @Override
-    public IRepository unmarshal(AdaptedRepository v) throws Exception {
+    public Repository unmarshal(AdaptedRepository v) throws Exception {
         Repository repo = new Repository();
         repo.setBeschreibung(v.getBeschreibung());
         repo.setModelElementId(v.getModelElementId());
         repo.setBeschreibung(v.getBeschreibung());
         repo.setName(v.getName());
         repo.setPattern(v.getPattern());
-        if (v.getRepositories() != null) {
-            for (IRepository r : v.getRepositories()) {
-                repo.add(r);
 
-            }
-        }
-        if (v.getEnumerations() != null) {
-            for (ISimpleEnum en : v.getEnumerations()) {
+        for (Repository r : v.getRepositories()) {
+            (repo).add(r);
 
-                repo.add(en);
-            }
         }
-        if (v.getPrototypes() != null) {
-            for (IPrototype prot : v.getPrototypes()) {
-                repo.add(prot);
-            }
+
+        for (SimpleEnum en : v.getEnumerations()) {
+            // System.out.println(en);
+            repo.add(en);
         }
-        if (v.getFunctions() != null) {
-            for (Function func : v.getFunctions())
-                repo.add(func);
+
+        for (Prototype prot : v.getPrototypes()) {
+            repo.add(prot);
         }
+
+        for (Function func : v.getFunctions())
+            repo.add(func);
 
         return repo;
     }
 
     @Override
-    public AdaptedRepository marshal(IRepository v) throws Exception {
+    public AdaptedRepository marshal(Repository v) throws Exception {
 
         return null;
 

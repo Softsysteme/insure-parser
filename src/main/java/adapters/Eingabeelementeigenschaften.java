@@ -3,36 +3,28 @@ package adapters;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlAttribute;
-import javax.xml.bind.annotation.XmlIDREF;
+import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlType;
-import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
-
-import insure.infoservice.feldsteuerung.impl.Eingabeelement;
-import insure.infoservice.feldsteuerung.impl.Eingabeelementeigenschaft;
 
 @XmlRootElement(name = "eingabeelementeigenschaften")
 @XmlAccessorType(XmlAccessType.FIELD)
-@XmlType(name = "Eingabeelementeigenschaften", propOrder = {
-        "key",
-        "value"
-})
+@XmlType(name = "Eingabeelementeigenschaften")
 public class Eingabeelementeigenschaften {
-
-    public Eingabeelementeigenschaften(Eingabeelement key, Value value) {
-        this.key = key;
-        this.value = value;
-    }
 
     public Eingabeelementeigenschaften() {
 
     }
 
-    public Eingabeelement getKey() {
+    @XmlElement(required = true)
+    public Key key;
+    public Value value;
+
+    public Key getKey() {
         return key;
     }
 
-    public void setKey(Eingabeelement key) {
+    public void setKey(Key key) {
         this.key = key;
     }
 
@@ -44,30 +36,40 @@ public class Eingabeelementeigenschaften {
         this.value = value;
     }
 
-    @XmlIDREF
-    @XmlAttribute(name = "key")
-    @XmlJavaTypeAdapter(SimpleEnumAdapter.class)
-    private Eingabeelement key;
 
-    public Value value;
 
-    @XmlRootElement(name = "EingabeelementeigenschaftenValue")
-    @XmlType(name = "Value", propOrder = {
-            "href",
+    @XmlRootElement(name = "key")
+    @XmlType(name = "Key")
+    @XmlAccessorType(XmlAccessType.FIELD)
+    public static class Key {
 
-    })
+
+        @XmlAttribute
+
+        private String ref;
+
+        public String getRef() {
+            return ref;
+        }
+
+        public void setRef(String ref) {
+            this.ref = ref;
+        }
+    }
+
+    @XmlRootElement(name = "value")
+    @XmlType(name = "Value")
     @XmlAccessorType(XmlAccessType.FIELD)
     public static class Value {
-        @XmlIDREF
-        @XmlAttribute
-        @XmlJavaTypeAdapter(SimpleEnumAdapter.class)
-        private Eingabeelementeigenschaft href;
 
-        public Eingabeelementeigenschaft getHref() {
+        @XmlAttribute
+        private String href;
+
+        public String getHref() {
             return href;
         }
 
-        public void setValue(Eingabeelementeigenschaft href) {
+        public void setHref(String href) {
             this.href = href;
         }
     }

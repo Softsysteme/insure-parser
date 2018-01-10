@@ -9,8 +9,7 @@ import javax.xml.bind.annotation.XmlElements;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 
-import insure.core.IRepository;
-import insure.core.IRootRepository;
+import insure.RootRepository;
 import insure.core.impl.NamedType;
 
 @XmlRootElement
@@ -22,13 +21,13 @@ public class SuperRoot extends NamedType {
 
     @XmlElements({ @XmlElement(name = "RootRepository") })
     @XmlJavaTypeAdapter(RootRepositoryAdapter.class)
-    public List<IRootRepository> RootRepository;
+    public List<RootRepository> RootRepository;
 
-    public List<IRootRepository> getRootRepository() {
+    public List<RootRepository> getRootRepository() {
         return RootRepository;
     }
 
-    public void setRootRepository(List<IRootRepository> superRoot) {
+    public void setRootRepository(List<RootRepository> superRoot) {
         this.RootRepository = superRoot;
     }
 
@@ -45,7 +44,7 @@ public class SuperRoot extends NamedType {
     }
 
 
-    public List<IRepository> getRepositories() {
+    public List<insure.RootRepository> getRepositories() {
         // TODO Auto-generated method stub
         return null;
     }

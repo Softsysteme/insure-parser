@@ -3,13 +3,8 @@ package adapters;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlAttribute;
-import javax.xml.bind.annotation.XmlIDREF;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlType;
-import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
-
-import insure.infoservice.feldsteuerung.impl.Steuerelement;
-import insure.infoservice.feldsteuerung.impl.Steuerelementeigenschaft;
 
 @XmlRootElement(name = "steuerelementeigenschaften")
 @XmlAccessorType(XmlAccessType.FIELD)
@@ -18,11 +13,11 @@ import insure.infoservice.feldsteuerung.impl.Steuerelementeigenschaft;
         "value"
 })
 public class Steuerelementeigenschaften {
-    public Steuerelement getKey() {
+    public String getKey() {
         return key;
     }
 
-    public void setKey(Steuerelement key) {
+    public void setKey(String key) {
         this.key = key;
     }
 
@@ -34,30 +29,24 @@ public class Steuerelementeigenschaften {
         this.value = value;
     }
 
-    @XmlIDREF
+
     @XmlAttribute(name = "key")
-    @XmlJavaTypeAdapter(SimpleEnumAdapter.class)
-    private Steuerelement key;
+    private String key;
 
     public Value value;
 
     @XmlRootElement(name = "value")
-    @XmlType(name = "SteuerelementeigenschaftenValue", propOrder = {
-            "href",
-
-    })
+    @XmlType(name = "SteuerelementeigenschaftenValue")
     @XmlAccessorType(XmlAccessType.FIELD)
     public static class Value {
-        @XmlIDREF
-        @XmlAttribute
-        @XmlJavaTypeAdapter(SimpleEnumAdapter.class)
-        private Steuerelementeigenschaft href;
 
-        public Steuerelementeigenschaft getHref() {
+        private String href;
+
+        public String getHref() {
             return href;
         }
 
-        public void setValue(Steuerelementeigenschaft href) {
+        public void setValue(String href) {
             this.href = href;
         }
     }

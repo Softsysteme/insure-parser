@@ -1,6 +1,5 @@
 package adapters;
 
-import java.lang.reflect.Constructor;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -10,14 +9,14 @@ import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.adapters.XmlAdapter;
 
 import adapters.SimpleEnumAdapter.AdaptedSimpleEnum;
-import insure.core.ISimpleEnum;
-import insure.core.impl.EnumerationType;
-import insure.infoservice.feldsteuerung.impl.Eingabeelement;
-import insure.infoservice.feldsteuerung.impl.Eingabeelementeigenschaft;
-import insure.infoservice.feldsteuerung.impl.Steuerelement;
-import insure.infoservice.feldsteuerung.impl.Steuerelementeigenschaft;
+import insure.SimpleEnum;
+import insure.infoservice.feldsteuerung.EingabeelementLiterals;
+import insure.infoservice.feldsteuerung.EingabeelementeigenschaftLiterals;
+import insure.infoservice.feldsteuerung.SteuerelementLiterals;
+import insure.infoservice.feldsteuerung.SteuerelementeigenschaftLiterals;
+import tools.GlobalEnumMapFactory;
 
-public class SimpleEnumAdapter extends XmlAdapter<AdaptedSimpleEnum, ISimpleEnum> {
+public class SimpleEnumAdapter extends XmlAdapter<AdaptedSimpleEnum, SimpleEnum> {
 
     @XmlAccessorType(XmlAccessType.FIELD)
     public static class AdaptedSimpleEnum extends AdaptedClass {
@@ -161,67 +160,44 @@ public class SimpleEnumAdapter extends XmlAdapter<AdaptedSimpleEnum, ISimpleEnum
     }
 
     @Override
-    public ISimpleEnum unmarshal(AdaptedSimpleEnum v) throws Exception {
+    public SimpleEnum unmarshal(AdaptedSimpleEnum v) throws Exception {
         AdaptedSimpleEnum adapted = (AdaptedSimpleEnum) v;
 
-        if (adapted.getType() != null) {
-            if (adapted.getType().contains("insure")) {
-                adapted.getNameSpaceMap().put(adapted.getType().substring(0, adapted.getType().indexOf(":")), "de.adesso.ais.domainreference.tickets.");
-            }
+        String atype = adapted.getType();
 
-            if (adapted.getKey() != null && !adapted.getType().contains("MaskensteuerungIdentifier") && !adapted.getType().contains("SchnittstellensteuerungIdentifier")
-                    && !adapted.getType().contains("insure")) {
-                Class<?> clazz = Class.forName(FullyQualifiedName(adapted.getType(), adapted.getNameSpaceMap()));
-                Constructor<?> ctor = clazz.getDeclaredConstructor();
-                EnumerationType ident = (EnumerationType) ctor.newInstance();
-                ident.setBeschreibung(adapted.getBeschreibung());
-                ident.setName(adapted.getName());
-                ident.setModelElementId(adapted.getModelElementId());
-                ident.setKey(adapted.getKey() != null ? adapted.getKey() : null);
-                return ident;
+        if (adapted.getName() != null) {
+            if (atype != null) {
+                if (atype.contains("insure")) {
+                    adapted.getNameSpaceMap().put(atype.substring(0, atype.indexOf(":")), "de.adesso.ais.domainreference.tickets.");
+                }
+                atype = atype.substring(atype.indexOf(":") + 1);
 
-            }
-            if (!v.getType().contains("maskensteuerung") && !v.getType().contains("schnittstellensteuerun") && !adapted.getType().contains("insure")) {
-
-                if (adapted.getType().contains("Steuerelementeigenschaft")) {
-                    Steuerelementeigenschaft eig = new Steuerelementeigenschaft();
-                    eig.setBeschreibung(adapted.getBeschreibung());
-                    eig.setName(adapted.getName());
-                    eig.setModelElementId(adapted.getModelElementId());
-                    eig.setAktiviert(adapted.isAktiviert() != null ? adapted.isAktiviert() : false);
-                    eig.setSichtbar(adapted.isSichtbar() != null ? adapted.isSichtbar() : false);
-                    return eig;
+                if (atype.equals("Eingabelement")) {
+                    EingabeelementLiterals.getInstance();
+                    GlobalEnumMapFactory.INSTANCE.getEnumMap().store(adapted.modelElementId, (SimpleEnum) EingabeelementLiterals.valueOf(adapted.getName()));
+                    EingabeelementLiterals.getInstance();
+                    return (SimpleEnum) EingabeelementLiterals.valueOf(adapted.getName());
                 }
 
-                if (adapted.getType().endsWith("Steuerelement")) {
-                    Steuerelement steuer = new Steuerelement();
-                    steuer.setBeschreibung(adapted.getBeschreibung());
-                    steuer.setName(adapted.getName());
-                    steuer.setModelElementId(adapted.getModelElementId());
-
-                    return steuer;
+                if (atype.equals("Steuerelement")) {
+                    SteuerelementLiterals.getInstance();
+                    GlobalEnumMapFactory.INSTANCE.getEnumMap().store(adapted.modelElementId, (SimpleEnum) SteuerelementLiterals.valueOf(adapted.getName()));
+                    SteuerelementLiterals.getInstance();
+                    return (SimpleEnum) SteuerelementLiterals.valueOf(adapted.getName());
                 }
 
-                if (v.getType().endsWith("eingabeelement")) {
-                    Eingabeelement eing = new Eingabeelement();
-                    eing.setBeschreibung(adapted.getBeschreibung());
-                    eing.setName(adapted.getName());
-                    eing.setModelElementId(adapted.getModelElementId());
-
-                    return eing;
+                if (atype.equals("Steuerelementeigenschaft")) {
+                    SteuerelementeigenschaftLiterals.getInstance();
+                    GlobalEnumMapFactory.INSTANCE.getEnumMap().store(adapted.modelElementId, (SimpleEnum) SteuerelementeigenschaftLiterals.valueOf(adapted.getName()));
+                    SteuerelementeigenschaftLiterals.getInstance();
+                    return (SimpleEnum) SteuerelementeigenschaftLiterals.valueOf(adapted.getName());
                 }
 
-                if (adapted.getType().contains("Eingabeelementeigenschaft")) {
-                    Eingabeelementeigenschaft eig = new Eingabeelementeigenschaft();
-                    eig.setBeschreibung(adapted.getBeschreibung());
-                    eig.setName(adapted.getName());
-                    eig.setModelElementId(adapted.getModelElementId());
-                    eig.setEditierbar(adapted.isEditierbar() != null ? adapted.isEditierbar() : false);
-                    eig.setSichtbar(adapted.isSichtbar() != null ? adapted.isSichtbar() : false);
-                    eig.setNotwendig(adapted.isNotwendig() != null ? adapted.isNotwendig() : false);
-
-                    return eig;
-
+                if (atype.equals("Eingabeelementeigenschaft")) {
+                    EingabeelementeigenschaftLiterals.getInstance();
+                    GlobalEnumMapFactory.INSTANCE.getEnumMap().store(adapted.modelElementId, (SimpleEnum) EingabeelementeigenschaftLiterals.valueOf(adapted.getName()));
+                    EingabeelementeigenschaftLiterals.getInstance();
+                    return (SimpleEnum) EingabeelementeigenschaftLiterals.valueOf(adapted.getName());
                 }
             }
         }
@@ -230,7 +206,7 @@ public class SimpleEnumAdapter extends XmlAdapter<AdaptedSimpleEnum, ISimpleEnum
     }
 
     @Override
-    public AdaptedSimpleEnum marshal(ISimpleEnum v) throws Exception {
+    public AdaptedSimpleEnum marshal(SimpleEnum v) throws Exception {
         // TODO Auto-generated method stub
         return null;
     }
@@ -238,7 +214,7 @@ public class SimpleEnumAdapter extends XmlAdapter<AdaptedSimpleEnum, ISimpleEnum
     public String FullyQualifiedName(String typefromxml, Map<String, String> map) {
         String newType = typefromxml;
         newType = newType.replaceAll("enums_1", "enums");
-        newType = newType.replaceAll(":", ".impl.");
+        newType = newType.replaceAll(":", ".");
         String h = map.get(typefromxml.substring(0, typefromxml.indexOf(":")));
         h += newType;
         return h;

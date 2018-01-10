@@ -21,9 +21,9 @@ import org.eclipse.equinox.app.IApplicationContext;
 import org.osgi.framework.Bundle;
 
 import adapters.SuperRoot;
-import insure.core.IPrototype;
-import insure.core.IRepository;
-import insure.core.ISimpleEnum;
+import insure.Prototype;
+import insure.Repository;
+import insure.SimpleEnum;
 import parser.PrintObjects;
 import parser.XmlParser;
 
@@ -36,7 +36,7 @@ public class StartUp implements IApplication {
     @Override
     public Object start(IApplicationContext context) throws Exception {
         String[] xmlPaths =
-                new String[] { "/src/main/resources/model/infoservice.insure", "/src/main/resources/model/domain-reference.insure", "/src/main/resources/model/infoservice-reference.insure" };
+                new String[] { "/src/main/resources/model/infoservice.insure" };
         init("insure.core.modell", "de.adesso.ais.insure-parser", xmlPaths);
         return IApplication.EXIT_OK;
 
@@ -71,13 +71,11 @@ public class StartUp implements IApplication {
             Reader reader = new InputStreamReader(new FileInputStream(mergeFiles(xmlFiles)), "UTF-8");
             XmlParser parser = new XmlParser();
             parser.parseXml(reader, elementClasses[0], new PrintObjects());
-            for (IRepository repo : XmlParser.getObjects().get(0).getRepositories()) {
-                System.out.println(repo.getName());
-                for (IRepository reposit : repo.getRepositories())
-                    System.out.println(reposit.toString());
-                for (IPrototype prot : repo.getPrototypes())
+            for (Repository repo : XmlParser.getObjects().get(0).getRepositories()) {
+                for (Repository reposit : repo.getRepositories())
+                    for (Prototype prot : repo.getPrototypes())
                     System.out.println(prot.toString());
-                for (ISimpleEnum enu : repo.getEnumerations())
+                for (SimpleEnum enu : repo.getEnumerations())
                     System.out.println(enu.toString());
                 ;
                 // System.out.println(repo.getPrototypes().toString());
@@ -98,6 +96,8 @@ public class StartUp implements IApplication {
 
             FileReader reader = new FileReader(inputXML);
             String search = "xsi:type";
+            String search2 = "<steuerelementeigenschaften key=";
+            String search3 = "<eingabeelementeigenschaften key=";
 
             br = new BufferedReader(reader);
             while ((newString = br.readLine()) != null) {
@@ -105,7 +105,15 @@ public class StartUp implements IApplication {
                 if (newString.contains("href=")) {
                     newString = newString.replace(newString.substring((newString.indexOf("=") + 2), newString.indexOf("#") + 1), "");
                 }
-                // newString = newString.replaceAll("href", "");
+                if (newString.contains(search2)) {
+                    String key = newString.substring((newString.indexOf("=") + 1), newString.indexOf(">"));
+                    newString = newString.replace(newString.substring((newString.indexOf("=") - 4), newString.length()), ">\n\t<key ref=" + key + "/>");
+                }
+                if (newString.contains(search3)) {
+                    String key = newString.substring((newString.indexOf("=") + 1), newString.indexOf(">"));
+                    newString = newString.replace(newString.substring((newString.indexOf("=") - 4), newString.length()), ">\n\t<key ref=" + key + "/>");
+                }
+
                 strTotale.append(newString + '\n');
             }
 

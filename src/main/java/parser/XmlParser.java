@@ -24,9 +24,8 @@ import javax.xml.validation.Validator;
 import org.xml.sax.SAXException;
 
 import adapters.SuperRoot;
-import insure.core.IRepository;
-import insure.core.IRootRepository;
-import insure.core.impl.RootRepository;
+import insure.Repository;
+import insure.RootRepository;
 
 /**
  * Klasse zum Parsen XML-Dateien (durch Kombination von JAXB mit StAX). Es wird nicht das StartElement geparst, aber alle darunter angeordneten Elemente.
@@ -77,7 +76,6 @@ public class XmlParser {
         XMLEventReader staxFiltRd = staxFactory.createFilteredReader(staxReader, startElementFilter);
         JAXBContext jaxbContext = JAXBContext.newInstance(elementClasses);
         Unmarshaller unmarshaller = jaxbContext.createUnmarshaller();
-        // unmarshaller.setProperty(IDResolver.class.getName(), new IDResolverExtension());
         unmarshaller.setEventHandler(new DefaultValidationEventHandler());
         // staxFiltRd.nextEvent();
         // Parsing:
@@ -88,23 +86,23 @@ public class XmlParser {
         }
 
         overab.verarbeite((SuperRoot) element);
-        for (IRootRepository root : ((SuperRoot) element).getRootRepository()) {
-            System.out.println(root.toString());
-            for (IRepository repo : root.getRepositories()) {
+        for (RootRepository root : ((SuperRoot) element).getRootRepository()) {
+            System.out.println(root.getRepositories());
+            for (Repository repo : root.getRepositories()) {
                 System.out.println(repo.toString());
                 System.out.println(repo.getEnumerations().toString());
                 System.out.println(repo.getPrototypes().toString());
-                for (IRepository r : repo.getRepositories()) {
+                for (Repository r : repo.getRepositories()) {
                     System.out.println(r.toString());
                     System.out.println(r.getEnumerations().toString());
                     System.out.println(r.getPrototypes().toString());
 
-                    for (IRepository re : r.getRepositories()) {
+                    for (Repository re : r.getRepositories()) {
                         System.out.println(re.toString());
                         System.out.println(re.getEnumerations().toString());
                         System.out.println(re.getPrototypes().toString());
 
-                        for (IRepository y : re.getRepositories()) {
+                        for (Repository y : re.getRepositories()) {
                             System.out.println(y.toString());
                             System.out.println(y.getEnumerations().toString());
                             System.out.println(y.getPrototypes().toString());

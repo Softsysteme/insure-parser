@@ -2,39 +2,27 @@ package adapters;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
 
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
-import javax.xml.bind.annotation.XmlIDREF;
 import javax.xml.bind.annotation.adapters.XmlAdapter;
-import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 
 import adapters.PrototypeAdapter.AdaptedPrototype;
-import insure.core.IPrototype;
-import insure.core.ISimpleEnum;
-import insure.core.impl.EnumerationType;
-import insure.core.impl.Prototype;
-import insure.domain.prototype.kontext.IKontext;
-import insure.infoservice.feldsteuerung.Feldelementeigenschaften;
+import insure.Prototype;
+import insure.infoservice.feldsteuerung.Feldsteuerung;
 import insure.infoservice.feldsteuerung.IEingabeelement;
+import insure.infoservice.feldsteuerung.IEingabeelementeigenschaft;
 import insure.infoservice.feldsteuerung.IFeldelementeigenschaften;
 import insure.infoservice.feldsteuerung.IFeldsteuerungIdentifier;
 import insure.infoservice.feldsteuerung.ISteuerelement;
 import insure.infoservice.feldsteuerung.ISteuerelementeigenschaft;
-import insure.infoservice.feldsteuerung.impl.Eingabeelementeigenschaft;
-import insure.infoservice.feldsteuerung.impl.Eingabeelementeigenschaftenzuordnung;
-import insure.infoservice.feldsteuerung.impl.Feldelementeigenschaftenzuordnung;
-import insure.infoservice.feldsteuerung.impl.Feldsteuerung;
-import insure.infoservice.feldsteuerung.impl.StandardFeldelementeigenschaften;
-import insure.infoservice.feldsteuerung.impl.Steuerelementeigenschaft;
-import insure.infoservice.feldsteuerung.impl.Steuerelementeigenschaftenzuordnung;
-import insure.infoservice.feldsteuerung.impl.TemplateFeldelementeigenschaften;
+import insure.infoservice.feldsteuerung.StandardFeldelementeigenschaften;
+import insure.infoservice.feldsteuerung.TemplateFeldelementeigenschaften;
+import tools.GlobalEnumMapFactory;
 
-public class PrototypeAdapter extends XmlAdapter<AdaptedPrototype, IPrototype> {
+public class PrototypeAdapter extends XmlAdapter<AdaptedPrototype, Prototype> {
 
     @XmlAccessorType(XmlAccessType.FIELD)
     public static class AdaptedPrototype extends AdaptedClass {
@@ -44,10 +32,10 @@ public class PrototypeAdapter extends XmlAdapter<AdaptedPrototype, IPrototype> {
         }
 
         public List<Eingabeelementeigenschaften> getEingabeelementeigenschaften() {
-            if (teste == null) {
+            if (eingabeelementeigenschaften == null) {
                 return new ArrayList<Eingabeelementeigenschaften>();
             }
-            return teste;
+            return eingabeelementeigenschaften;
         }
 
         public String getBeschreibung() {
@@ -66,56 +54,55 @@ public class PrototypeAdapter extends XmlAdapter<AdaptedPrototype, IPrototype> {
             this.name = name;
         }
 
-        public IFeldelementeigenschaften getTemplate() {
+        public String getTemplate() {
             return template;
         }
 
-        public void setTemplate(IFeldelementeigenschaften template) {
+        public void setTemplate(String template) {
             this.template = template;
         }
 
-        public ISteuerelementeigenschaft getStandardSteuerelementeigenschaft() {
+        public String getStandardSteuerelementeigenschaft() {
             return standardSteuerelementeigenschaft;
         }
 
-        public void setStandardSteuerelementeigenschaft(Steuerelementeigenschaft standardSteuerelementeigenschaft) {
+        public void setStandardSteuerelementeigenschaft(String standardSteuerelementeigenschaft) {
             this.standardSteuerelementeigenschaft = standardSteuerelementeigenschaft;
         }
 
-        public Map<Feldelementeigenschaften, EnumerationType> getFeldelementeigenschaften() {
-            return feldelementeigenschaften;
-        }
+        // public Map<Feldelementeigenschaften, SimpleEnum> getFeldelementeigenschaften() {
+        // return feldelementeigenschaften;
+        // }
 
-        public void setFeldelementeigenschaften(Map<Feldelementeigenschaften, EnumerationType> feldelementeigenschaften) {
-            this.feldelementeigenschaften = feldelementeigenschaften;
-        }
+        // public void setFeldelementeigenschaften(Map<Feldelementeigenschaften, SimpleEnum> feldelementeigenschaften) {
+        // this.feldelementeigenschaften = feldelementeigenschaften;
+        // }
 
-        public EnumerationType getIdentifier() {
+        public String getIdentifier() {
             return identifier;
         }
 
-        public void setIdentifier(EnumerationType identifier) {
+        public void setIdentifier(String identifier) {
             this.identifier = identifier;
         }
 
 
-        @XmlElement(name = "eingabeelementeigenschaften", type = Eingabeelementeigenschaften.class)
-        protected List<Eingabeelementeigenschaften> teste = new ArrayList<Eingabeelementeigenschaften>();
 
+        protected List<Eingabeelementeigenschaften> eingabeelementeigenschaften = new ArrayList<Eingabeelementeigenschaften>();
 
-        @XmlElement(name = "steuerelementeigenschaften", type = Steuerelementeigenschaften.class)
-        protected List<Steuerelementeigenschaften> tests;
+        // @XmlElement(name = "steuerelementeigenschaften", type = Steuerelementeigenschaften.class)
+        protected List<Steuerelementeigenschaften> steuerelementeigenschaften;
 
         public List<Steuerelementeigenschaften> getSteuerelementeigenschaften() {
-            return tests;
+            return steuerelementeigenschaften;
         }
 
         public void setSteuerelementeigenschaften(List<Steuerelementeigenschaften> steuerelementeigenschaften) {
-            this.tests = steuerelementeigenschaften;
+            this.steuerelementeigenschaften = steuerelementeigenschaften;
         }
 
         public void setEingabeelementeigenschaften(List<Eingabeelementeigenschaften> eingabeelementeigenschaften) {
-            this.teste = eingabeelementeigenschaften;
+            this.eingabeelementeigenschaften = eingabeelementeigenschaften;
         }
 
         @XmlAttribute
@@ -134,48 +121,30 @@ public class PrototypeAdapter extends XmlAdapter<AdaptedPrototype, IPrototype> {
         @XmlAttribute(name = "name")
         public String name;
 
-        @XmlIDREF
-        @XmlAttribute(name = "template")
-        @XmlJavaTypeAdapter(PrototypeAdapter.class)
-        public IFeldelementeigenschaften template;
 
-        public Eingabeelementeigenschaft getStandadEingabeelementeigenschaft() {
+        public String template;
+
+        public String getStandadEingabeelementeigenschaft() {
             return standadEingabeelementeigenschaft;
         }
 
-        public void setStandadEingabeelementeigenschaft(Eingabeelementeigenschaft standadEingabeelementeigenschaft) {
+        public void setStandadEingabeelementeigenschaft(String standadEingabeelementeigenschaft) {
             this.standadEingabeelementeigenschaft = standadEingabeelementeigenschaft;
         }
 
         @XmlElement(name = "standardEingabeelementeigenschaft")
-        @XmlJavaTypeAdapter(SimpleEnumAdapter.class)
-        protected Eingabeelementeigenschaft standadEingabeelementeigenschaft;
+        protected String standadEingabeelementeigenschaft;
 
         @XmlElement(name = "standardSteuerelementeigenschaft")
-        @XmlJavaTypeAdapter(SimpleEnumAdapter.class)
-        protected Steuerelementeigenschaft standardSteuerelementeigenschaft;
+        protected String standardSteuerelementeigenschaft;
 
-        @XmlElement(name = "feldelementeigenschaften")
-        @XmlJavaTypeAdapter(FeldelementeigenschaftenMapAdapter.class)
-        protected Map<Feldelementeigenschaften, EnumerationType> feldelementeigenschaften;
+//        @XmlElement(name = "feldelementeigenschaften")
+//        @XmlJavaTypeAdapter(FeldelementeigenschaftenMapAdapter.class)
+        // protected Map<Feldelementeigenschaften, SimpleEnum> feldelementeigenschaften;
 
-        @XmlIDREF
+
         @XmlAttribute
-        @XmlJavaTypeAdapter(SimpleEnumAdapter.class)
-        public EnumerationType identifier;
-
-        @XmlIDREF
-        @XmlAttribute
-        @XmlJavaTypeAdapter(SimpleEnumAdapter.class)
-        public ISimpleEnum key;
-
-        public ISimpleEnum getKey() {
-            return key;
-        }
-
-        public void setKey(ISimpleEnum key) {
-            this.key = key;
-        }
+        public String identifier;
 
     }
 
@@ -189,86 +158,69 @@ public class PrototypeAdapter extends XmlAdapter<AdaptedPrototype, IPrototype> {
         if (!v.getType().contains("maskensteuerung") && !v.getType().contains("schnittstellensteuerun") && !v.getType().contains("insure")) {
             if (v.getType().endsWith("StandardFeldelementeigenschaften")) {
                 StandardFeldelementeigenschaften std = new StandardFeldelementeigenschaften();
-                std.setBeschreibung(v.getBeschreibung());
-                std.setName(v.getName());
-                std.setModelElementId(v.getModelElementId());
-                std.setStandardEingabeelementeigenschaft(
-                    v.getStandadEingabeelementeigenschaft() != null ? v.getStandadEingabeelementeigenschaft() : null);
-                std.setStandardSteuerelementeigenschaft(v.getStandardSteuerelementeigenschaft() != null ? v.getStandardSteuerelementeigenschaft() : null);
+                std.setStandardEingabeelementeigenschaft((IEingabeelementeigenschaft) GlobalEnumMapFactory.INSTANCE.getEnumMap().retrieve(v.getStandadEingabeelementeigenschaft()));
+                std.setStandardSteuerelementeigenschaft((ISteuerelementeigenschaft) GlobalEnumMapFactory.INSTANCE.getEnumMap().retrieve(v.getStandardSteuerelementeigenschaft()));
                 if (v.getSteuerelementeigenschaften() != null) {
-
                     for (Steuerelementeigenschaften entry : v.getSteuerelementeigenschaften()) {
-                        Steuerelementeigenschaftenzuordnung stzu = new Steuerelementeigenschaftenzuordnung();
-                        stzu.setKey((ISteuerelement) entry.getKey());
-                        stzu.setValue(entry.getValue().getHref());
-                        std.getSteuerelementeigenschaften().add(stzu);
+                        ISteuerelement key = (ISteuerelement) GlobalEnumMapFactory.INSTANCE.getEnumMap().retrieve(entry.getKey());
+                        ISteuerelementeigenschaft value = (ISteuerelementeigenschaft) GlobalEnumMapFactory.INSTANCE.getEnumMap().retrieve(entry.getValue().getHref());
+                        std.getSteuerelementeigenschaften().put(key, value);
                         System.out.println(entry.getKey() + "/" + entry.getValue().getHref().toString());
                     }
                 }
                 if (v.getEingabeelementeigenschaften() != null) {
                     for (Eingabeelementeigenschaften entry : v.getEingabeelementeigenschaften()) {
-                        Eingabeelementeigenschaftenzuordnung eizu = new Eingabeelementeigenschaftenzuordnung();
-                        eizu.setKey((IEingabeelement) entry.getKey());
-                        eizu.setValue(entry.getValue().getHref());
-                        std.getEingabeelementeigenschaften().add(eizu);
+                        IEingabeelement key = (IEingabeelement) GlobalEnumMapFactory.INSTANCE.getEnumMap().retrieve(entry.getKey().getRef());
+                        IEingabeelementeigenschaft value = (IEingabeelementeigenschaft) GlobalEnumMapFactory.INSTANCE.getEnumMap().retrieve(entry.getValue().getHref());
+                        std.getEingabeelementeigenschaften().put(key, value);
                         System.out.println(entry.getKey() + "/" + entry.getValue().getHref().toString());
                     }
                 }
 
-                return std;
+                return (Prototype) std;
 
             }
 
             if (v.getType().endsWith("TemplateFeldelementeigenschaften")) {
                 TemplateFeldelementeigenschaften templ = new TemplateFeldelementeigenschaften();
-                templ.setBeschreibung(v.getBeschreibung());
-                templ.setName(v.getName());
-                templ.setModelElementId(v.getModelElementId());
-                templ.setTemplate(v.getTemplate() != null ? v.getTemplate() : null);
+                 templ.setTemplate((IFeldelementeigenschaften) GlobalEnumMapFactory.INSTANCE.getEnumMap().retrieve(v.getTemplate()));
 
-                if (v.getSteuerelementeigenschaften() != null) {
-
-                    for (Steuerelementeigenschaften entry : v.getSteuerelementeigenschaften()) {
-                        Steuerelementeigenschaftenzuordnung stzu = new Steuerelementeigenschaftenzuordnung();
-                        stzu.setKey((ISteuerelement) entry.getKey());
-                        stzu.setValue(entry.getValue().getHref());
-                        templ.getSteuerelementeigenschaften().add(stzu);
-                        System.out.println(entry.getKey() + "/" + entry.getValue().getHref().toString());
-                    }
-                }
-                if (v.getEingabeelementeigenschaften() != null) {
-                    for (Eingabeelementeigenschaften entry : v.getEingabeelementeigenschaften()) {
-                        Eingabeelementeigenschaftenzuordnung eizu = new Eingabeelementeigenschaftenzuordnung();
-                        eizu.setKey((IEingabeelement) entry.getKey());
-                        eizu.setValue(entry.getValue().getHref());
-                        templ.getEingabeelementeigenschaften().add(eizu);
-                        System.out.println(entry.getKey() + "/" + entry.getValue().getHref().toString());
-                    }
-                }
-                return templ;
+                 if (v.getSteuerelementeigenschaften() != null) {
+                     for (Steuerelementeigenschaften entry : v.getSteuerelementeigenschaften()) {
+                         ISteuerelement key = (ISteuerelement) GlobalEnumMapFactory.INSTANCE.getEnumMap().retrieve(entry.getKey());
+                        ISteuerelementeigenschaft value = (ISteuerelementeigenschaft) GlobalEnumMapFactory.INSTANCE.getEnumMap().retrieve(entry.getValue().getHref());
+                         templ.getSteuerelementeigenschaften().put(key, value);
+                         System.out.println(entry.getKey() + "/" + entry.getValue().getHref().toString());
+                     }
+                 }
+                 if (v.getEingabeelementeigenschaften() != null) {
+                     for (Eingabeelementeigenschaften entry : v.getEingabeelementeigenschaften()) {
+                         IEingabeelement key = (IEingabeelement) GlobalEnumMapFactory.INSTANCE.getEnumMap().retrieve(entry.getKey().getRef());
+                         IEingabeelementeigenschaft value = (IEingabeelementeigenschaft) GlobalEnumMapFactory.INSTANCE.getEnumMap().retrieve(entry.getValue().getHref());
+                         templ.getEingabeelementeigenschaften().put(key, value);
+                         System.out.println(entry.getKey() + "/" + entry.getValue().getHref().toString());
+                     }
+                 }
+                return (Prototype) templ;
             }
 
             if (v.getType().endsWith("Feldsteuerung")) {
                 Feldsteuerung feldst = new Feldsteuerung();
-                feldst.setBeschreibung(v.getBeschreibung());
-                feldst.setName(v.getName());
-                feldst.setModelElementId(v.getModelElementId());
-                if (v.getFeldelementeigenschaften() != null) {
-                    for (Entry<Feldelementeigenschaften, EnumerationType> entry : v.getFeldelementeigenschaften().entrySet()) {
-                        Feldelementeigenschaftenzuordnung fldzu = new Feldelementeigenschaftenzuordnung();
-                        fldzu.setKey((IKontext) entry.getKey());
-                        fldzu.setValue((IFeldelementeigenschaften) entry.getValue());
-                        feldst.getFeldelementeigenschaften().add(fldzu);
-                        System.out.println(entry.getKey() + "/" + entry.getValue());
-                    }
-                }
+                // if (v.getFeldelementeigenschaften() != null) {
+                // for (Entry<Feldelementeigenschaften, SimpleEnum> entry : v.getFeldelementeigenschaften().entrySet()) {
+                // IKontext value = GlobalEnumMapFactory.INSTANCE.getEnumMap().retrieve(entry.getValue().)
+                // fldzu.setKey(entry.getKey());
+                // fldzu.setValue((IFeldelementeigenschaften) entry.getValue());
+                // feldst.getFeldelementeigenschaften().add(fldzu);
+                // System.out.println(entry.getKey() + "/" + entry.getValue());
+                // }
+                // }
                 if (v.getIdentifier() != null) {
-                    feldst.setIdentifier((IFeldsteuerungIdentifier) v.getIdentifier());
-                    return feldst;
+                    feldst.setIdentifier((IFeldsteuerungIdentifier) GlobalEnumMapFactory.INSTANCE.getEnumMap().retrieve(v.getIdentifier()));
 
                 }
 
-                return feldst;
+                // return (Prototype) feldst;
 
             }
 
@@ -277,7 +229,7 @@ public class PrototypeAdapter extends XmlAdapter<AdaptedPrototype, IPrototype> {
     }
 
     @Override
-    public AdaptedPrototype marshal(IPrototype v) throws Exception {
+    public AdaptedPrototype marshal(Prototype v) throws Exception {
         // TODO Auto-generated method stub
         return null;
     }
