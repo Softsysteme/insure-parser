@@ -18,7 +18,7 @@ import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 import adapters.SteuerelementMapAdapter.AdaptedSteuerelementMap;
 import insure.infoservice.feldsteuerung.ISteuerelement;
 import insure.infoservice.feldsteuerung.ISteuerelementeigenschaft;
-import insure.infoservice.feldsteuerung.impl.Steuerelementeigenschaft;
+import insure.infoservice.feldsteuerung.steuerelementeigenschaften.Steuerelementeigenschaft;
 
 public class SteuerelementMapAdapter extends XmlAdapter<AdaptedSteuerelementMap, Map<ISteuerelement, ISteuerelementeigenschaft>> {
     @XmlAccessorType(XmlAccessType.FIELD)
