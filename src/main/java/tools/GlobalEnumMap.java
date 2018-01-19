@@ -2,15 +2,15 @@ package tools;
 
 import java.util.HashMap;
 
-import insure.SimpleEnum;
+import insure.core.IEnumeration;
 
 public class GlobalEnumMap {
 
-    private HashMap<String, SimpleEnum> cache;
+    private static HashMap<String, IEnumeration> cache;
     private static GlobalEnumMap globalSpace = null;
 
     GlobalEnumMap() {
-        cache = new HashMap<String, SimpleEnum>();
+        cache = new HashMap<String, IEnumeration>();
     }
 
     public static synchronized GlobalEnumMap getInstance() {
@@ -25,7 +25,7 @@ public class GlobalEnumMap {
         cache.clear();
     }
 
-    public synchronized void store(String id, SimpleEnum value) {
+    public synchronized static void store(String id, IEnumeration value) {
         cache.put(id, value);
     }
 
@@ -39,6 +39,10 @@ public class GlobalEnumMap {
 
     public synchronized boolean containsKey(String id) {
         return cache.containsKey(id);
+    }
+
+    public synchronized static boolean mapEmpty() {
+        return cache.isEmpty();
     }
 
 }

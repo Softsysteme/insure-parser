@@ -7,7 +7,6 @@
 		<plugins>
 			<plugin>
 				<artifactId>maven-compiler-plugin</artifactId>
-				<version>3.6.1</version>
 				<configuration>
 					<source>1.8</source>
 					<target>1.8</target>
@@ -21,8 +20,31 @@
 			<groupId>insure.infoservice</groupId>
 			<artifactId>insure-infoservice-gen</artifactId>
 		</dependency>
+		<dependency>
+			<groupId>insure.core</groupId>
+			<artifactId>insure-core</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>insure.infoservice</groupId>
+			<artifactId>insure.infoservice.daten</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>de.adesso.ais.infoservice-reference</groupId>
+			<artifactId>infoservice-reference-daten</artifactId>
+		</dependency>
+		<!-- https://mvnrepository.com/artifact/junit/junit -->
+		<dependency>
+			<groupId>junit</groupId>
+			<artifactId>junit</artifactId>
+			<version>4.12</version>
+			<scope>test</scope>
+		</dependency>
+		<!-- https://mvnrepository.com/artifact/org.eclipse.core/org.eclipse.core.resources -->
+		<dependency>
+			<groupId>org.eclipse.core</groupId>
+			<artifactId>org.eclipse.core.resources</artifactId>
+		</dependency>
 	</dependencies>
-
 	<parent>
 		<groupId>insure-parser-parent</groupId>
 		<artifactId>insure-parser-parent</artifactId>

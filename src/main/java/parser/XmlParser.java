@@ -1,8 +1,19 @@
 package parser;
 
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.FileReader;
+import java.io.FileWriter;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.OutputStream;
 import java.io.Reader;
+import java.io.UnsupportedEncodingException;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -16,16 +27,9 @@ import javax.xml.stream.XMLEventReader;
 import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.events.XMLEvent;
-import javax.xml.transform.stream.StreamSource;
-import javax.xml.validation.Schema;
-import javax.xml.validation.SchemaFactory;
-import javax.xml.validation.Validator;
 
-import org.xml.sax.SAXException;
-
-import adapters.SuperRoot;
-import insure.Repository;
 import insure.RootRepository;
+import insure.SuperRoot;
 
 /**
  * Klasse zum Parsen XML-Dateien (durch Kombination von JAXB mit StAX). Es wird nicht das StartElement geparst, aber alle darunter angeordneten Elemente.
@@ -35,7 +39,7 @@ public class XmlParser {
     // Liste mit deserialisierte Objekten
     private static List<RootRepository> objects;
 
-    public static List<RootRepository> getObjects() {
+    public List<RootRepository> getObjects() {
         return objects;
     }
 
@@ -48,22 +52,19 @@ public class XmlParser {
         objects = new LinkedList<RootRepository>();
     }
 
-    /**
-     * Hilfsmethode zum Parsen grosser XML-Dateien (durch Kombination von JAXB mit StAX). Es kann nur die eine angegebene Klasse geparst werden (eine XmlRootElement-Annotation wird nicht benoetigt).
-     * <br>
-     * <b>Achtung:</b> Zum XML-Reader wird normalerweise kein close() aufgerufen.
-     *
-     * @param readrs[
-     *            Reader zur XML-Datei
-     * @param elementClass
-     *            Die zu parsende Java-Klasse
-     * @param elemVerarb
-     *            Callback-Objekt fuer die Verarbeitung der einzelnen Elemente
-     * @return Anzahl der gefundenen Elemente
-     */
-    public long parseXml(Reader reader, Class<?> elementClasses, objectVerarbeitung overab)
+    public long parseXml(String[] xmlBundleNames, String[] filePaths, Class<?> elementClasses, objectVerarbeitung overab)
             throws XMLStreamException, JAXBException {
         // StAX:
+        Reader reader = null;
+        try {
+            reader = new InputStreamReader(new FileInputStream(mergeFiles(resolvePaths(filePaths))), "UTF-8");
+        } catch (UnsupportedEncodingException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        } catch (FileNotFoundException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
         EventFilter startElementFilter = new EventFilter() {
             @Override
             public boolean accept(XMLEvent event) {
@@ -85,50 +86,205 @@ public class XmlParser {
             element = ((JAXBElement<?>) element).getValue();
         }
 
-        overab.verarbeite((SuperRoot) element);
+        overab.verarbeite(element);
         for (RootRepository root : ((SuperRoot) element).getRootRepository()) {
             System.out.println(root.getRepositories());
-            for (Repository repo : root.getRepositories()) {
-                System.out.println(repo.toString());
-                System.out.println(repo.getEnumerations().toString());
-                System.out.println(repo.getPrototypes().toString());
-                for (Repository r : repo.getRepositories()) {
-                    System.out.println(r.toString());
-                    System.out.println(r.getEnumerations().toString());
-                    System.out.println(r.getPrototypes().toString());
-
-                    for (Repository re : r.getRepositories()) {
-                        System.out.println(re.toString());
-                        System.out.println(re.getEnumerations().toString());
-                        System.out.println(re.getPrototypes().toString());
-
-                        for (Repository y : re.getRepositories()) {
-                            System.out.println(y.toString());
-                            System.out.println(y.getEnumerations().toString());
-                            System.out.println(y.getPrototypes().toString());
-                        }
-                    }
-                }
-            }
-
-            objects.add((RootRepository) root);
+            objects.add(root);
         }
         return anzahlElem++;
 
     }
 
-    /**
-     * Validierung des XML-Readers gegen ein XSD-Schema. xsdSchema XSD-Schema
-     *
-     * @param xml
-     *            XML-Reader
-     */
-    public void validate(String xsdSchema, Reader xml) throws SAXException, IOException {
+    public File supressXsi(File inputXML, String outputPath) {
 
-        final String w3cXmlSchemaNsUri = "http://www.w3.org/2001/XMLSchema";
-        SchemaFactory schemaFactory = SchemaFactory.newInstance(w3cXmlSchemaNsUri);
-        Schema schema = schemaFactory.newSchema(new File(xsdSchema));
-        Validator validator = schema.newValidator();
-        validator.validate(new StreamSource(xml));
+        BufferedReader br = null;
+        String newString = "";
+        StringBuilder strTotale = new StringBuilder();
+        try {
+
+            FileReader reader = new FileReader(inputXML);
+            String search = "xsi:type";
+            String search2 = "<steuerelementeigenschaften key=";
+            String search3 = "<eingabeelementeigenschaften key=";
+
+            br = new BufferedReader(reader);
+            while ((newString = br.readLine()) != null) {
+                newString = newString.replaceAll(search, "type");
+                if (newString.contains("href=")) {
+                    newString = newString.replace(newString.substring((newString.indexOf("=") + 2), newString.indexOf("#") + 1), "");
+                }
+                if (newString.contains(search2)) {
+                    String key = newString.substring((newString.indexOf("=") + 1), newString.indexOf(">"));
+                    newString = newString.replace(newString.substring((newString.indexOf("=") - 4), newString.length()), ">\n\t<key ref=" + key + "/>");
+                }
+                if (newString.contains(search3)) {
+                    String key = newString.substring((newString.indexOf("=") + 1), newString.indexOf(">"));
+                    newString = newString.replace(newString.substring((newString.indexOf("=") - 4), newString.length()), ">\n\t<key ref=" + key + "/>");
+                }
+
+                strTotale.append(newString + '\n');
+            }
+
+        } catch (IOException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        } // calls it
+        finally {
+            try {
+                br.close();
+            } catch (IOException e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+            }
+        }
+
+        File outputFile = new File(outputPath);
+        BufferedWriter writer = null;
+        try {
+            writer = new BufferedWriter(new FileWriter(outputFile));
+            writer.write(strTotale.toString());
+        } catch (IOException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        } finally {
+            if (writer != null)
+                try {
+                    writer.close();
+                } catch (IOException e) {
+                    // TODO Auto-generated catch block
+                    e.printStackTrace();
+                }
+        }
+
+        return outputFile;
     }
+
+    public File mergeFiles(File[] xmlFiles) {
+        File outputFile = new File("/src/main/resources/model/merged-file.xml");
+        BufferedWriter writer = null;
+        try {
+            writer = new BufferedWriter(new FileWriter(outputFile));
+            writer.write("<?xml version=" + "\"1.0\" " + "encoding=" + "\"UTF-8\"" + "?>" + '\n');
+            writer.write(("<SuperRoot>" + '\n'));
+            for (int i = 0; i < xmlFiles.length; i++) {
+                writer.write(createBuilder(xmlFiles[i], false).toString());
+            }
+            writer.write(("</SuperRoot>" + '\n'));
+
+        } catch (IOException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        } finally {
+            if (writer != null)
+                try {
+                    writer.close();
+                } catch (IOException e) {
+                    // TODO Auto-generated catch block
+                    e.printStackTrace();
+                }
+        }
+
+        BufferedReader br = null;
+        String newString = "";
+        StringBuilder strTotale = new StringBuilder();
+        try {
+
+            FileReader reader = new FileReader(outputFile);
+            br = new BufferedReader(reader);
+            while ((newString = br.readLine()) != null) {
+                strTotale.append(newString + '\n');
+            }
+
+        } catch (IOException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        } // calls it
+        finally {
+            System.out.println(strTotale.toString());
+            try {
+                br.close();
+            } catch (IOException e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+            }
+        }
+        return outputFile;
+
+    }
+
+    public StringBuilder createBuilder(File xmlFile, boolean removeXmlTag) {
+        BufferedReader br = null;
+        String newString = "";
+        StringBuilder strTotale = new StringBuilder();
+        try {
+
+            FileReader reader = new FileReader(xmlFile);
+            br = new BufferedReader(reader);
+            while ((newString = br.readLine()) != null) {
+                if (newString.contains("?xml") && !removeXmlTag) {
+                    strTotale.append("" + '\n');
+                } else {
+                    strTotale.append(newString + '\n');
+                }
+            }
+
+        } catch (IOException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        } // calls it
+        finally {
+            try {
+                br.close();
+            } catch (IOException e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+            }
+        }
+
+        return strTotale;
+
+    }
+
+    /**
+     * 
+     * InputStream is = this.getClass().getResourceAsStream("/test.xml");
+     * 
+     * @param xmlPaths
+     *            byte[] buffer = new byte[initialStream.available()]; initialStream.read(buffer);
+     * 
+     *            File targetFile = new File("src/main/resources/targetFile.tmp"); OutputStream outStream = new FileOutputStream(targetFile); outStream.write(buffer);
+     */
+
+    public File[] resolvePaths(String[] xmlPaths) {
+        File[] xmlFiles = new File[xmlPaths.length];
+        for (int i = 0; i < xmlPaths.length; i++) {
+            InputStream is = this.getClass().getResourceAsStream(xmlPaths[i]);
+            byte[] buffer = null;
+            try {
+                buffer = new byte[is.available()];
+            } catch (IOException e1) {
+                // TODO Auto-generated catch block
+                e1.printStackTrace();
+            }
+            try {
+                is.read(buffer);
+            } catch (IOException e1) {
+                // TODO Auto-generated catch block
+                e1.printStackTrace();
+            }
+            ;
+            try {
+                xmlFiles[i] = new File("src/main/resources/targetFile" + i);
+                @SuppressWarnings("resource")
+                OutputStream outStream = new FileOutputStream(xmlFiles[i]);
+                outStream.write(buffer);
+                xmlFiles[i] = supressXsi(xmlFiles[i], "/src/main/resources/model/modified" + i);
+            } catch (IOException e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+            }
+        }
+        return xmlFiles;
+    }
+
 }

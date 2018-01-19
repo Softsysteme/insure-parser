@@ -1,8 +1,5 @@
 package insure;
 
-import insure.core.IEnumeration;
-
-public interface SimpleEnum extends IEnumeration {
-
+public interface SimpleEnum extends insure.core.IEnumeration {
 
 }

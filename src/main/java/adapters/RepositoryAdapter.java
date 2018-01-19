@@ -14,7 +14,7 @@ import adapters.RepositoryAdapter.AdaptedRepository;
 import insure.Function;
 import insure.Prototype;
 import insure.Repository;
-import insure.SimpleEnum;
+import insure.core.IEnumeration;
 
 public class RepositoryAdapter extends XmlAdapter<AdaptedRepository, Repository> {
 
@@ -31,7 +31,7 @@ public class RepositoryAdapter extends XmlAdapter<AdaptedRepository, Repository>
         @XmlAttribute(name = "modelElementId")
         public String modelElementId;
 
-        @XmlElement
+        @XmlElement(name = "repositories")
         @XmlJavaTypeAdapter(RepositoryAdapter.class)
         public List<Repository> repositories = new ArrayList<Repository>();
 
@@ -44,7 +44,7 @@ public class RepositoryAdapter extends XmlAdapter<AdaptedRepository, Repository>
 
         @XmlElement(name = "enumerations")
         @XmlJavaTypeAdapter(SimpleEnumAdapter.class)
-        public List<SimpleEnum> enumerations = new ArrayList<SimpleEnum>();
+        public List<IEnumeration> enumerations = new ArrayList<IEnumeration>();
 
         public void setPattern(String value) {
             pattern = value;
@@ -90,7 +90,7 @@ public class RepositoryAdapter extends XmlAdapter<AdaptedRepository, Repository>
             this.functions = funct;
         }
 
-        public void setEnumerations(List<SimpleEnum> enums) {
+        public void setEnumerations(List<IEnumeration> enums) {
             this.enumerations = enums;
         }
 
@@ -115,16 +115,15 @@ public class RepositoryAdapter extends XmlAdapter<AdaptedRepository, Repository>
             return functions;
         }
 
-        public List<SimpleEnum> getEnumerations() {
+        public List<IEnumeration> getEnumerations() {
             if (enumerations == null) {
-                return new ArrayList<SimpleEnum>();
+                return new ArrayList<IEnumeration>();
             }
             return enumerations;
         }
 
     }
 
-    @SuppressWarnings("unchecked")
     @Override
     public Repository unmarshal(AdaptedRepository v) throws Exception {
         Repository repo = new Repository();
@@ -139,8 +138,7 @@ public class RepositoryAdapter extends XmlAdapter<AdaptedRepository, Repository>
 
         }
 
-        for (SimpleEnum en : v.getEnumerations()) {
-            // System.out.println(en);
+        for (IEnumeration en : v.getEnumerations()) {
             repo.add(en);
         }
 

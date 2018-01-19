@@ -12,6 +12,7 @@ import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 import adapters.PrototypeAdapter;
 import adapters.RepositoryAdapter;
 import adapters.SimpleEnumAdapter;
+import insure.core.IEnumeration;
 
 public class Repository {
 
@@ -39,7 +40,7 @@ public class Repository {
 
     @XmlElement
     @XmlJavaTypeAdapter(SimpleEnumAdapter.class)
-    public List<SimpleEnum> enumerations = new ArrayList<SimpleEnum>();
+    public List<IEnumeration> enumerations = new ArrayList<IEnumeration>();
 
     public void setPattern(String value) {
         pattern = value;
@@ -85,7 +86,7 @@ public class Repository {
         this.functions = funct;
     }
 
-    public void setEnumerations(List<SimpleEnum> enums) {
+    public void setEnumerations(List<IEnumeration> enums) {
         this.enumerations = enums;
     }
 
@@ -107,9 +108,9 @@ public class Repository {
         return functions;
     }
 
-    public List<SimpleEnum> getEnumerations() {
+    public List<IEnumeration> getEnumerations() {
         if (enumerations == null) {
-            return new ArrayList<SimpleEnum>();
+            return new ArrayList<IEnumeration>();
         }
         return enumerations;
     }
@@ -125,8 +126,8 @@ public class Repository {
         if (element instanceof Function) {
             return this.getFunctions().add((Function) element);
         }
-        if (element instanceof SimpleEnum) {
-            return this.getEnumerations().add((SimpleEnum) element);
+        if (element instanceof IEnumeration) {
+            return this.getEnumerations().add((IEnumeration) element);
         }
         return false;
     }

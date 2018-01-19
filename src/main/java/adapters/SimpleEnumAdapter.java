@@ -9,14 +9,17 @@ import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.adapters.XmlAdapter;
 
 import adapters.SimpleEnumAdapter.AdaptedSimpleEnum;
-import insure.SimpleEnum;
+import caches.SimpleEnumCacheConfig;
+import insure.core.IEnumeration;
+import insure.core.cache.CacheManager;
+import insure.core.cache.ICache;
 import insure.infoservice.feldsteuerung.EingabeelementLiterals;
 import insure.infoservice.feldsteuerung.EingabeelementeigenschaftLiterals;
 import insure.infoservice.feldsteuerung.SteuerelementLiterals;
 import insure.infoservice.feldsteuerung.SteuerelementeigenschaftLiterals;
-import tools.GlobalEnumMapFactory;
 
-public class SimpleEnumAdapter extends XmlAdapter<AdaptedSimpleEnum, SimpleEnum> {
+public class SimpleEnumAdapter extends XmlAdapter<AdaptedSimpleEnum, IEnumeration> {
+    ICache<String, IEnumeration> enumCache = CacheManager.getCache(SimpleEnumCacheConfig.NAME);
 
     @XmlAccessorType(XmlAccessType.FIELD)
     public static class AdaptedSimpleEnum extends AdaptedClass {
@@ -59,63 +62,8 @@ public class SimpleEnumAdapter extends XmlAdapter<AdaptedSimpleEnum, SimpleEnum>
             this.name = name;
         }
 
-        public String getBeschreibung() {
-            return beschreibung;
-        }
-
-        public void setBeschreibung(String beschreibung) {
-            this.beschreibung = beschreibung;
-        }
-
-        public Boolean isNotwendig() {
-            return notwendig;
-        }
-
-        public void setNotwendig(Boolean notwendig) {
-            this.notwendig = notwendig;
-        }
-
-        public Boolean isEditierbar() {
-            return editierbar;
-        }
-
-        public void setEditierbar(Boolean editierbar) {
-            this.editierbar = editierbar;
-        }
-
-        public Boolean isSichtbar() {
-            return sichtbar;
-        }
-
-        public void setSichtbar(Boolean sichtbar) {
-            this.sichtbar = sichtbar;
-        }
-
-        public Boolean isAktiviert() {
-            return aktiviert;
-        }
-
-        public void setAktiviert(Boolean aktiviert) {
-            this.aktiviert = aktiviert;
-        }
-
         @XmlAttribute(name = "name")
         public String name;
-
-        @XmlAttribute(name = "beschreibung")
-        public String beschreibung;
-
-        @XmlAttribute(name = "notwendig")
-        public Boolean notwendig;
-
-        @XmlAttribute(name = "editierbar")
-        public Boolean editierbar;
-
-        @XmlAttribute(name = "sichtbar")
-        public Boolean sichtbar;
-
-        @XmlAttribute(name = "aktiviert")
-        public Boolean aktiviert;
 
         @XmlAttribute(name = "key")
         public Integer key;
@@ -133,22 +81,6 @@ public class SimpleEnumAdapter extends XmlAdapter<AdaptedSimpleEnum, SimpleEnum>
             this.nameSpaceMap = nameSpaceMap;
         }
 
-        public Boolean getNotwendig() {
-            return notwendig;
-        }
-
-        public Boolean getEditierbar() {
-            return editierbar;
-        }
-
-        public Boolean getSichtbar() {
-            return sichtbar;
-        }
-
-        public Boolean getAktiviert() {
-            return aktiviert;
-        }
-
         public Integer getKey() {
             return key;
         }
@@ -159,9 +91,10 @@ public class SimpleEnumAdapter extends XmlAdapter<AdaptedSimpleEnum, SimpleEnum>
 
     }
 
+    @SuppressWarnings({ "static-access" })
     @Override
-    public SimpleEnum unmarshal(AdaptedSimpleEnum v) throws Exception {
-        AdaptedSimpleEnum adapted = (AdaptedSimpleEnum) v;
+    public IEnumeration unmarshal(AdaptedSimpleEnum v) throws Exception {
+        AdaptedSimpleEnum adapted = v;
 
         String atype = adapted.getType();
 
@@ -173,31 +106,27 @@ public class SimpleEnumAdapter extends XmlAdapter<AdaptedSimpleEnum, SimpleEnum>
                 atype = atype.substring(atype.indexOf(":") + 1);
 
                 if (atype.equals("Eingabelement")) {
-                    EingabeelementLiterals.getInstance();
-                    GlobalEnumMapFactory.INSTANCE.getEnumMap().store(adapted.modelElementId, (SimpleEnum) EingabeelementLiterals.valueOf(adapted.getName()));
-                    EingabeelementLiterals.getInstance();
-                    return (SimpleEnum) EingabeelementLiterals.valueOf(adapted.getName());
+                    EingabeelementLiterals INSTANCE = EingabeelementLiterals.getInstance();
+                    enumCache.put(adapted.modelElementId, INSTANCE.valueOf(adapted.getName()));
+                    return INSTANCE.valueOf(adapted.getName());
                 }
 
                 if (atype.equals("Steuerelement")) {
-                    SteuerelementLiterals.getInstance();
-                    GlobalEnumMapFactory.INSTANCE.getEnumMap().store(adapted.modelElementId, (SimpleEnum) SteuerelementLiterals.valueOf(adapted.getName()));
-                    SteuerelementLiterals.getInstance();
-                    return (SimpleEnum) SteuerelementLiterals.valueOf(adapted.getName());
+                    SteuerelementLiterals INSTANCE = SteuerelementLiterals.getInstance();
+                    enumCache.put(adapted.modelElementId, INSTANCE.valueOf(adapted.getName()));
+                    return INSTANCE.valueOf(adapted.getName());
                 }
 
                 if (atype.equals("Steuerelementeigenschaft")) {
-                    SteuerelementeigenschaftLiterals.getInstance();
-                    GlobalEnumMapFactory.INSTANCE.getEnumMap().store(adapted.modelElementId, (SimpleEnum) SteuerelementeigenschaftLiterals.valueOf(adapted.getName()));
-                    SteuerelementeigenschaftLiterals.getInstance();
-                    return (SimpleEnum) SteuerelementeigenschaftLiterals.valueOf(adapted.getName());
+                    SteuerelementeigenschaftLiterals INSTANCE = SteuerelementeigenschaftLiterals.getInstance();
+                    enumCache.put(adapted.modelElementId, INSTANCE.valueOf(adapted.getName()));
+                    return INSTANCE.valueOf(adapted.getName());
                 }
 
                 if (atype.equals("Eingabeelementeigenschaft")) {
-                    EingabeelementeigenschaftLiterals.getInstance();
-                    GlobalEnumMapFactory.INSTANCE.getEnumMap().store(adapted.modelElementId, (SimpleEnum) EingabeelementeigenschaftLiterals.valueOf(adapted.getName()));
-                    EingabeelementeigenschaftLiterals.getInstance();
-                    return (SimpleEnum) EingabeelementeigenschaftLiterals.valueOf(adapted.getName());
+                    EingabeelementeigenschaftLiterals INSTANCE = EingabeelementeigenschaftLiterals.getInstance();
+                    enumCache.put(adapted.modelElementId, INSTANCE.valueOf(adapted.getName()));
+                    return INSTANCE.valueOf(adapted.getName());
                 }
             }
         }
@@ -206,7 +135,7 @@ public class SimpleEnumAdapter extends XmlAdapter<AdaptedSimpleEnum, SimpleEnum>
     }
 
     @Override
-    public AdaptedSimpleEnum marshal(SimpleEnum v) throws Exception {
+    public AdaptedSimpleEnum marshal(IEnumeration v) throws Exception {
         // TODO Auto-generated method stub
         return null;
     }
