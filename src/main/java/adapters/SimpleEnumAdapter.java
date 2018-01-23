@@ -9,17 +9,16 @@ import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.adapters.XmlAdapter;
 
 import adapters.SimpleEnumAdapter.AdaptedSimpleEnum;
-import caches.SimpleEnumCacheConfig;
+import caches.InsureParserCacheManager;
 import insure.core.IEnumeration;
-import insure.core.cache.CacheManager;
-import insure.core.cache.ICache;
 import insure.infoservice.feldsteuerung.EingabeelementLiterals;
 import insure.infoservice.feldsteuerung.EingabeelementeigenschaftLiterals;
 import insure.infoservice.feldsteuerung.SteuerelementLiterals;
 import insure.infoservice.feldsteuerung.SteuerelementeigenschaftLiterals;
 
 public class SimpleEnumAdapter extends XmlAdapter<AdaptedSimpleEnum, IEnumeration> {
-    ICache<String, IEnumeration> enumCache = CacheManager.getCache(SimpleEnumCacheConfig.NAME);
+
+    InsureParserCacheManager cm = InsureParserCacheManager.INSTANCE;
 
     @XmlAccessorType(XmlAccessType.FIELD)
     public static class AdaptedSimpleEnum extends AdaptedClass {
@@ -94,6 +93,7 @@ public class SimpleEnumAdapter extends XmlAdapter<AdaptedSimpleEnum, IEnumeratio
     @SuppressWarnings({ "static-access" })
     @Override
     public IEnumeration unmarshal(AdaptedSimpleEnum v) throws Exception {
+
         AdaptedSimpleEnum adapted = v;
 
         String atype = adapted.getType();
@@ -107,25 +107,26 @@ public class SimpleEnumAdapter extends XmlAdapter<AdaptedSimpleEnum, IEnumeratio
 
                 if (atype.equals("Eingabelement")) {
                     EingabeelementLiterals INSTANCE = EingabeelementLiterals.getInstance();
-                    enumCache.put(adapted.modelElementId, INSTANCE.valueOf(adapted.getName()));
+                    cm.putInCache(adapted.modelElementId, INSTANCE.valueOf(adapted.getName()));
                     return INSTANCE.valueOf(adapted.getName());
                 }
 
                 if (atype.equals("Steuerelement")) {
                     SteuerelementLiterals INSTANCE = SteuerelementLiterals.getInstance();
-                    enumCache.put(adapted.modelElementId, INSTANCE.valueOf(adapted.getName()));
+                    cm.putInCache(adapted.modelElementId, INSTANCE.valueOf(adapted.getName()));
                     return INSTANCE.valueOf(adapted.getName());
                 }
 
                 if (atype.equals("Steuerelementeigenschaft")) {
                     SteuerelementeigenschaftLiterals INSTANCE = SteuerelementeigenschaftLiterals.getInstance();
-                    enumCache.put(adapted.modelElementId, INSTANCE.valueOf(adapted.getName()));
+                    cm.putInCache(adapted.modelElementId, INSTANCE.valueOf(adapted.getName()));
+                    System.out.println(cm.getKeys() + "wrwerwwr");
                     return INSTANCE.valueOf(adapted.getName());
                 }
 
                 if (atype.equals("Eingabeelementeigenschaft")) {
                     EingabeelementeigenschaftLiterals INSTANCE = EingabeelementeigenschaftLiterals.getInstance();
-                    enumCache.put(adapted.modelElementId, INSTANCE.valueOf(adapted.getName()));
+                    cm.putInCache(adapted.modelElementId, INSTANCE.valueOf(adapted.getName()));
                     return INSTANCE.valueOf(adapted.getName());
                 }
             }

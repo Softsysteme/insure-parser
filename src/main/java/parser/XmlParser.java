@@ -52,7 +52,7 @@ public class XmlParser {
         objects = new LinkedList<RootRepository>();
     }
 
-    public long parseXml(String[] xmlBundleNames, String[] filePaths, Class<?> elementClasses, objectVerarbeitung overab)
+    public long parseXml(String[] filePaths, Class<?> elementClasses, objectVerarbeitung overab)
             throws XMLStreamException, JAXBException {
         // StAX:
         Reader reader = null;
