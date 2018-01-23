@@ -1,0 +1,50 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<groupId>insure-parser</groupId>
+	<artifactId>insure-parser</artifactId>
+	<build>
+		<plugins>
+			<plugin>
+				<artifactId>maven-compiler-plugin</artifactId>
+				<configuration>
+					<source>1.8</source>
+					<target>1.8</target>
+				</configuration>
+			</plugin>
+		</plugins>
+	</build>
+
+	<dependencies>
+		<dependency>
+			<groupId>insure.infoservice</groupId>
+			<artifactId>insure-infoservice-gen</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>insure.core</groupId>
+			<artifactId>insure-core</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>insure.infoservice</groupId>
+			<artifactId>insure.infoservice.daten</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>de.adesso.ais.infoservice-reference</groupId>
+			<artifactId>infoservice-reference-daten</artifactId>
+		</dependency>
+		<!-- https://mvnrepository.com/artifact/junit/junit -->
+		<dependency>
+			<groupId>junit</groupId>
+			<artifactId>junit</artifactId>
+			<version>4.12</version>
+			<scope>test</scope>
+		</dependency>
+
+	</dependencies>
+
+	<parent>
+		<groupId>insure-parser-parent</groupId>
+		<artifactId>insure-parser-parent</artifactId>
+		<version>0.0.1-SNAPSHOT</version>
+	</parent>
+</project>

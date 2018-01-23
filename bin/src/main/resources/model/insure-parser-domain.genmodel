@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<genmodel:GenModel xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:ecore="http://www.eclipse.org/emf/2002/Ecore"
+    xmlns:genmodel="http://www.eclipse.org/emf/2002/GenModel" modelDirectory="/de.adesso.ais.insure-parser/src" modelPluginID="de.adesso.ais.insure-parser"
+    modelName="Insure-parser-domain" rootExtendsClass="org.eclipse.emf.ecore.impl.MinimalEObjectImpl$Container"
+    importerID="org.eclipse.emf.importer.ecore" complianceLevel="8.0" copyrightFields="false"
+    interfaceNamePattern="I{0}" classNamePattern="{0}" operationReflection="true"
+    importOrganizing="true">
+  <genAnnotations source="http://www.eclipse.org/emf/2002/GenModel/exporter/org.eclipse.xsd.ecore.exporter">
+    <genAnnotations source="selectedPackages">
+      <details key="http://de.adesso.ais.insure-parser" value="insure-parser-domain.xsd"/>
+    </genAnnotations>
+    <details key="directoryURI" value="."/>
+  </genAnnotations>
+  <foreignModel>insure-parser-domain.ecore</foreignModel>
+  <genPackages prefix="Parser" disposableProviderFactory="true" ecorePackage="insure-parser-domain.ecore#/">
+    <genAnnotations source="http://www.eclipse.org/emf/2002/GenModel/exporter/org.eclipse.xsd.ecore.exporter">
+      <genAnnotations source="insure-parser-domain.xsd"/>
+    </genAnnotations>
+    <genClasses ecoreClass="insure-parser-domain.ecore#//Angestellter">
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute insure-parser-domain.ecore#//Angestellter/name"/>
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute insure-parser-domain.ecore#//Angestellter/Alter"/>
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute insure-parser-domain.ecore#//Angestellter/Gehalt"/>
+      <genOperations ecoreOperation="insure-parser-domain.ecore#//Angestellter/BerechneGehalt"/>
+    </genClasses>
+    <genClasses ecoreClass="insure-parser-domain.ecore#//Dozent">
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute insure-parser-domain.ecore#//Dozent/bonus"/>
+      <genFeatures notify="false" children="true" createChild="true" propertySortChoices="true"
+          ecoreFeature="ecore:EReference insure-parser-domain.ecore#//Dozent/studenten"/>
+      <genOperations ecoreOperation="insure-parser-domain.ecore#//Dozent/BerechneGehalt">
+        <genParameters ecoreParameter="insure-parser-domain.ecore#//Dozent/BerechneGehalt/bonus"/>
+      </genOperations>
+    </genClasses>
+    <genClasses ecoreClass="insure-parser-domain.ecore#//Student"/>
+    <genClasses ecoreClass="insure-parser-domain.ecore#//Schueler"/>
+    <genClasses ecoreClass="insure-parser-domain.ecore#//Lernende">
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute insure-parser-domain.ecore#//Lernende/Name"/>
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute insure-parser-domain.ecore#//Lernende/alter"/>
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute insure-parser-domain.ecore#//Lernende/geschlecht"/>
+    </genClasses>
+    <genClasses ecoreClass="insure-parser-domain.ecore#//Tutor">
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute insure-parser-domain.ecore#//Tutor/bonus"/>
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute insure-parser-domain.ecore#//Tutor/Stundenzahl"/>
+      <genFeatures children="true" createChild="true" propertySortChoices="true" ecoreFeature="ecore:EReference insure-parser-domain.ecore#//Tutor/lernende"/>
+      <genOperations ecoreOperation="insure-parser-domain.ecore#//Tutor/BerechneGehalt">
+        <genParameters ecoreParameter="insure-parser-domain.ecore#//Tutor/BerechneGehalt/bonus"/>
+      </genOperations>
+    </genClasses>
+    <genClasses ecoreClass="insure-parser-domain.ecore#//Repository">
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute insure-parser-domain.ecore#//Repository/name"/>
+    </genClasses>
+    <genClasses ecoreClass="insure-parser-domain.ecore#//RootRepository">
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference insure-parser-domain.ecore#//RootRepository/repositories"/>
+    </genClasses>
+    <genClasses ecoreClass="insure-parser-domain.ecore#//AngestellterRepyosito">
+      <genFeatures notify="false" children="true" createChild="true" propertySortChoices="true"
+          ecoreFeature="ecore:EReference insure-parser-domain.ecore#//AngestellterRepyosito/angestellter"/>
+    </genClasses>
+    <genClasses ecoreClass="insure-parser-domain.ecore#//LernendenRepository">
+      <genFeatures notify="false" children="true" createChild="true" propertySortChoices="true"
+          ecoreFeature="ecore:EReference insure-parser-domain.ecore#//LernendenRepository/lernenden"/>
+    </genClasses>
+  </genPackages>
+</genmodel:GenModel>
