@@ -120,7 +120,6 @@ public class SimpleEnumAdapter extends XmlAdapter<AdaptedSimpleEnum, IEnumeratio
                 if (atype.equals("Steuerelementeigenschaft")) {
                     SteuerelementeigenschaftLiterals INSTANCE = SteuerelementeigenschaftLiterals.getInstance();
                     cm.putInCache(adapted.modelElementId, INSTANCE.valueOf(adapted.getName()));
-                    System.out.println(cm.getKeys() + "wrwerwwr");
                     return INSTANCE.valueOf(adapted.getName());
                 }
 

@@ -13,6 +13,7 @@ import adapters.PrototypeAdapter;
 import adapters.RepositoryAdapter;
 import adapters.SimpleEnumAdapter;
 import insure.core.IEnumeration;
+import insure.core.IPrototype;
 
 public class Repository {
 
@@ -33,7 +34,7 @@ public class Repository {
 
     @XmlElement
     @XmlJavaTypeAdapter(PrototypeAdapter.class)
-    public List<Prototype> prototypes = new ArrayList<Prototype>();
+    public List<IPrototype> prototypes = new ArrayList<IPrototype>();
 
     @XmlAnyElement
     public List<Function> functions = new ArrayList<Function>();
@@ -78,7 +79,7 @@ public class Repository {
         this.repositories = repos;
     }
 
-    public void setPrototypes(List<Prototype> protos) {
+    public void setPrototypes(List<IPrototype> protos) {
         this.prototypes = protos;
     }
 
@@ -97,9 +98,9 @@ public class Repository {
         return repositories;
     }
 
-    public List<Prototype> getPrototypes() {
+    public List<IPrototype> getPrototypes() {
         if (prototypes == null) {
-            return new ArrayList<Prototype>();
+            return new ArrayList<IPrototype>();
         }
         return prototypes;
     }
@@ -120,8 +121,8 @@ public class Repository {
         if (element instanceof Repository) {
             this.getRepositories().add((Repository) element);
         }
-        if (element instanceof Prototype) {
-            return this.getPrototypes().add((Prototype) element);
+        if (element instanceof IPrototype) {
+            return this.getPrototypes().add((IPrototype) element);
         }
         if (element instanceof Function) {
             return this.getFunctions().add((Function) element);

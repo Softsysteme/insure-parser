@@ -12,6 +12,28 @@
 					<target>1.8</target>
 				</configuration>
 			</plugin>
+
+<!-- 			<plugin> -->
+<!-- 				<groupId>org.codehaus.mojo</groupId> -->
+<!-- 				<artifactId>jaxb2-maven-plugin</artifactId> -->
+<!-- 				<version>${project.version}</version> -->
+<!-- 				<executions> -->
+<!-- 					<execution> -->
+<!-- 						<id>xjc-schema1</id> -->
+<!-- 						<goals> -->
+<!-- 							<goal>xjc</goal> -->
+<!-- 						</goals> -->
+<!-- 						<configuration> -->
+<!-- 							<sources> -->
+<!-- 								<source>src/main/resources/xsds</source> -->
+<!-- 							</sources> -->
+<!-- 							<packageName>src/main/java/jaxb</packageName> -->
+<!-- 							<clearOutputDir>false</clearOutputDir> -->
+<!-- 						</configuration> -->
+<!-- 					</execution> -->
+<!-- 				</executions> -->
+<!-- 			</plugin> -->
+
 		</plugins>
 	</build>
 
@@ -39,6 +61,14 @@
 			<version>4.12</version>
 			<scope>test</scope>
 		</dependency>
+		<dependency>
+			<groupId>org.eclipse.xsd.ecore</groupId>
+			<artifactId>exporter</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.eclipse.emf.codegen</groupId>
+			<artifactId>ecore</artifactId>
+		</dependency>
 		<!-- https://mvnrepository.com/artifact/org.eclipse.core/org.eclipse.core.resources -->
 		<dependency>
 			<groupId>org.eclipse.core</groupId>
@@ -53,6 +83,19 @@
 			<artifactId>slf4j-jdk14</artifactId>
 			<version>1.7.14</version>
 		</dependency>
+		<dependency>
+			<groupId>insure.core</groupId>
+			<artifactId>insure.core.modell</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>insure.domain</groupId>
+			<artifactId>insure.domain.modell</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>insure.infoservice</groupId>
+			<artifactId>insure.infoservice.modell</artifactId>
+		</dependency>
+
 	</dependencies>
 	<parent>
 		<groupId>insure-parser-parent</groupId>

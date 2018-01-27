@@ -12,9 +12,9 @@ import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 
 import adapters.RepositoryAdapter.AdaptedRepository;
 import insure.Function;
-import insure.Prototype;
 import insure.Repository;
 import insure.core.IEnumeration;
+import insure.core.IPrototype;
 
 public class RepositoryAdapter extends XmlAdapter<AdaptedRepository, Repository> {
 
@@ -37,7 +37,7 @@ public class RepositoryAdapter extends XmlAdapter<AdaptedRepository, Repository>
 
         @XmlElement(name = "prototypes")
         @XmlJavaTypeAdapter(PrototypeAdapter.class)
-        public List<Prototype> prototypes = new ArrayList<Prototype>();
+        public List<IPrototype> prototypes = new ArrayList<IPrototype>();
 
         @XmlElement
         public List<Function> functions = new ArrayList<Function>();
@@ -82,7 +82,7 @@ public class RepositoryAdapter extends XmlAdapter<AdaptedRepository, Repository>
             this.repositories = repos;
         }
 
-        public void setPrototypes(List<Prototype> protos) {
+        public void setPrototypes(List<IPrototype> protos) {
             this.prototypes = protos;
         }
 
@@ -101,9 +101,9 @@ public class RepositoryAdapter extends XmlAdapter<AdaptedRepository, Repository>
             return repositories;
         }
 
-        public List<Prototype> getPrototypes() {
+        public List<IPrototype> getPrototypes() {
             if (prototypes == null) {
-                return new ArrayList<Prototype>();
+                return new ArrayList<IPrototype>();
             }
             return prototypes;
         }
@@ -142,7 +142,7 @@ public class RepositoryAdapter extends XmlAdapter<AdaptedRepository, Repository>
             repo.add(en);
         }
 
-        for (Prototype prot : v.getPrototypes()) {
+        for (IPrototype prot : v.getPrototypes()) {
             repo.add(prot);
         }
 
