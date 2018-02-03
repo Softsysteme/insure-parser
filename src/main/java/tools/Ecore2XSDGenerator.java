@@ -1,13 +1,9 @@
 package tools;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Map;
-
-import javax.xml.crypto.Data;
 
 import org.eclipse.emf.codegen.ecore.genmodel.GenModel;
 import org.eclipse.emf.codegen.ecore.genmodel.GenModelPackage;
@@ -22,7 +18,6 @@ import org.eclipse.xsd.XSDSchema;
 import org.eclipse.xsd.ecore.EcoreSchemaBuilder;
 import org.eclipse.xsd.ecore.MapBuilder;
 import org.eclipse.xsd.util.XSDResourceFactoryImpl;
-import org.eclipse.xsd.util.XSDResourceImpl;
 
 public class Ecore2XSDGenerator {
 
@@ -32,7 +27,6 @@ public class Ecore2XSDGenerator {
 
     @SuppressWarnings("unused")
     public void exportEcoreToXSD(ResourceSet ecoreResources_p, String genpath_p) throws Exception {
-        System.out.println(ecoreResources_p.getResources().toString());
 
         ecoreResources_p.getPackageRegistry().put(GenModelPackage.eNS_URI, GenModelPackage.eINSTANCE);
 
@@ -47,48 +41,37 @@ public class Ecore2XSDGenerator {
         Resource genmodelresource = resourceSet.getResource(genModelURI, true);
         genmodelresource.load(loadOptions);
         GenModel genModel = (GenModel) genmodelresource.getContents().get(0);
-
         MapBuilder mapBuilder = new EcoreSchemaBuilder(genModel.getExtendedMetaData());
 
-        EPackage pack = null;
-        URI xsdSchemaURI = null;
         int i = 0;
         for (Resource res : ecoreResources_p.getResources()) {
+            System.out.println(res);
             EPackage current = (EPackage) res.getContents().get(0);
-            pack = current;
-            xsdSchemaURI = res.getURI().appendFileExtension("xsd"); //$NON-NLS-1$
-            XSDSchema xsdSchema = ((EcoreSchemaBuilder) mapBuilder).getSchema(pack);
-            Resource xsdResource = resourceSet.createResource(URI.createFileURI("src/main/resources/xsds/file" + i + ".xsd"));
-            xsdResource.getContents().add(xsdSchema);
-            try {
-                Map<String, Boolean> options = new HashMap<String, Boolean>();
-                options.put(XMLResource.OPTION_RECORD_UNKNOWN_FEATURE, Boolean.TRUE);
-                xsdResource.save(options);
-            } catch (IOException e) {
-                e.printStackTrace();
+            verarbeiteEPackage(mapBuilder, resourceSet, res, current, i++);
+            Iterator<EPackage> it1 = current.getESubpackages().iterator();
+            Iterator<?> it2 = genModel.getUsedGenPackages().iterator();
+            while (it1.hasNext() && it2.hasNext()) {
+                MapBuilder mapB = new EcoreSchemaBuilder(((GenModel) it2.next()).getExtendedMetaData());
+                verarbeiteEPackage(mapB, resourceSet, res, it1.next(), i);
+                i++;
             }
-            i++;
-        }
 
+        }
     }
 
-    public File loadXSD(String filePath) {
-
-        XSDResourceImpl resource = new XSDResourceImpl();
-        File source = new File(filePath);
+    public void verarbeiteEPackage(MapBuilder mapBuilder, ResourceSet resourceSet, Resource res, EPackage pack, int filenumber) {
+        URI xsdSchemaURI = null;
+        xsdSchemaURI = res.getURI().appendFileExtension("xsd"); //$NON-NLS-1$
+        XSDSchema xsdSchema = ((EcoreSchemaBuilder) mapBuilder).getSchema(pack);
+        Resource xsdResource = resourceSet.createResource(URI.createFileURI("src/main/resources/xsds/file" + filenumber + ".xsd"));
+        xsdResource.getContents().add(xsdSchema);
+        System.out.println(xsdResource.getContents());
         try {
-            resource.load(new FileInputStream(source), new HashMap<Object, Object>());
-        } catch (FileNotFoundException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
+            Map<String, Boolean> options = new HashMap<String, Boolean>();
+            options.put(XMLResource.OPTION_RECORD_UNKNOWN_FEATURE, Boolean.TRUE);
+            xsdResource.save(options);
         } catch (IOException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
         }
-
-        Data data = (Data) resource.getContents().get(0);
-
-        return source;
 
     }
 

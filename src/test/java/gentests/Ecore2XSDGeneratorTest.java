@@ -4,15 +4,15 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.util.Collections;
 
 import org.eclipse.core.runtime.Assert;
+import org.eclipse.emf.common.util.URI;
 import org.eclipse.emf.ecore.EcorePackage;
+import org.eclipse.emf.ecore.resource.Resource;
 import org.eclipse.emf.ecore.resource.ResourceSet;
 import org.eclipse.emf.ecore.resource.impl.ResourceSetImpl;
-import org.eclipse.emf.ecore.xmi.XMIResource;
 import org.eclipse.emf.ecore.xmi.impl.EcoreResourceFactoryImpl;
-import org.eclipse.emf.ecore.xmi.impl.XMIResourceFactoryImpl;
-import org.eclipse.xsd.util.XSDResourceFactoryImpl;
 import org.junit.Test;
 
 import tools.Ecore2XSDGenerator;
@@ -26,24 +26,16 @@ public class Ecore2XSDGeneratorTest {
 
     @Test
     public void xsdDataWasCorrectlyCreatedFromEcore() {
-        ResourceSet resourceSet = new ResourceSetImpl();
-        resourceSet.getPackageRegistry().put(EcorePackage.eNS_URI, EcorePackage.eINSTANCE);
-        resourceSet.getLoadOptions().put(XMIResource.OPTION_RECORD_UNKNOWN_FEATURE, Boolean.TRUE);
-        resourceSet.getResourceFactoryRegistry().getExtensionToFactoryMap().put("ecore", new EcoreResourceFactoryImpl());
-        resourceSet.getResourceFactoryRegistry().getExtensionToFactoryMap().put("ecore", new XMIResourceFactoryImpl());
-        resourceSet.getResourceFactoryRegistry().getExtensionToFactoryMap().put("genmodel", new EcoreResourceFactoryImpl());
-        resourceSet.getResourceFactoryRegistry().getExtensionToFactoryMap().put("xsd", new XSDResourceFactoryImpl());
-        // final ExtendedMetaData extendedMetaData = new BasicExtendedMetaData(resourceSet.getPackageRegistry());
 
         Ecore2XSDGenerator gen = new Ecore2XSDGenerator();
-
+        String[] ecorePaths = { "domain-reference.ecore" };
         try {
-            gen.exportEcoreToXSD(resourceSet, ExportResource("core.genmodel"));
+            gen.exportEcoreToXSD(createResourceSet(ecorePaths), ExportResource("infoservice.genmodel"));
         } catch (Exception e) {
             // TODO Auto-generated catch block
             e.printStackTrace();
         }
-        Assert.isNotNull(gen.loadXSD("src/main/resources/xsds/file0.xsd"));
+        Assert.isTrue(new File("src/main/resources/xsds/file0.xsd").exists());
         Assert.isTrue(new File("src/main/resources/xsds").exists());
     }
 
@@ -78,9 +70,38 @@ public class Ecore2XSDGeneratorTest {
             stream.close();
             resStreamOut.close();
         }
-        System.out.println(jarFolder + resourceName);
-
         return jarFolder + resourceName;
+    }
+
+    public ResourceSet createResourceSet(String[] paths) {
+        ResourceSet resourceSet = new ResourceSetImpl();
+
+        resourceSet.getResourceFactoryRegistry().getExtensionToFactoryMap().put("ecore",
+            new EcoreResourceFactoryImpl());
+
+        resourceSet.getPackageRegistry().put(EcorePackage.eNS_URI,
+            EcorePackage.eINSTANCE);
+        File file = null;
+        for (int i = 0; i < paths.length; i++) {
+            try {
+                file = new File(ExportResource(paths[i]));
+            } catch (Exception e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+            }
+
+            try {
+                URI uri = (file.isFile() ? URI.createFileURI(file.getAbsolutePath()) : URI.createURI(ExportResource(paths[i])));
+                Resource resource = resourceSet.getResource(uri, true);
+                resource.save(Collections.EMPTY_MAP);
+            } catch (Exception e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+            }
+
+        }
+        return resourceSet;
+
     }
 
 }
