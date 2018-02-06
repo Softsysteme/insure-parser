@@ -9,6 +9,8 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -23,14 +25,15 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
+import com.sun.xml.bind.api.impl.NameConverter;
+
 import caches.InsureParserCacheManager;
-import insure.infoservice.feldsteuerung.EingabeelementLiterals;
-import insure.infoservice.feldsteuerung.EingabeelementeigenschaftLiterals;
-import insure.infoservice.feldsteuerung.SteuerelementLiterals;
-import insure.infoservice.feldsteuerung.SteuerelementeigenschaftLiterals;
+import insure.core.IEnumeration;
+import tools.NameSpaceResolver;
 
 public class DomParser {
     private List<Object> speicher;
+    private NameSpaceResolver resolver;
     InsureParserCacheManager cm = InsureParserCacheManager.INSTANCE;
 
     public DomParser() {
@@ -59,6 +62,7 @@ public class DomParser {
 
         // Normalize the XML Structure; important !!
         document.getDocumentElement().normalize();
+        resolver = new NameSpaceResolver(document, false);
 
         // Here comes the root node
         Element root = document.getDocumentElement();
@@ -79,32 +83,12 @@ public class DomParser {
                     if (node.hasAttributes()) {
                         // get attributes names and values
                         NamedNodeMap nodeMap = node.getAttributes();
-                        if (nodeMap.getNamedItem("type") != null) {
-                            Node nodeType = nodeMap.getNamedItem("type");
-                            if (nodeType.getNodeValue().contentEquals("Eingabelement")) {
-                                String nodeValue = nodeMap.getNamedItem("modelElementId").getNodeValue();
-                                cm.putInCache(nodeValue, EingabeelementLiterals.valueOf(nodeValue));
-                                speicher.add(EingabeelementLiterals.valueOf(nodeValue));
-                            }
-
-                            if (nodeType.getNodeValue().contentEquals("Steuerelement")) {
-                                String nodeValue = nodeMap.getNamedItem("modelElementId").getNodeValue();
-                                cm.putInCache(nodeValue, SteuerelementLiterals.valueOf(nodeValue));
-                                speicher.add(SteuerelementLiterals.valueOf(nodeValue));
-                            }
-
-                            if (nodeType.getNodeValue().contentEquals("Steuerelementeigenschaft")) {
-                                String nodeValue = nodeMap.getNamedItem("modelElementId").getNodeValue();
-                                cm.putInCache(nodeValue, SteuerelementeigenschaftLiterals.valueOf(nodeValue));
-                                speicher.add(SteuerelementeigenschaftLiterals.valueOf(nodeValue));
-                            }
-
-                            if (nodeType.getNodeValue().contentEquals("Eingabeelementeigenschaft")) {
-                                String nodeValue = nodeMap.getNamedItem("modelElementId").getNodeValue();
-                                cm.putInCache(nodeValue, EingabeelementeigenschaftLiterals.valueOf(nodeValue));
-                                speicher.add(EingabeelementeigenschaftLiterals.valueOf(nodeValue));
-
-                            }
+                        if (nodeMap.getNamedItem("xsi:type") != null) {
+                            Node nodeType = nodeMap.getNamedItem("xsi:type");
+                            String literalName = nodeType.getNodeValue();
+                            List<String> list = splitString(literalName);
+                            String nodeValue = nodeMap.getNamedItem("modelElementId").getNodeValue();
+                            saveEnum(resolver.getNamespaceURI(convertToPackageName(list.get(0))), list.get(1), nodeValue);
                             if (node.hasChildNodes()) {
                                 // We got more childs; Let's visit them as well
                                 visitChildNodes(node.getChildNodes());
@@ -122,6 +106,60 @@ public class DomParser {
                 }
             }
         }
+    }
+
+    public List<String> splitString(String s) {
+        List<String> result = new ArrayList<String>();
+        result.add(0, s.substring(0, s.indexOf(':')));
+        result.add(1, s.substring(s.indexOf(':') + 1, s.length() + 1));
+        return result;
+
+    }
+
+    @SuppressWarnings("unchecked")
+    public void saveEnum(String packageName, String localName, String nodeValue) {
+        IEnumeration enumeration;
+        String name = packageName + localName + ".";
+        name += "Literals";
+        @SuppressWarnings("rawtypes")
+        Class cls = null;
+        try {
+            cls = Class.forName(name);
+        } catch (ClassNotFoundException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+        Method method1 = null;
+        Method method2 = null;
+        try {
+            method1 = cls.getMethod("getInstance", new Class[0]);
+            method2 = cls.getMethod("valueOf", new Class[0]);
+        } catch (NoSuchMethodException | SecurityException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+        try {
+
+            method1.invoke(cls, new Object[0]);
+            enumeration = (IEnumeration) method2.invoke(cls, nodeValue);
+            cm.putInCache(nodeValue, enumeration);
+            speicher.add(enumeration);
+
+        } catch (IllegalAccessException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        } catch (IllegalArgumentException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        } catch (InvocationTargetException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+    }
+
+    public String convertToPackageName(String xmlNamespace) {
+        NameConverter nameConverter = new NameConverter.Standard();
+        return nameConverter.toPackageName(xmlNamespace);
     }
 
     public File supressXsi(File inputXML, String outputPath) {

@@ -56,6 +56,11 @@
 			<groupId>de.adesso.ais.infoservice-reference</groupId>
 			<artifactId>infoservice-reference-daten</artifactId>
 		</dependency>
+		<dependency>
+			<groupId>com.sun.xml.bind</groupId>
+			<artifactId>jaxb-impl</artifactId>
+			<version>2.2.3</version>
+		</dependency>
 		<!-- https://mvnrepository.com/artifact/junit/junit -->
 		<dependency>
 			<groupId>junit</groupId>
