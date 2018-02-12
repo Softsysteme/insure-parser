@@ -1,7 +1,9 @@
 package tools;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 
 import javax.xml.XMLConstants;
@@ -50,18 +52,23 @@ public class NameSpaceResolver implements NamespaceContext {
      * This method looks at an attribute and stores it, if it is a namespace attribute.
      */
     private void storeAttribute(Attr attribute) {
-        // examine the attributes in namespace xmlns
-        if (attribute.getNamespaceURI() != null
-                && attribute.getNamespaceURI().equals(
-                    XMLConstants.XMLNS_ATTRIBUTE_NS_URI)) {
-            // Default namespace xmlns="uri goes here"
-            if (attribute.getNodeName().equals(XMLConstants.XMLNS_ATTRIBUTE)) {
-                putInCache(DEFAULT_NS, attribute.getNodeValue());
-            } else {
-                // The defined prefixes are stored here
-                putInCache(attribute.getLocalName(), attribute.getNodeValue());
-            }
+        if (attribute.getNodeName().contains("xmlns")) {
+            List<String> list = splitString(attribute.getNodeName());
+            putInCache(list.get(1), attribute.getNodeValue());
         }
+
+        // // examine the attributes in namespace xmlns
+        // if (attribute.getNamespaceURI() != null
+        // && attribute.getNamespaceURI().equals(
+        // XMLConstants.XMLNS_ATTRIBUTE_NS_URI)) {
+        // // Default namespace xmlns="uri goes here"
+        // if (attribute.getNodeName().equals(XMLConstants.XMLNS_ATTRIBUTE)) {
+        // putInCache(DEFAULT_NS, attribute.getNodeValue());
+        // } else {
+        // // The defined prefixes are stored here
+        // putInCache(attribute.getLocalName(), attribute.getNodeValue());
+        // }
+        // }
 
     }
 
@@ -83,6 +90,22 @@ public class NameSpaceResolver implements NamespaceContext {
         }
     }
 
+    public Map<String, String> getPrefix2Uri() {
+        return prefix2Uri;
+    }
+
+    public void setPrefix2Uri(Map<String, String> prefix2Uri) {
+        this.prefix2Uri = prefix2Uri;
+    }
+
+    public Map<String, String> getUri2Prefix() {
+        return uri2Prefix;
+    }
+
+    public void setUri2Prefix(Map<String, String> uri2Prefix) {
+        this.uri2Prefix = uri2Prefix;
+    }
+
     /**
      * This method is not needed in this context, but can be implemented in a similar way.
      */
@@ -95,6 +118,13 @@ public class NameSpaceResolver implements NamespaceContext {
     public Iterator getPrefixes(String namespaceURI) {
         // Not implemented
         return null;
+    }
+
+    public List<String> splitString(String s) {
+        List<String> result = new ArrayList<String>();
+        result.add(0, s.substring(0, s.indexOf(':')));
+        result.add(1, s.substring(s.indexOf(':') + 1, s.length()));
+        return result;
     }
 
 }
