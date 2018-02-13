@@ -37,12 +37,12 @@ import com.sun.xml.bind.api.impl.NameConverter;
 
 import caches.InsureParserCacheManager;
 import insure.core.IEnumeration;
-import insure.infoservice.feldsteuerung.Feldsteuerung;
 import tools.NameSpaceResolver;
 import tools.Uri2PackageNameConverter;
 
 public class DomParser {
     private List<Object> speicher;
+    private static transient Object prototype;
 
     private NameSpaceResolver resolver;
     InsureParserCacheManager cm = InsureParserCacheManager.INSTANCE;
@@ -119,13 +119,13 @@ public class DomParser {
 
                 }
                 // work only with prototypes of type Feldsteuerung
-                if (node.getNodeName().contentEquals("prototypes") && node.getAttributes().getNamedItem("xsi:type").getNodeValue().contains("Feldsteuerung")) {
+                if (node.getNodeName().contentEquals("prototypes") && node.getAttributes().getNamedItem("xsi:type").getNodeValue().contains("feldsteuerung")) {
                     Class<?> clazz = null;
                     List<Field> fields = null;
                     List<Field> listFields = new ArrayList<Field>();
                     List<Field> mapFields = new ArrayList<Field>();
                     List<Field> otherFields = new ArrayList<Field>();
-                    Object prototype = null;
+                    prototype = null;
                     String nodeValue = null;
                     // get attributes names and values
                     NamedNodeMap nodeMap = node.getAttributes();
@@ -183,12 +183,16 @@ public class DomParser {
                                         Type[] mapTypes = pt.getActualTypeArguments();
                                         Class<?>[] mapClasses = new Class<?>[mapTypes.length];
                                         for (int k = 0; k < mapClasses.length; k++) {
-                                            mapClasses[k] = mapTypes[k].getClass();
+                                            try {
+                                                mapClasses[k] = Class.forName(mapTypes[k].getTypeName());
+                                            } catch (ClassNotFoundException e) {
+                                                // TODO Auto-generated catch block
+                                                e.printStackTrace();
+                                            }
                                         }
                                         map = new HashMap<Object, Object>();
                                         Method put = Map.class.getDeclaredMethod("put", Object.class, Object.class);
                                         Object[] obj = buildObjectWithAttributes(mapClasses, item.getChildNodes(), item, field);
-                                        System.out.println(obj[0] + "," + obj[1]);
                                         Method methode = findMethod(clazz, "set" + Character.toUpperCase(field.getName().charAt(0)) + field.getName().substring(1, field.getName().length()),
                                             field.getType());
                                         methode.invoke(prototype, map);
@@ -198,25 +202,21 @@ public class DomParser {
                             }
                         }
 
-                        // visitPropertyChildNode(clazz, item);
                         for (Field field : otherFields) {
-                            Object element = null;
+                            // Object element = null;
                             // only Element nodes getChildNodesWithName
+                            Class<?> cl = null;
+                            try {
+                                cl = Class.forName(field.getType().getTypeName());
+                            } catch (ClassNotFoundException e) {
+                                // TODO Auto-generated catch block
+                                e.printStackTrace();
+                            }
                             for (int i = 0; i < node.getChildNodes().getLength(); i++) {
                                 Node item = node.getChildNodes().item(i);
                                 if (item.getNodeType() == 1) {
                                     if (field.getName().contentEquals(item.getNodeName())) {
-                                        System.out.println("tttttttttttttttttttttt");
-                                        ParameterizedType pt = (ParameterizedType) field.getGenericType();
-                                        Class<?> elementClazz = (Class<?>) pt.getActualTypeArguments()[0];
-                                        try {
-                                            element = field.getType().newInstance();
-                                            buildObjectWithAttributes(elementClazz, element, item);
-
-                                        } catch (InstantiationException e) {
-                                            // TODO Auto-generated catch block
-                                            e.printStackTrace();
-                                        }
+                                        buildObjectWithAttributes(clazz, field, prototype, item);
                                     }
                                 }
 
@@ -224,8 +224,7 @@ public class DomParser {
                         }
                     }
                     speicher.add(prototype);
-                    if (!(prototype instanceof Feldsteuerung))
-                        cm.putInCache(nodeValue, prototype);
+                    cm.putInCache(nodeValue, prototype);
                 }
             }
         }
@@ -254,7 +253,8 @@ public class DomParser {
     public void buildObjectWithAttributes(Class<?> clazz, Object obj, NamedNodeMap attrList)
             throws NoSuchMethodException, IllegalAccessException, IllegalArgumentException, InvocationTargetException, DOMException {
         for (int i = 0; i < attrList.getLength(); i++) {
-            String nodeN = attrList.item(i).getNodeName();
+            Node item = attrList.item(i);
+            String nodeN = item.getNodeName();
             if (!nodeN.contentEquals("xsi:type")) {
                 Class<?> type = null;
                 try {
@@ -266,13 +266,13 @@ public class DomParser {
                     // TODO Auto-generated catch block
                     e.printStackTrace();
                 }
-                Method methode = findMethod(clazz, "set" + Character.toUpperCase(nodeN.charAt(0)) + nodeN.substring(1, nodeN.length() + 1), type);
+                Method methode = findMethod(clazz, "set" + Character.toUpperCase(nodeN.charAt(0)) + nodeN.substring(1, nodeN.length()), type);
                 if (type.isPrimitive()) {
-                    methode.invoke(obj, attrList.item(i).getNodeValue());
+                    methode.invoke(obj, item.getNodeValue());
                 }
 
                 else {
-                    methode.invoke(obj, cm.retrieveFromCache(attrList.item(i).getNodeValue()));
+                    methode.invoke(obj, cm.retrieveFromCache(item.getNodeValue()));
                 }
             }
         }
@@ -280,26 +280,17 @@ public class DomParser {
     }
 
     // create a new Object and set the attributes of this object
-    public void buildObjectWithAttributes(Class<?> clazz, Object obj, Node node)
+    public void buildObjectWithAttributes(Class<?> clazz, Field field, Object obj, Node node)
             throws NoSuchMethodException, IllegalAccessException, IllegalArgumentException, InvocationTargetException, DOMException {
 
-        Class<?> type = null;
-        try {
-            type = clazz.getDeclaredField(node.getNodeName()).getType();
-        } catch (NoSuchFieldException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        } catch (SecurityException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        }
-        Method methode = findMethod(clazz, "set" + Character.toUpperCase(node.getNodeName().charAt(0)) + node.getNodeName().substring(1, node.getNodeName().length() + 1), type);
+        Class<?> type = field.getType();
+        Method methode = findMethod(clazz, "set" + Character.toUpperCase(node.getNodeName().charAt(0)) + node.getNodeName().substring(1, node.getNodeName().length()), type);
         if (type.isPrimitive()) {
             methode.invoke(obj, node.getNodeValue());
         }
 
         else {
-            methode.invoke(obj, cm.retrieveFromCache(node.getNodeValue()));
+            methode.invoke(obj, cm.retrieveFromCache(node.getAttributes().getNamedItem("href").getNodeValue()));
         }
     }
 
@@ -310,29 +301,40 @@ public class DomParser {
         Object value = null;
         NamedNodeMap attList = node.getAttributes();
         if (attList != null) {
-            if (attList.getNamedItem("value") != null) {
-                value = cm.retrieveFromCache(attList.getNamedItem("value").getNodeValue());
-
+            Node vnamedItem = attList.getNamedItem("value");
+            if (vnamedItem != null) {
+                value = cm.retrieveFromCache(vnamedItem.getNodeValue());
             }
 
-            if (attList.getNamedItem("key") != null) {
-                key = cm.retrieveFromCache(attList.getNamedItem("key").getNodeValue());
+            Node knamedItem = attList.getNamedItem("key");
+            if (knamedItem != null) {
+                key = cm.retrieveFromCache(knamedItem.getNodeValue());
             }
         }
         for (int i = 0; i < children.getLength(); i++) {
             Node item = children.item(i);
+
             if (item.getNodeType() == 1) {
+                NamedNodeMap attributes = item.getAttributes();
+                for (int k = 0; k < attributes.getLength(); k++) {
+                }
                 if (item.getNodeName().contentEquals("key")) {
-                    Node att = item.getAttributes().getNamedItem("href");
+                    Node att = attributes.getNamedItem("href");
                     if (att != null) {
                         key = cm.retrieveFromCache(att.getNodeValue());
+
+                    } else {
+                        key = cm.retrieveFromCache(attributes.getNamedItem("xsi:type").getNodeValue());
                     }
                 }
 
                 if (item.getNodeName().contentEquals("value")) {
-                    Node att = item.getAttributes().getNamedItem("href");
+                    Node att = attributes.getNamedItem("href");
                     if (att != null) {
                         value = cm.retrieveFromCache(att.getNodeValue());
+                    } else {
+                        System.out.println(attributes.item(0).getNodeValue());
+                        value = cm.retrieveFromCache(attributes.item(0).getNodeValue());
                     }
                 }
             }
@@ -340,6 +342,7 @@ public class DomParser {
         }
         result[0] = key;
         result[1] = value;
+        System.out.println("key:" + key + ",value:" + value);
 
         return result;
     }
@@ -430,7 +433,7 @@ public class DomParser {
         if (packageName.contains("entity.tickets")) {
             packageName = packageName.replace(".entity", "");
         }
-        IEnumeration enumeration;
+        IEnumeration enumeration = null;
         String name = buildFullyQualifiedName(packageName, localName);
         name += "Literals";
         @SuppressWarnings("rawtypes")
@@ -450,25 +453,25 @@ public class DomParser {
             // TODO Auto-generated catch block
             e.printStackTrace();
         }
+
+        Object obj = null;
         try {
-
-            Object obj = method1.invoke(cls);
-            enumeration = (IEnumeration) method2.invoke(obj, literalsName);
-            if (enumeration != null) {
-                cm.putInCache(nodeValue, enumeration);
-                speicher.add(enumeration);
-            }
-
-        } catch (IllegalAccessException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        } catch (IllegalArgumentException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        } catch (InvocationTargetException e) {
+            obj = method1.invoke(cls);
+        } catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
             // TODO Auto-generated catch block
             e.printStackTrace();
         }
+        try {
+            enumeration = (IEnumeration) method2.invoke(obj, literalsName);
+        } catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+        if (enumeration != null) {
+            cm.putInCache(nodeValue, enumeration);
+            speicher.add(enumeration);
+        }
+
     }
 
     public String convertToPackageName(String xmlNamespace) {
@@ -484,12 +487,10 @@ public class DomParser {
         try {
 
             FileReader reader = new FileReader(inputXML);
-            // String search = "href";
             br = new BufferedReader(reader);
             while ((newString = br.readLine()) != null) {
                 if (newString.contains("href=")) {
                     newString = newString.replace(newString.substring((newString.indexOf("=") + 2), newString.indexOf("#") + 1), "");
-                    // newString = newString.replaceAll(search, "");
                 }
                 strTotale.append(newString + '\n');
             }
@@ -527,102 +528,6 @@ public class DomParser {
 
         return outputFile;
     }
-
-    public File mergeFiles(File[] xmlFiles) {
-        File outputFile = new File("/src/main/resources/model/merged-file.xml");
-        BufferedWriter writer = null;
-        try {
-            writer = new BufferedWriter(new FileWriter(outputFile));
-            writer.write("<?xml version=" + "\"1.0\" " + "encoding=" + "\"UTF-8\"" + "?>" + '\n');
-            writer.write(("<SuperRoot>" + '\n'));
-            for (int i = 0; i < xmlFiles.length; i++) {
-                writer.write(createBuilder(xmlFiles[i], false).toString());
-            }
-            writer.write(("</SuperRoot>" + '\n'));
-
-        } catch (IOException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        } finally {
-            if (writer != null)
-                try {
-                    writer.close();
-                } catch (IOException e) {
-                    // TODO Auto-generated catch block
-                    e.printStackTrace();
-                }
-        }
-
-        BufferedReader br = null;
-        String newString = "";
-        StringBuilder strTotale = new StringBuilder();
-        try {
-
-            FileReader reader = new FileReader(outputFile);
-            br = new BufferedReader(reader);
-            while ((newString = br.readLine()) != null) {
-                strTotale.append(newString + '\n');
-            }
-
-        } catch (IOException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        } // calls it
-        finally {
-            System.out.println(strTotale.toString());
-            try {
-                br.close();
-            } catch (IOException e) {
-                // TODO Auto-generated catch block
-                e.printStackTrace();
-            }
-        }
-        return outputFile;
-
-    }
-
-    public StringBuilder createBuilder(File xmlFile, boolean removeXmlTag) {
-        BufferedReader br = null;
-        String newString = "";
-        StringBuilder strTotale = new StringBuilder();
-        try {
-
-            FileReader reader = new FileReader(xmlFile);
-            br = new BufferedReader(reader);
-            while ((newString = br.readLine()) != null) {
-                if (newString.contains("?xml") && !removeXmlTag) {
-                    strTotale.append("" + '\n');
-                } else {
-                    strTotale.append(newString + '\n');
-                }
-            }
-
-        } catch (IOException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        } // calls it
-        finally {
-            try {
-                br.close();
-            } catch (IOException e) {
-                // TODO Auto-generated catch block
-                e.printStackTrace();
-            }
-        }
-
-        return strTotale;
-
-    }
-
-    /**
-     * 
-     * InputStream is = this.getClass().getResourceAsStream("/test.xml");
-     * 
-     * @param xmlPaths
-     *            byte[] buffer = new byte[initialStream.available()]; initialStream.read(buffer);
-     * 
-     *            File targetFile = new File("src/main/resources/targetFile.tmp"); OutputStream outStream = new FileOutputStream(targetFile); outStream.write(buffer);
-     */
 
     public File resolvePaths(String xmlPath) {
         File xmlFile = null;
