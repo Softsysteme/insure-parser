@@ -86,8 +86,9 @@ public class DomParser {
         // Get all Prototypes
         NodeList nListPrototypes = document.getElementsByTagName("prototypes");
         try {
+            System.out.println("doc" + i);
             parseEnums(nListEnum);
-            parsePrototypes(nListPrototypes);
+            // parsePrototypes(nListPrototypes);
         } catch (IllegalArgumentException | DOMException e) {
         }
 
@@ -254,6 +255,31 @@ public class DomParser {
                 }
                 speicher.add(prototype);
                 cm.putInCache(nodeValue, prototype);
+            }
+        }
+    }
+
+    // Functions parser
+    public void parseFunction(NodeList nList) {
+        for (int temp = 0; temp < nList.getLength(); temp++) {
+            Node node = nList.item(temp);
+            if (node.getNodeType() == Node.ELEMENT_NODE) {
+                // Check all attributes
+                if (node.getNodeName().contentEquals("functions")) {
+                    if (node.hasAttributes()) {
+                        // get attributes names and values
+                        NamedNodeMap nodeMap = node.getAttributes();
+                        if (nodeMap.getNamedItem("xsi:type") != null) {
+                            Node nodeType = nodeMap.getNamedItem("xsi:type");
+                            String functionsPkgName = nodeType.getNodeValue();
+                            List<String> list = splitString(functionsPkgName);
+                            String functionID = nodeMap.getNamedItem("modelElementId").getNodeValue();
+                            String functionsName = nodeMap.getNamedItem("name").getNodeValue();
+
+                        }
+                    }
+
+                }
             }
         }
     }
@@ -474,6 +500,7 @@ public class DomParser {
         if (enumeration != null) {
             cm.putInCache(nodeValue, enumeration);
             speicher.add(enumeration);
+            System.out.println("enum: " + nodeValue + "," + enumeration);
         }
 
     }

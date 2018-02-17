@@ -21,10 +21,6 @@
 			<artifactId>insure-infoservice-gen</artifactId>
 		</dependency>
 		<dependency>
-			<groupId>insure.core</groupId>
-			<artifactId>insure-core</artifactId>
-		</dependency>
-		<dependency>
 			<groupId>insure.infoservice</groupId>
 			<artifactId>insure.infoservice.daten</artifactId>
 		</dependency>
@@ -33,8 +29,20 @@
 			<artifactId>infoservice-reference-daten</artifactId>
 		</dependency>
 		<dependency>
+			<groupId>de.adesso.ais.infoservice-reference</groupId>
+			<artifactId>infoservice-reference-daten-gen</artifactId>
+		</dependency>
+		<dependency>
 			<groupId>de.adesso.ais.domain-reference</groupId>
 			<artifactId>domain-reference-gen</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>de.adesso.ais.domain-reference</groupId>
+			<artifactId>domain-reference-daten-gen</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>de.adesso.ais.domain-reference</groupId>
+			<artifactId>domain-reference-daten</artifactId>
 		</dependency>
 		<dependency>
 			<groupId>com.sun.xml.bind</groupId>
@@ -70,18 +78,6 @@
 			<groupId>org.slf4j</groupId>
 			<artifactId>slf4j-jdk14</artifactId>
 			<version>1.7.14</version>
-		</dependency>
-		<dependency>
-			<groupId>insure.core</groupId>
-			<artifactId>insure.core.modell</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>insure.domain</groupId>
-			<artifactId>insure.domain.modell</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>insure.infoservice</groupId>
-			<artifactId>insure.infoservice.modell</artifactId>
 		</dependency>
 	</dependencies>
 	<parent>
