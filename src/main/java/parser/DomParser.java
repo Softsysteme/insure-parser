@@ -1,20 +1,17 @@
 package parser;
 
 import java.io.BufferedReader;
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.FileReader;
-import java.io.FileWriter;
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.OutputStream;
+import java.io.InputStreamReader;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -25,11 +22,20 @@ import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
+import org.eclipse.emf.common.notify.Adapter;
+import org.eclipse.emf.common.notify.Notification;
+import org.eclipse.emf.common.util.EList;
+import org.eclipse.emf.common.util.TreeIterator;
+import org.eclipse.emf.ecore.EClass;
+import org.eclipse.emf.ecore.EObject;
+import org.eclipse.emf.ecore.EOperation;
+import org.eclipse.emf.ecore.EReference;
+import org.eclipse.emf.ecore.EStructuralFeature;
+import org.eclipse.emf.ecore.resource.Resource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.DOMException;
 import org.w3c.dom.Document;
-import org.w3c.dom.Element;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -39,14 +45,17 @@ import com.sun.xml.bind.api.impl.NameConverter;
 
 import caches.InsureParserCacheManager;
 import insure.core.IEnumeration;
+import insure.core.IFunction;
+import insure.core.IPrototype;
+import tools.JavaPackageNameResolver;
 import tools.NameSpaceResolver;
 import tools.Uri2PackageNameConverter;
 
 public class DomParser {
     private List<Object> speicher;
     private static transient Object prototype;
+    private JavaPackageNameResolver pResolver;
     final static Logger logger = LoggerFactory.getLogger(DomParser.class);
-    private int i = 0;
 
     private NameSpaceResolver resolver;
     InsureParserCacheManager cm = InsureParserCacheManager.INSTANCE;
@@ -56,8 +65,8 @@ public class DomParser {
         speicher = new ArrayList<Object>();
     }
 
-    public void parseXml(String filePath) {
-        i++;
+    public void parseXml(String filePath, String ecoreFilePath) {
+
         // Get Document Builder
         DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
         DocumentBuilder builder = null;
@@ -65,34 +74,42 @@ public class DomParser {
             builder = factory.newDocumentBuilder();
         } catch (ParserConfigurationException e1) {
             // TODO Auto-generated catch block
-            e1.printStackTrace();
+        }
+
+        if (ecoreFilePath != null) {
+            Document ecoreDocument = null;
+            try {
+                ecoreDocument = builder.parse(copyFile(ecoreFilePath));
+            } catch (SAXException | IOException e) {
+                // TODO Auto-generated catch block
+            }
+            ecoreDocument.getDocumentElement().normalize();
+            pResolver = new JavaPackageNameResolver(ecoreDocument);
+            Map<String, String> map = pResolver.getUri2PackageName();
+            for (Map.Entry<String, String> entry : map.entrySet()) {
+                cm.putInCache(entry.getKey(), entry.getValue());
+            }
+
         }
 
         // Build Document
-        Document document = null;
+        Document insureDocument = null;
         try {
-            document = builder.parse(copyFile(filePath, i));
+            insureDocument = builder.parse(correctHref(copyFile(filePath)));
         } catch (SAXException | IOException e) {
             // TODO Auto-generated catch block
-            e.printStackTrace();
         }
 
         // Normalize the XML Structure; important !!
-        document.getDocumentElement().normalize();
-        resolver = new NameSpaceResolver(document, false);
-
-        // Here comes the root node
-        Element root = document.getDocumentElement();
-        // Get the root element
-        NodeList nListRoot = document.getElementsByTagName("core");
+        insureDocument.getDocumentElement().normalize();
+        resolver = new NameSpaceResolver(insureDocument, false);
         // Get all Enumerations
-        NodeList nListEnum = document.getElementsByTagName("enumerations");
+        NodeList nListEnum = insureDocument.getElementsByTagName("enumerations");
         // Get all Prototypes
-        NodeList nListPrototypes = document.getElementsByTagName("prototypes");
+        NodeList nListPrototypes = insureDocument.getElementsByTagName("prototypes");
         // Get all functions
-        NodeList nListFunctions = document.getElementsByTagName("functions");
+        NodeList nListFunctions = insureDocument.getElementsByTagName("functions");
         try {
-            System.out.println(i);
             parseEnums(nListEnum);
             parseFunction(nListFunctions);
             parsePrototypes(nListPrototypes);
@@ -101,46 +118,40 @@ public class DomParser {
 
     }
 
-    // parse Enums
+    // Enums parser
     public void parseEnums(NodeList nList) {
         for (int temp = 0; temp < nList.getLength(); temp++) {
             Node node = nList.item(temp);
             if (node.getNodeType() == Node.ELEMENT_NODE) {
                 // Check all attributes
-                if (node.getNodeName().contentEquals("enumerations")) {
-                    if (node.hasAttributes()) {
-                        // get attributes names and values
-                        NamedNodeMap nodeMap = node.getAttributes();
-                        if (nodeMap.getNamedItem("xsi:type") != null) {
-                            Node nodeType = nodeMap.getNamedItem("xsi:type");
-                            String nodeName = nodeType.getNodeValue();
-                            List<String> list = splitString(nodeName);
-                            String nodeValue = nodeMap.getNamedItem("modelElementId").getNodeValue();
-                            String literalsName = nodeMap.getNamedItem("name").getNodeValue();
-                            if (nodeName.contains("Identifier")) {
-                                saveIdentifier(convertToPackageName(resolver.getNamespaceURI((list.get(0)))), list.get(1), nodeMap.getNamedItem("key").getNodeValue(), nodeValue);
-                            } else {
-                                saveEnum(convertToPackageName(resolver.getNamespaceURI((list.get(0)))), list.get(1), literalsName, null, nodeValue);
-                            }
-                        }
-                    }
+                if (node.hasAttributes()) {
+                    // get attributes names and values
+                    NamedNodeMap nodeMap = node.getAttributes();
+                    if (nodeMap.getNamedItem("xsi:type") != null) {
+                        Node nodeType = nodeMap.getNamedItem("xsi:type");
+                        String nodeName = nodeType.getNodeValue();
 
+                        List<String> list = splitString(nodeName);
+                        String att_ID_Value = nodeMap.getNamedItem("modelElementId").getNodeValue();
+                        String att_Name_Value = nodeMap.getNamedItem("name").getNodeValue();
+                        String att_Key_Value = nodeMap.getNamedItem("key") != null ? nodeMap.getNamedItem("key").getNodeValue() : null;
+                        saveEnum((String) cm.retrieveFromCache(resolver.getNamespaceURI(list.get(0))), list.get(1), att_Name_Value, att_Key_Value, att_ID_Value);
+                    }
                 }
+
             }
         }
+
     }
 
-    // parse Prototypes
+    // Prototypes parser
     public void parsePrototypes(NodeList nList) {
         for (int temp = 0; temp < nList.getLength(); temp++) {
             Node node = nList.item(temp);
-            String nodeValue = node.getAttributes().getNamedItem("modelElementId").getNodeValue();
-            // works only with prototypes of type Feldsteuerung
-            if (node.getNodeName().contentEquals("prototypes") && node.getAttributes().getNamedItem("xsi:type").getNodeValue().contains("feldsteuerung")) {
-                visitnode(node, prototype);
-                speicher.add(prototype);
-                cm.putInCache(nodeValue, prototype);
-            }
+            String att_ID_Value = node.getAttributes().getNamedItem("modelElementId").getNodeValue();
+            prototype = visitnode(node, prototype);
+            speicher.add(prototype);
+            cm.putInCache(att_ID_Value, prototype);
         }
     }
 
@@ -149,66 +160,154 @@ public class DomParser {
         Object function = null;
         for (int temp = 0; temp < nList.getLength(); temp++) {
             Node node = nList.item(temp);
-            String nodeValue = node.getAttributes().getNamedItem("modelElementId").getNodeValue();
-            // work only with prototypes of type Feldsteuerung
-            if (node.getNodeName().contentEquals("functions") && node.getAttributes().getNamedItem("xsi:type").getNodeValue().contains("feldsteuerung")) {
-                function = visitnode(node);
-                speicher.add(function);
-                cm.putInCache(nodeValue, function);
-            }
+            String att_ID_Value = node.getAttributes().getNamedItem("modelElementId").getNodeValue();
+            function = visitnode(node, new Object());
+            speicher.add(function);
+            cm.putInCache(att_ID_Value, function);
         }
     }
 
-    public Object visitnode(Node node) {
-        Class<?> clazz = null;
-        List<Field> fields = null;
+    // constructs and save the simple enum in the cache and in the Memory
+    @SuppressWarnings("unchecked")
+    public void saveEnum(String packageName, String localName, String literalsName, String literalsKey, String nodeValue) {
+        IEnumeration enumeration = null;
+        String name = buildFullyQualifiedName(packageName, localName);
+        name += "Literals";
+        @SuppressWarnings("rawtypes")
+        Class cls = null;
+        try {
+            cls = Class.forName(name);
+        } catch (ClassNotFoundException | NoSuchMethodError | NoClassDefFoundError e1) {
+            if ((e1 instanceof NoSuchMethodError || e1 instanceof NoClassDefFoundError) && literalsKey != null) {
+                try {
+                    saveFromEnumClass(packageName, localName, literalsKey, nodeValue);
+                } catch (ClassNotFoundException e) {
+                    // TODO Auto-generated catch block
+                }
+            }
+
+        }
+
+        Method method1 = null;
+        Method method2 = null;
+
+        if (cls != null) {
+            try {
+                method1 = cls.getMethod("getInstance");
+                method2 = cls.getMethod("valueOf", String.class);
+            } catch (NoSuchMethodException | SecurityException e1) {
+                // TODO Auto-generated catch block
+            }
+
+            Object obj = null;
+            try {
+                obj = method1.invoke(cls);
+            } catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException e1) {
+                // TODO Auto-generated catch block
+            }
+            try {
+                enumeration = (IEnumeration) method2.invoke(obj, literalsName);
+            } catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException e1) {
+                // TODO Auto-generated catch block
+            }
+            if (enumeration != null) {
+                cm.putInCache(nodeValue, enumeration);
+                speicher.add(enumeration);
+            }
+
+        }
+    }
+
+    // constructs and save an Enum that have not null key attribute in the cache and in the Memory
+    public void saveFromEnumClass(String packageName, String localName, String literalsKey, String nodeValue) throws ClassNotFoundException {
+        @SuppressWarnings("unused")
+        Object identifier = null;
+        String name = buildFullyQualifiedName(packageName, localName);
+        Class<?> cls = null;
+        try {
+            cls = Class.forName(name);
+        } catch (ClassNotFoundException e) {
+            throw e;
+        }
+        Method method1 = null;
+        try {
+            method1 = cls.getMethod("fromKey", int.class);
+        } catch (NoSuchMethodException | SecurityException e) {
+            // TODO Auto-generated catch block
+
+        }
+        try {
+            identifier = method1.invoke(cls, Integer.parseInt(literalsKey));
+        } catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
+            // TODO Auto-generated catch block
+
+        }
+
+        if (identifier != null) {
+            cm.putInCache(nodeValue, identifier);
+            speicher.add(identifier);
+        }
+
+    }
+
+    // for nodes that doesn't have type attribute (often happens by List Element) we refer to the parent to discover the child type
+    public Object visitNodeWithParent(Class<?> parentClass, Class<?> nodeClass, Node node) {
+        // List<Class<?>> fields = new ArrayList<Class<?>>();
+        // Reflections reflections = new Reflections(nodeClass.getPackage().getName());
+        // Set<?> subTypes = reflections.getSubTypesOf(nodeClass);
+        // Iterator<?> it = subTypes.iterator();
+        // while (it.hasNext()) {
+        // // System.out.println(it.next());
+        // }
+
+        // try to find a concrete class implementing the interface (waiting for better solution)
+        if (nodeClass.isInterface()) {
+            try {
+                nodeClass = Class.forName(nodeClass.getName().replace("I", ""));
+            } catch (ClassNotFoundException e) {
+                // TODO Auto-generated catch block
+            }
+        } else {
+            try {
+                nodeClass = Class.forName(nodeClass.getName());
+            } catch (ClassNotFoundException e) {
+                // TODO Auto-generated catch block
+            }
+        }
+
+        Object result = null;
+        try {
+            result = nodeClass.newInstance();
+        } catch (InstantiationException | IllegalAccessException e3) {
+            // TODO Auto-generated catch block
+        }
+
         List<Field> listFields = new ArrayList<Field>();
         List<Field> mapFields = new ArrayList<Field>();
         List<Field> otherFields = new ArrayList<Field>();
-        // get attributes names and values
-        NamedNodeMap nodeMap = node.getAttributes();
-        Object object = null;
-        if (nodeMap.getNamedItem("xsi:type") != null) {
-            Node nodeType = nodeMap.getNamedItem("xsi:type");
-            String functionName = nodeType.getNodeValue();
-            List<String> list = splitString(functionName);
+        List<Field> childFields = getAllDeclaredFields(nodeClass);
+        Iterator<Field> iter = childFields.iterator();
+        while (iter.hasNext()) {
+            Field field = (iter.next());
+            Class<?> type = field.getType();
+            if (List.class.isAssignableFrom(type) || Map.class.isAssignableFrom(type)) {
+                if (List.class.isAssignableFrom(type)) {
+                    listFields.add(field);
+
+                }
+
+                if (Map.class.isAssignableFrom(type)) {
+                    mapFields.add(field);
+                }
+            } else {
+                otherFields.add(field);
+            }
+        }
+        if (node.hasAttributes()) {
             try {
-                clazz = Class.forName(buildFullyQualifiedName(convertToPackageName(resolver.getNamespaceURI((list.get(0)))), list.get(1)));
-                Constructor<?> constructor = clazz.getDeclaredConstructor();
-                object = constructor.newInstance();
-                fields = getAllDeclaredFields(clazz);
-
-            } catch (ClassNotFoundException | InstantiationException | NoSuchMethodException | SecurityException | IllegalAccessException | IllegalArgumentException
-                    | InvocationTargetException e) {
+                setObjectFields(nodeClass, result, node.getAttributes());
+            } catch (NoSuchMethodException | IllegalAccessException | IllegalArgumentException | InvocationTargetException | DOMException e) {
                 // TODO Auto-generated catch block
-            }
-            Iterator<Field> iter = fields.iterator();
-            while (iter.hasNext()) {
-
-                Field field = (iter.next());
-                Class<?> type = field.getType();
-                if (List.class.isAssignableFrom(type) || Map.class.isAssignableFrom(type)) {
-                    if (List.class.isAssignableFrom(type)) {
-                        listFields.add(field);
-
-                    }
-
-                    if (Map.class.isAssignableFrom(type)) {
-                        mapFields.add(field);
-                    }
-                }
-
-                else {
-                    otherFields.add(field);
-                }
-            }
-            if (node.hasAttributes()) {
-                try {
-                    setObjectFields(clazz, object, nodeMap);
-                } catch (NoSuchMethodException | IllegalAccessException | IllegalArgumentException | InvocationTargetException | DOMException e) {
-                    // TODO Auto-generated catch block
-                }
-
             }
 
         }
@@ -238,20 +337,20 @@ public class DomParser {
                                 // TODO Auto-generated catch block
                             }
                             try {
-                                Object[] obj = buildAndSetMap(mapClasses, item.getChildNodes(), item, field);
+                                Object[] obj = buildMapElement(mapClasses, item.getChildNodes(), item, field);
                                 put.invoke(map, obj[0], obj[1]);
                             } catch (NoSuchMethodException | IllegalAccessException | IllegalArgumentException | InvocationTargetException | DOMException e) {
                                 // TODO Auto-generated catch block
                             }
                             Method methode = null;
                             try {
-                                methode = findMethod(clazz, "set" + Character.toUpperCase(field.getName().charAt(0)) + field.getName().substring(1, field.getName().length()),
+                                methode = findMethod(nodeClass, "set" + Character.toUpperCase(field.getName().charAt(0)) + field.getName().substring(1, field.getName().length()),
                                     field.getType());
                             } catch (NoSuchMethodException e) {
                                 // TODO Auto-generated catch block
                             }
                             try {
-                                methode.invoke(object, map);
+                                methode.invoke(result, map);
                             } catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
                                 // TODO Auto-generated catch block
                             }
@@ -261,145 +360,643 @@ public class DomParser {
                 }
             }
 
+            for (Field field : listFields) {
+                List<Object> lst = new ArrayList<Object>();
+                // only Element nodes getChildNodesWithName
+                for (int i = 0; i < node.getChildNodes().getLength(); i++) {
+                    Node item = node.getChildNodes().item(i);
+                    if (item.getNodeType() == 1) {
+                        if (field.getName().contentEquals(item.getNodeName())) {
+                            ParameterizedType pt = (ParameterizedType) field.getGenericType();
+                            Type listType = pt.getActualTypeArguments()[0];
+                            Class<?> listClass = null;
+                            try {
+                                listClass = Class.forName(listType.getTypeName());
+                            } catch (ClassNotFoundException e2) {
+                                // TODO Auto-generated catch blockF
+                            }
+                            Method add = null;
+                            try {
+                                add = ArrayList.class.getDeclaredMethod("add", Object.class);
+                            } catch (NoSuchMethodException | SecurityException e1) {
+                                // TODO Auto-generated catch block
+                            }
+                            try {
+                                Object obj = buildListElement(nodeClass, listClass, item.getChildNodes(), item, field);
+                                add.invoke(lst, obj);
+                            } catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException | DOMException e) {
+                                // TODO Auto-generated catch block
+                            }
+                        }
+                    }
+                }
+                Method methode = null;
+                try {
+                    methode = findMethod(nodeClass, "set" + Character.toUpperCase(field.getName().charAt(0)) + field.getName().substring(1, field.getName().length()),
+                        field.getType());
+
+                } catch (NoSuchMethodException e) {
+                    // TODO Auto-generated catch block
+                }
+                if (methode != null) {
+                    try {
+                        methode.invoke(result, lst);
+                    } catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
+                        // TODO Auto-generated catch block
+                    }
+
+                }
+            }
             for (Field field : otherFields) {
                 for (int i = 0; i < node.getChildNodes().getLength(); i++) {
                     Node item = node.getChildNodes().item(i);
                     if (item.getNodeType() == 1) {
                         if (field.getName().contentEquals(item.getNodeName())) {
                             try {
-                                setRefObject(clazz, field, object, item);
+                                setRefObject(nodeClass, field, result, item);
+                            } catch (NoSuchMethodException | IllegalAccessException | IllegalArgumentException | InvocationTargetException | DOMException e) {
+                                // TODO Auto-generated catch block
+                                e.printStackTrace();
+                            }
+                        }
+                    }
+                }
+            }
+
+        }
+        return result;
+
+    }
+
+    // recursive call for prototypes
+    public Object visitnode(Node node, Object object) {
+        Class<?> clazz = null;
+        List<Field> fields = null;
+        List<Field> listFields = new ArrayList<Field>();
+        List<Field> mapFields = new ArrayList<Field>();
+        List<Field> otherFields = new ArrayList<Field>();
+        // get attributes names and values
+        NamedNodeMap nodeMap = node.getAttributes();
+        if (nodeMap.getNamedItem("href") != null) {
+            return nodeMap.getNamedItem("href").getNodeValue();
+        } else {
+            if (nodeMap.getNamedItem("xsi:type") != null) {
+                Node nodeType = nodeMap.getNamedItem("xsi:type");
+                String prototypeName = nodeType.getNodeValue();
+                List<String> list = splitString(prototypeName);
+                try {
+                    clazz = Class.forName(buildFullyQualifiedName((String) cm.retrieveFromCache(resolver.getNamespaceURI((list.get(0)))), list.get(1)));
+                    Constructor<?> constructor = clazz.getDeclaredConstructor();
+
+                    object = constructor.newInstance();
+                    fields = getAllDeclaredFields(clazz);
+
+                } catch (ClassNotFoundException | InstantiationException | NoSuchMethodException | SecurityException | IllegalAccessException | IllegalArgumentException
+                        | InvocationTargetException e) {
+                    if (e instanceof ClassNotFoundException) {
+
+                        Map<String, Object> propertyRefFields = new HashMap<String, Object>();
+                        Map<String, String> propertyFields = new HashMap<String, String>();
+                        if (!node.hasChildNodes()) {
+                            for (int i = 0; i < node.getChildNodes().getLength(); i++) {
+                                Node it = node.getChildNodes().item(i);
+                                if (it.getNodeType() == 1) {
+                                    propertyRefFields.put(it.getNodeName(), visitnode(it, new Object()));
+                                }
+
+                            }
+                        }
+                        propertyFields.put("modelElementId",
+                            node.getAttributes().getNamedItem("modelElementId") != null ? node.getAttributes().getNamedItem("modelElementId").getNodeValue() : null);
+                        propertyFields.put("name", node.getAttributes().getNamedItem("name") != null ? node.getAttributes().getNamedItem("name").getNodeValue() : null);
+                        propertyFields.put("beschreibung",
+                            node.getAttributes().getNamedItem("beschreibung") != null ? node.getAttributes().getNamedItem("beschreibung").getNodeValue() : null);
+                        if (node.getNodeName().contentEquals("functions")) {
+                            return new IFunction() {
+                                private Map<String, Object> propertyRefFields;
+                                private Map<String, String> propertyFields;
+
+                                private IFunction init(Map<String, String> prop, Map<String, Object> propRf) {
+                                    setPropertyRefFields(propRf);
+                                    propertyFields = prop;
+                                    return this;
+                                }
+
+                                @Override
+                                public String getName() {
+                                    // TODO Auto-generated method stub
+                                    return propertyFields.get("name");
+                                }
+
+                                @Override
+                                public void setName(String value) {
+                                    propertyFields.remove("name");
+                                    propertyFields.put("name", value);
+
+                                }
+
+                                @Override
+                                public String getBeschreibung() {
+                                    return propertyFields.get("beschreibung");
+                                }
+
+                                @Override
+                                public void setBeschreibung(String value) {
+                                    propertyFields.remove("beschreibung");
+                                    propertyFields.put("beschreibung", value);
+
+                                }
+
+                                @Override
+                                public String getModelElementId() {
+                                    return propertyFields.get("modelElementId");
+                                }
+
+                                @Override
+                                public void setModelElementId(String value) {
+                                    propertyFields.remove("modelElementId");
+                                    propertyFields.put("modelElementId", value);
+
+                                }
+
+                                @Override
+                                public EClass eClass() {
+                                    // TODO Auto-generated method stub
+                                    return null;
+                                }
+
+                                @Override
+                                public Resource eResource() {
+                                    // TODO Auto-generated method stub
+                                    return null;
+                                }
+
+                                @Override
+                                public EObject eContainer() {
+                                    // TODO Auto-generated method stub
+                                    return null;
+                                }
+
+                                @Override
+                                public EStructuralFeature eContainingFeature() {
+                                    // TODO Auto-generated method stub
+                                    return null;
+                                }
+
+                                @Override
+                                public EReference eContainmentFeature() {
+                                    // TODO Auto-generated method stub
+                                    return null;
+                                }
+
+                                @Override
+                                public EList<EObject> eContents() {
+                                    // TODO Auto-generated method stub
+                                    return null;
+                                }
+
+                                @Override
+                                public TreeIterator<EObject> eAllContents() {
+                                    // TODO Auto-generated method stub
+                                    return null;
+                                }
+
+                                @Override
+                                public boolean eIsProxy() {
+                                    // TODO Auto-generated method stub
+                                    return false;
+                                }
+
+                                @Override
+                                public EList<EObject> eCrossReferences() {
+                                    // TODO Auto-generated method stub
+                                    return null;
+                                }
+
+                                @Override
+                                public Object eGet(EStructuralFeature feature) {
+                                    // TODO Auto-generated method stub
+                                    return null;
+                                }
+
+                                @Override
+                                public Object eGet(EStructuralFeature feature, boolean resolve) {
+                                    // TODO Auto-generated method stub
+                                    return null;
+                                }
+
+                                @Override
+                                public void eSet(EStructuralFeature feature, Object newValue) {
+                                    // TODO Auto-generated method stub
+
+                                }
+
+                                @Override
+                                public boolean eIsSet(EStructuralFeature feature) {
+                                    // TODO Auto-generated method stub
+                                    return false;
+                                }
+
+                                @Override
+                                public void eUnset(EStructuralFeature feature) {
+                                    // TODO Auto-generated method stub
+
+                                }
+
+                                @Override
+                                public Object eInvoke(EOperation operation, EList<?> arguments) throws InvocationTargetException {
+                                    // TODO Auto-generated method stub
+                                    return null;
+                                }
+
+                                @Override
+                                public EList<Adapter> eAdapters() {
+                                    // TODO Auto-generated method stub
+                                    return null;
+                                }
+
+                                @Override
+                                public boolean eDeliver() {
+                                    // TODO Auto-generated method stub
+                                    return false;
+                                }
+
+                                @Override
+                                public void eSetDeliver(boolean deliver) {
+                                    // TODO Auto-generated method stub
+
+                                }
+
+                                @Override
+                                public void eNotify(Notification notification) {
+                                    // TODO Auto-generated method stub
+
+                                }
+
+                                public Map<String, Object> getPropertyRefFields() {
+                                    return propertyRefFields;
+                                }
+
+                                public void setPropertyRefFields(Map<String, Object> propertyRefFields) {
+                                    this.propertyRefFields = propertyRefFields;
+                                }
+                            }.init(propertyFields, propertyRefFields);
+
+                        }
+
+                        if (node.getNodeName().contentEquals("prototypes")) {
+                            return new IPrototype() {
+
+                                private Map<String, Object> propertyRefFields;
+                                private Map<String, String> propertyFields;
+
+                                private IPrototype init(Map<String, String> prop, Map<String, Object> propRf) {
+                                    setPropertyRefFields(propRf);
+                                    propertyFields = prop;
+                                    return this;
+                                }
+
+                                @Override
+                                public String getName() {
+                                    // TODO Auto-generated method stub
+                                    return propertyFields.get("name");
+                                }
+
+                                @Override
+                                public void setName(String value) {
+                                    propertyFields.remove("name");
+                                    propertyFields.put("name", value);
+
+                                }
+
+                                @Override
+                                public String getBeschreibung() {
+                                    return propertyFields.get("beschreibung");
+                                }
+
+                                @Override
+                                public void setBeschreibung(String value) {
+                                    propertyFields.remove("beschreibung");
+                                    propertyFields.put("beschreibung", value);
+
+                                }
+
+                                @Override
+                                public String getModelElementId() {
+                                    return propertyFields.get("modelElementId");
+                                }
+
+                                @Override
+                                public void setModelElementId(String value) {
+                                    propertyFields.remove("modelElementId");
+                                    propertyFields.put("modelElementId", value);
+
+                                }
+
+                                @Override
+                                public EClass eClass() {
+                                    // TODO Auto-generated method stub
+                                    return null;
+                                }
+
+                                @Override
+                                public Resource eResource() {
+                                    // TODO Auto-generated method stub
+                                    return null;
+                                }
+
+                                @Override
+                                public EObject eContainer() {
+                                    // TODO Auto-generated method stub
+                                    return null;
+                                }
+
+                                @Override
+                                public EStructuralFeature eContainingFeature() {
+                                    // TODO Auto-generated method stub
+                                    return null;
+                                }
+
+                                @Override
+                                public EReference eContainmentFeature() {
+                                    // TODO Auto-generated method stub
+                                    return null;
+                                }
+
+                                @Override
+                                public EList<EObject> eContents() {
+                                    // TODO Auto-generated method stub
+                                    return null;
+                                }
+
+                                @Override
+                                public TreeIterator<EObject> eAllContents() {
+                                    // TODO Auto-generated method stub
+                                    return null;
+                                }
+
+                                @Override
+                                public boolean eIsProxy() {
+                                    // TODO Auto-generated method stub
+                                    return false;
+                                }
+
+                                @Override
+                                public EList<EObject> eCrossReferences() {
+                                    // TODO Auto-generated method stub
+                                    return null;
+                                }
+
+                                @Override
+                                public Object eGet(EStructuralFeature feature) {
+                                    // TODO Auto-generated method stub
+                                    return null;
+                                }
+
+                                @Override
+                                public Object eGet(EStructuralFeature feature, boolean resolve) {
+                                    // TODO Auto-generated method stub
+                                    return null;
+                                }
+
+                                @Override
+                                public void eSet(EStructuralFeature feature, Object newValue) {
+                                    // TODO Auto-generated method stub
+
+                                }
+
+                                @Override
+                                public boolean eIsSet(EStructuralFeature feature) {
+                                    // TODO Auto-generated method stub
+                                    return false;
+                                }
+
+                                @Override
+                                public void eUnset(EStructuralFeature feature) {
+                                    // TODO Auto-generated method stub
+
+                                }
+
+                                @Override
+                                public Object eInvoke(EOperation operation, EList<?> arguments) throws InvocationTargetException {
+                                    // TODO Auto-generated method stub
+                                    return null;
+                                }
+
+                                @Override
+                                public EList<Adapter> eAdapters() {
+                                    // TODO Auto-generated method stub
+                                    return null;
+                                }
+
+                                @Override
+                                public boolean eDeliver() {
+                                    // TODO Auto-generated method stub
+                                    return false;
+                                }
+
+                                @Override
+                                public void eSetDeliver(boolean deliver) {
+                                    // TODO Auto-generated method stub
+
+                                }
+
+                                @Override
+                                public void eNotify(Notification notification) {
+                                    // TODO Auto-generated method stub
+
+                                }
+
+                                public Map<String, Object> getPropertyRefFields() {
+                                    return propertyRefFields;
+                                }
+
+                                public void setPropertyRefFields(Map<String, Object> propertyRefFields) {
+                                    this.propertyRefFields = propertyRefFields;
+                                }
+                            }.init(propertyFields, propertyRefFields);
+
+                        }
+                    }
+                }
+            }
+            Iterator<Field> iter = fields.iterator();
+            while (iter.hasNext()) {
+
+                Field field = (iter.next());
+                Class<?> type = field.getType();
+                if (List.class.isAssignableFrom(type) || Map.class.isAssignableFrom(type)) {
+                    if (List.class.isAssignableFrom(type)) {
+                        listFields.add(field);
+
+                    }
+
+                    if (Map.class.isAssignableFrom(type)) {
+                        mapFields.add(field);
+                    }
+                } else {
+                    otherFields.add(field);
+                }
+
+            }
+            if (node.hasAttributes()) {
+                if (node.getAttributes().getNamedItem("href") != null) {
+                    return cm.retrieveFromCache(node.getAttributes().getNamedItem("href").getNodeValue());
+                }
+
+                else {
+                    try {
+                        setObjectFields(clazz, object, nodeMap);
+                    } catch (NoSuchMethodException | IllegalAccessException | IllegalArgumentException | InvocationTargetException | DOMException e) {
+                        // TODO Auto-generated catch block
+                    }
+
+                }
+            }
+
+        }
+
+        if (node.hasChildNodes()) {
+            for (Field field : mapFields) {
+                Map<Object, Object> map = new HashMap<Object, Object>();
+                // only Element nodes getChildNodesWithName
+                for (int i = 0; i < node.getChildNodes().getLength(); i++) {
+                    Node item = node.getChildNodes().item(i);
+                    if (item.getNodeType() == 1) {
+                        if (field.getName().contentEquals(item.getNodeName())) {
+                            ParameterizedType pt = (ParameterizedType) field.getGenericType();
+                            Type[] mapTypes = pt.getActualTypeArguments();
+                            Class<?>[] mapClasses = new Class<?>[mapTypes.length];
+                            for (int k = 0; k < mapClasses.length; k++) {
+                                try {
+                                    mapClasses[k] = Class.forName(mapTypes[k].getTypeName());
+                                } catch (ClassNotFoundException e) {
+                                    // TODO Auto-generated catch block
+                                }
+                            }
+                            Method put = null;
+                            try {
+                                put = HashMap.class.getDeclaredMethod("put", Object.class, Object.class);
+                            } catch (NoSuchMethodException | SecurityException e1) {
+                                // TODO Auto-generated catch block
+                            }
+                            try {
+                                Object[] obj = buildMapElement(mapClasses, item.getChildNodes(), item, field);
+                                put.invoke(map, obj[0], obj[1]);
                             } catch (NoSuchMethodException | IllegalAccessException | IllegalArgumentException | InvocationTargetException | DOMException e) {
                                 // TODO Auto-generated catch block
                             }
                         }
                     }
+                    Method methode = null;
+                    try {
+                        methode = findMethod(clazz, "set" + Character.toUpperCase(field.getName().charAt(0)) + field.getName().substring(1, field.getName().length()),
+                            field.getType());
+                    } catch (NoSuchMethodException e) {
+                        // TODO Auto-generated catch block
+                    }
+                    if (methode != null) {
+                        try {
+                            methode.invoke(object, map);
+                        } catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
+                            // TODO Auto-generated catch block
+                        }
+                    }
+                }
 
+            }
+        }
+
+        for (Field field : listFields) {
+            List<Object> lst = new ArrayList<Object>();
+            // only Element nodes getChildNodesWithName
+            for (int i = 0; i < node.getChildNodes().getLength(); i++) {
+                Node item = node.getChildNodes().item(i);
+                if (item.getNodeType() == 1) {
+                    if (field.getName().contentEquals(item.getNodeName())) {
+                        ParameterizedType pt = (ParameterizedType) field.getGenericType();
+                        Type listType = pt.getActualTypeArguments()[0];
+                        Class<?> listClass = null;
+                        try {
+                            listClass = Class.forName(listType.getTypeName());
+                        } catch (ClassNotFoundException e2) {
+                            // TODO Auto-generated catch blockF
+                        }
+                        Method add = null;
+                        try {
+                            add = ArrayList.class.getDeclaredMethod("add", Object.class);
+                        } catch (NoSuchMethodException | SecurityException e1) {
+                            // TODO Auto-generated catch block
+                        }
+                        try {
+                            Object obj = buildListElement(clazz, listClass, item.getChildNodes(), item, field);
+                            add.invoke(lst, obj);
+                        } catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException | DOMException e) {
+                            // TODO Auto-generated catch block
+                        }
+                    }
+                }
+            }
+            Method methode = null;
+            try {
+                methode = findMethod(clazz, "set" + Character.toUpperCase(field.getName().charAt(0)) + field.getName().substring(1, field.getName().length()),
+                    field.getType());
+
+            } catch (NoSuchMethodException e) {
+                // TODO Auto-generated catch block
+
+            }
+
+            if (methode != null) {
+                try {
+                    methode.invoke(object, lst);
+                } catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
+                    // TODO Auto-generated catch block
+                    e.printStackTrace();
+                }
+            }
+
+        }
+        for (Field field : otherFields) {
+            for (int i = 0; i < node.getChildNodes().getLength(); i++) {
+                Node item = node.getChildNodes().item(i);
+                if (item.getNodeType() == 1) {
+                    if (field.getName().contentEquals(item.getNodeName())) {
+                        try {
+                            setRefObject(clazz, field, object, item);
+                        } catch (NoSuchMethodException | IllegalAccessException | IllegalArgumentException | InvocationTargetException | DOMException e) {
+                            // TODO Auto-generated catch block
+                            e.printStackTrace();
+                        }
+                    }
                 }
             }
         }
+
         return object;
+
     }
 
-    public void visitnode(Node node, Object object) {
-        Class<?> clazz = null;
-        List<Field> fields = null;
-        List<Field> listFields = new ArrayList<Field>();
-        List<Field> mapFields = new ArrayList<Field>();
-        List<Field> otherFields = new ArrayList<Field>();
-        // get attributes names and values
-        NamedNodeMap nodeMap = node.getAttributes();
-        if (nodeMap.getNamedItem("xsi:type") != null) {
-            Node nodeType = nodeMap.getNamedItem("xsi:type");
-            String functionName = nodeType.getNodeValue();
-            List<String> list = splitString(functionName);
-            try {
-                clazz = Class.forName(buildFullyQualifiedName(convertToPackageName(resolver.getNamespaceURI((list.get(0)))), list.get(1)));
-                Constructor<?> constructor = clazz.getDeclaredConstructor();
-                object = constructor.newInstance();
-                fields = getAllDeclaredFields(clazz);
-
-            } catch (ClassNotFoundException | InstantiationException | NoSuchMethodException | SecurityException | IllegalAccessException | IllegalArgumentException
-                    | InvocationTargetException e) {
-                // TODO Auto-generated catch block
-            }
-            Iterator<Field> iter = fields.iterator();
-            while (iter.hasNext()) {
-
-                Field field = (iter.next());
-                Class<?> type = field.getType();
-                if (List.class.isAssignableFrom(type) || Map.class.isAssignableFrom(type)) {
-                    if (List.class.isAssignableFrom(type)) {
-                        listFields.add(field);
-
-                    }
-
-                    if (Map.class.isAssignableFrom(type)) {
-                        mapFields.add(field);
-                    }
+    // constructs and returns an List element
+    private Object buildListElement(Class<?> parentClass, Class<?> listClass, NodeList childNodes, Node item, Field field) {
+        Object result = null;
+        if (childNodes != null) {
+            if (item.hasAttributes()) {
+                if (item.getAttributes().getNamedItem("href") != null) {
+                    return cm.retrieveFromCache(item.getAttributes().getNamedItem("href").getNodeValue());
                 }
-
-                else {
-                    otherFields.add(field);
+                if (item.getAttributes().getNamedItem("xsi:type") != null) {
+                    result = visitnode(item, new Object());
+                } else {
+                    result = visitNodeWithParent(parentClass, listClass, item);
                 }
-            }
-            if (node.hasAttributes()) {
-                try {
-                    setObjectFields(clazz, object, nodeMap);
-                } catch (NoSuchMethodException | IllegalAccessException | IllegalArgumentException | InvocationTargetException | DOMException e) {
-                    // TODO Auto-generated catch block
-                }
-
             }
 
         }
-
-        if (node.hasChildNodes()) {
-            for (Field field : mapFields) {
-                Map<Object, Object> map = new HashMap<Object, Object>();
-                // only Element nodes getChildNodesWithName
-                for (int i = 0; i < node.getChildNodes().getLength(); i++) {
-                    Node item = node.getChildNodes().item(i);
-                    if (item.getNodeType() == 1) {
-                        if (field.getName().contentEquals(item.getNodeName())) {
-                            ParameterizedType pt = (ParameterizedType) field.getGenericType();
-                            Type[] mapTypes = pt.getActualTypeArguments();
-                            Class<?>[] mapClasses = new Class<?>[mapTypes.length];
-                            for (int k = 0; k < mapClasses.length; k++) {
-                                try {
-                                    mapClasses[k] = Class.forName(mapTypes[k].getTypeName());
-                                } catch (ClassNotFoundException e) {
-                                    // TODO Auto-generated catch block
-                                }
-                            }
-                            Method put = null;
-                            try {
-                                put = HashMap.class.getDeclaredMethod("put", Object.class, Object.class);
-                            } catch (NoSuchMethodException | SecurityException e1) {
-                                // TODO Auto-generated catch block
-                            }
-                            try {
-                                Object[] obj = buildAndSetMap(mapClasses, item.getChildNodes(), item, field);
-                                put.invoke(map, obj[0], obj[1]);
-                            } catch (NoSuchMethodException | IllegalAccessException | IllegalArgumentException | InvocationTargetException | DOMException e) {
-                                // TODO Auto-generated catch block
-                            }
-                            Method methode = null;
-                            try {
-                                methode = findMethod(clazz, "set" + Character.toUpperCase(field.getName().charAt(0)) + field.getName().substring(1, field.getName().length()),
-                                    field.getType());
-                            } catch (NoSuchMethodException e) {
-                                // TODO Auto-generated catch block
-                            }
-                            try {
-                                methode.invoke(object, map);
-                            } catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
-                                // TODO Auto-generated catch block
-                            }
-                        }
-                    }
-
-                }
-            }
-
-            for (Field field : otherFields) {
-                for (int i = 0; i < node.getChildNodes().getLength(); i++) {
-                    Node item = node.getChildNodes().item(i);
-                    if (item.getNodeType() == 1) {
-                        if (field.getName().contentEquals(item.getNodeName())) {
-                            try {
-                                setRefObject(clazz, field, object, item);
-                            } catch (NoSuchMethodException | IllegalAccessException | IllegalArgumentException | InvocationTargetException | DOMException e) {
-                                // TODO Auto-generated catch block
-                            }
-                        }
-                    }
-
-                }
-            }
-        }
+        return result;
     }
 
-    // set the object fiels according to the corresponding attributes contained in @attrList
+    // set the object's fiels according to the corresponding attributes contained in @attrList
     public void setObjectFields(Class<?> clazz, Object obj, NamedNodeMap attrList)
             throws NoSuchMethodException, IllegalAccessException, IllegalArgumentException, InvocationTargetException, DOMException {
         for (int i = 0; i < attrList.getLength(); i++) {
@@ -416,41 +1013,33 @@ public class DomParser {
                 }
 
                 Method methode = findMethod(clazz, "set" + Character.toUpperCase(nodeN.charAt(0)) + nodeN.substring(1, nodeN.length()), cl);
-                if (cl.isPrimitive()) {
+                if (cl.getPackage().getName().contains("java.lang") || cl.getPackage().getName().contains("java.util")) {
                     methode.invoke(obj, item.getNodeValue());
                 }
 
                 else {
                     methode.invoke(obj, cm.retrieveFromCache(item.getNodeValue()));
                 }
+
             }
         }
     }
 
-    // set a reference Object to the current object
+    // resolve and set a reference object to the current object
     public void setRefObject(Class<?> clazz, Field field, Object obj, Node node)
             throws NoSuchMethodException, IllegalAccessException, IllegalArgumentException, InvocationTargetException, DOMException {
         Class<?> type = field.getType();
         Method methode = findMethod(clazz, "set" + Character.toUpperCase(node.getNodeName().charAt(0)) + node.getNodeName().substring(1, node.getNodeName().length()), type);
-        if (node.hasChildNodes()) {
-            Object object = visitnode(node);
-            methode.invoke(obj, object);
-        }
-
-        else {
-
-            if (type.isPrimitive()) {
-                methode.invoke(obj, node.getNodeValue());
-            }
-
-            else {
+        if (node.hasAttributes()) {
+            if (node.getAttributes().getNamedItem("href") != null) {
                 methode.invoke(obj, cm.retrieveFromCache(node.getAttributes().getNamedItem("href").getNodeValue()));
+
             }
         }
     }
 
-    // construct and set the Map to the Object
-    public Object[] buildAndSetMap(Class<?>[] clazz, NodeList children, Node node, Field field)
+    // constructs and returns the Map to the Object
+    public Object[] buildMapElement(Class<?>[] clazz, NodeList children, Node node, Field field)
             throws NoSuchMethodException, IllegalAccessException, IllegalArgumentException, InvocationTargetException, DOMException {
         Object[] result = new Object[2];
         Object key = null;
@@ -498,6 +1087,25 @@ public class DomParser {
         return result;
     }
 
+    /*--------------------------------------------------------------------------------------------------------
+     Getters and Setters
+     ---------------------------------------------------------------------------------------------------------* */
+    public JavaPackageNameResolver getpResolver() {
+        return pResolver;
+    }
+
+    public void setpResolver(JavaPackageNameResolver pResolver) {
+        this.pResolver = pResolver;
+    }
+
+    public NameSpaceResolver getResolver() {
+        return resolver;
+    }
+
+    public void setResolver(NameSpaceResolver resolver) {
+        this.resolver = resolver;
+    }
+
     public List<Object> getSpeicher() {
         return speicher;
     }
@@ -506,21 +1114,25 @@ public class DomParser {
         this.speicher = speicher;
     }
 
-    // returns true when the node contains a child wihth the given name
-    public boolean containsChild(Node node, String nodeName) {
+    /*--------------------------------------------------------------------------------------------------------
+    Help Methods
+    ---------------------------------------------------------------------------------------------------------* */
+
+    // returns true when the node contains a child with the given name
+    public boolean containsChild(Node node, String childName) {
         for (int i = 0; i < node.getChildNodes().getLength(); i++) {
-            if (node.getChildNodes().item(i).getNodeName().contentEquals(nodeName))
+            if (node.getChildNodes().item(i).getNodeName().contentEquals(childName))
                 return true;
         }
         return false;
     }
 
     // return a list containing the childnodes with the given name
-    public List<Node> getChildNodesWithName(Node parent, String nodeName) {
+    public List<Node> getChildNodesWithName(Node parent, String childName) {
         List<Node> result = new ArrayList<Node>();
         for (int i = 0; i < parent.getChildNodes().getLength(); i++) {
             Node item = parent.getChildNodes().item(i);
-            if (item.getNodeName().contentEquals(nodeName) && (item.getNodeType() == 1))
+            if (item.getNodeName().contentEquals(childName) && (item.getNodeType() == 1))
                 result.add(i, item);
         }
         return result;
@@ -528,7 +1140,6 @@ public class DomParser {
 
     // search for a method declared in a class and return it
     public Method findMethod(Class<?> clazz, String methodName, Class<?>... parameterTypes) throws NoSuchMethodException {
-
         // First try the trivial approach. This works usually, but not always.
         try {
             return clazz.getMethod(methodName, parameterTypes);
@@ -565,12 +1176,11 @@ public class DomParser {
             }
 
         }
-
         // None of our trials was successful!
         throw new NoSuchMethodException();
     }
 
-    // return a list containing both elements prefix and name space
+    // returns a list containing both elements prefix and namespace
     public List<String> splitString(String s) {
         List<String> result = new ArrayList<String>();
         result.add(0, s.substring(0, s.indexOf(':')));
@@ -579,88 +1189,11 @@ public class DomParser {
     }
 
     public String buildFullyQualifiedName(String packageName, String className) {
-        return packageName + "." + className;
-
-    }
-
-    // constructs and save an identifier in the cache and in the Memory
-    public void saveIdentifier(String packageName, String localName, String literalsKey, String nodeValue) {
-        if (packageName.contains("entity.tickets")) {
-            packageName = packageName.replace(".entity", "");
+        if (packageName != null) {
+            String basePackageName = pResolver.getBasePackage();
+            return basePackageName != null ? basePackageName + "." + packageName + "." + className : "insure." + packageName + "." + className;
         }
-        @SuppressWarnings("unused")
-        IEnumeration identifier = null;
-        String name = buildFullyQualifiedName(packageName, localName);
-        Class<?> cls = null;
-        try {
-            cls = Class.forName(name);
-        } catch (ClassNotFoundException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        }
-        Method method1 = null;
-        try {
-            method1 = cls.getMethod("fromKey", int.class);
-        } catch (NoSuchMethodException | SecurityException e) {
-            // TODO Auto-generated catch block
-
-        }
-        try {
-            identifier = (IEnumeration) method1.invoke(cls, Integer.parseInt(literalsKey));
-            System.out.println(identifier + ":" + Integer.parseInt(literalsKey));
-        } catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
-            // TODO Auto-generated catch block
-
-        }
-
-        if (identifier != null) {
-            cm.putInCache(nodeValue, identifier);
-            speicher.add(identifier);
-        }
-
-    }
-
-    // constructs and save the simple enum in the cache and in the Memory
-    @SuppressWarnings("unchecked")
-    public void saveEnum(String packageName, String localName, String literalsName, String literalsKey, String nodeValue) {
-        if (packageName.contains("entity.tickets")) {
-            packageName = packageName.replace(".entity", "");
-        }
-        IEnumeration enumeration = null;
-        String name = buildFullyQualifiedName(packageName, localName);
-        name += "Literals";
-        @SuppressWarnings("rawtypes")
-        Class cls = null;
-        try {
-            cls = Class.forName(name);
-        } catch (ClassNotFoundException e) {
-            // TODO Auto-generated catch block
-        }
-        Method method1 = null;
-        Method method2 = null;
-        try {
-            method1 = cls.getMethod("getInstance");
-            method2 = cls.getMethod("valueOf", String.class);
-        } catch (NoSuchMethodException | SecurityException e) {
-            // TODO Auto-generated catch block
-        }
-
-        Object obj = null;
-        try {
-            obj = method1.invoke(cls);
-        } catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
-            // TODO Auto-generated catch block
-        }
-        try {
-            enumeration = (IEnumeration) method2.invoke(obj, literalsName);
-        } catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
-            // TODO Auto-generated catch block
-        }
-        if (enumeration != null) {
-            cm.putInCache(nodeValue, enumeration);
-            speicher.add(enumeration);
-        }
-
+        return null;
     }
 
     // convert the namespace to a valid package name
@@ -669,16 +1202,15 @@ public class DomParser {
         return nameConverter.toPackageName(xmlNamespace);
     }
 
-    // suppress the unwanted expressions after the attribute href leaving only the ID
-    public File correctHref(File inputXML, String outputPath) {
+    // suppress unwanted expressions after the attribute href leaving only the ID
+    public InputStream correctHref(InputStream input) {
 
         BufferedReader br = null;
         String newString = "";
         StringBuilder strTotale = new StringBuilder();
         try {
 
-            FileReader reader = new FileReader(inputXML);
-            br = new BufferedReader(reader);
+            br = new BufferedReader(new InputStreamReader(input));
             while ((newString = br.readLine()) != null) {
                 if (newString.contains("href=")) {
                     newString = newString.replace(newString.substring((newString.indexOf("=") + 2), newString.indexOf("#") + 1), "");
@@ -689,61 +1221,14 @@ public class DomParser {
         } catch (IOException e) {
             // TODO Auto-generated catch block
         } // calls it
-        finally {
-            try {
-                br.close();
-            } catch (IOException e) {
-                // TODO Auto-generated catch block
-            }
-        }
+        return new ByteArrayInputStream(strTotale.toString().getBytes(StandardCharsets.UTF_8));
 
-        File outputFile = new File(outputPath);
-        BufferedWriter writer = null;
-        try {
-            writer = new BufferedWriter(new FileWriter(outputFile));
-            writer.write(strTotale.toString());
-        } catch (IOException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        } finally {
-            if (writer != null)
-                try {
-                    writer.close();
-                } catch (IOException e) {
-                    // TODO Auto-generated catch block
-                }
-        }
-
-        return outputFile;
     }
 
     // copy the given file to the classpath
-    public File copyFile(String xmlPath, int i) {
-        File xmlFile = null;
-        InputStream is = this.getClass().getResourceAsStream(xmlPath);
-        byte[] buffer = null;
-        try {
-            buffer = new byte[is.available()];
-        } catch (IOException e1) {
-            // TODO Auto-generated catch block
-        }
-        try {
-            is.read(buffer);
-        } catch (IOException e1) {
-            // TODO Auto-generated catch block
-        }
-        ;
-        try {
-            xmlFile = new File("src/main/resources/copiedFile" + i);
-            @SuppressWarnings("resource")
-            OutputStream outStream = new FileOutputStream(xmlFile);
-            outStream.write(buffer);
-            xmlFile = correctHref(xmlFile, "/src/main/resources/model/modified" + i);
-        } catch (IOException e) {
-            // TODO Auto-generated catch block
-        }
+    public InputStream copyFile(String xmlPath) {
+        return this.getClass().getResourceAsStream(xmlPath);
 
-        return xmlFile;
     }
 
     // returns a list containing all the fields declared in the type hierrachy
@@ -776,29 +1261,49 @@ public class DomParser {
             IllegalAccessException {
 
         logger.info("Begin - getFieldNamesAndValues");
-        @SuppressWarnings("rawtypes")
-        Class c1 = valueObj.getClass();
-        logger.info("Class name got is: " + c1.getName());
+        if (valueObj != null) {
+            Class c1 = valueObj.getClass();
+            logger.info("Class name got is: " + c1.getName());
 
-        Map fieldMap = new HashMap();
-        Field[] valueObjFields = c1.getDeclaredFields();
+            Map fieldMap = new HashMap();
+            Field[] valueObjFields = c1.getDeclaredFields();
 
-        // compare values now
-        for (int i = 0; i < valueObjFields.length; i++) {
+            // compare values now
+            for (int i = 0; i < valueObjFields.length; i++) {
 
-            String fieldName = valueObjFields[i].getName();
+                String fieldName = valueObjFields[i].getName();
 
-            logger.info("Getting Field Values for Field: " + valueObjFields[i].getName());
-            valueObjFields[i].setAccessible(true);
+                logger.info("Getting Field Values for Field: " + valueObjFields[i].getName());
+                valueObjFields[i].setAccessible(true);
 
-            Object newObj = valueObjFields[i].get(valueObj);
+                Object newObj = valueObjFields[i].get(valueObj);
 
-            logger.info("Value of field  " + fieldName + "  value: " + newObj);
-            fieldMap.put(fieldName, newObj);
+                logger.info("Value of field  " + fieldName + "  value: " + newObj);
+                fieldMap.put(fieldName, newObj);
 
+            }
+            logger.info("End - getFieldNamesAndValues");
+            return fieldMap;
         }
-        logger.info("End - getFieldNamesAndValues");
-        return fieldMap;
+        return null;
+    }
+
+    // returns true if every single node's attribute match a field of the given class
+    public boolean nodeAttMatchClassAtt(Class<?> cl, Node node) {
+        List<Field> fields = getAllDeclaredFields(cl);
+        List<String> fieldsName = new ArrayList<String>();
+        List<String> attNames = new ArrayList<String>();
+
+        for (int i = 0; i < fields.size(); i++) {
+            fieldsName.add(fields.get(i).getName());
+        }
+
+        for (int j = 0; j < node.getChildNodes().getLength(); j++) {
+            attNames.add(node.getChildNodes().item(j).getNodeName());
+        }
+
+        return fieldsName.containsAll(attNames);
+
     }
 
     // prints all the objects contained in the memory for a good visibillity

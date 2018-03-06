@@ -57,19 +57,6 @@ public class NameSpaceResolver implements NamespaceContext {
             putInCache(list.get(1), attribute.getNodeValue());
         }
 
-        // // examine the attributes in namespace xmlns
-        // if (attribute.getNamespaceURI() != null
-        // && attribute.getNamespaceURI().equals(
-        // XMLConstants.XMLNS_ATTRIBUTE_NS_URI)) {
-        // // Default namespace xmlns="uri goes here"
-        // if (attribute.getNodeName().equals(XMLConstants.XMLNS_ATTRIBUTE)) {
-        // putInCache(DEFAULT_NS, attribute.getNodeValue());
-        // } else {
-        // // The defined prefixes are stored here
-        // putInCache(attribute.getLocalName(), attribute.getNodeValue());
-        // }
-        // }
-
     }
 
     private void putInCache(String prefix, String uri) {

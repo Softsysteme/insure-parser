@@ -22,11 +22,19 @@
 		</dependency>
 		<dependency>
 			<groupId>insure.infoservice</groupId>
+			<artifactId>insure.infoservice.modell</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>insure.infoservice</groupId>
 			<artifactId>insure.infoservice.daten</artifactId>
 		</dependency>
 		<dependency>
 			<groupId>de.adesso.ais.infoservice-reference</groupId>
 			<artifactId>infoservice-reference-daten</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>de.adesso.ais.infoservice-reference</groupId>
+			<artifactId>infoservice-reference-modell</artifactId>
 		</dependency>
 		<dependency>
 			<groupId>de.adesso.ais.infoservice-reference</groupId>
@@ -42,11 +50,27 @@
 		</dependency>
 		<dependency>
 			<groupId>de.adesso.ais.domain-reference</groupId>
+			<artifactId>de.adesso.ais.domainreference.modell</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>de.adesso.ais.domain-reference</groupId>
 			<artifactId>domain-reference-daten-gen</artifactId>
 		</dependency>
 		<dependency>
 			<groupId>de.adesso.ais.domain-reference</groupId>
 			<artifactId>domain-reference-daten</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>insure.domain</groupId>
+			<artifactId>insure.domain.modell</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>insure.domain</groupId>
+			<artifactId>insure.domain.daten</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>insure.domain</groupId>
+			<artifactId>insure-domain-gen</artifactId>
 		</dependency>
 		<dependency>
 			<groupId>com.sun.xml.bind</groupId>
@@ -61,6 +85,13 @@
 			<version>4.12</version>
 			<scope>test</scope>
 		</dependency>
+		<!-- https://mvnrepository.com/artifact/commons-io/commons-io -->
+		<dependency>
+			<groupId>commons-io</groupId>
+			<artifactId>commons-io</artifactId>
+			<version>2.5</version>
+		</dependency>
+
 		<dependency>
 			<groupId>org.eclipse.xsd.ecore</groupId>
 			<artifactId>exporter</artifactId>
@@ -82,6 +113,11 @@
 			<groupId>org.slf4j</groupId>
 			<artifactId>slf4j-jdk14</artifactId>
 			<version>1.7.14</version>
+		</dependency>
+		<dependency>
+			<groupId>org.reflections</groupId>
+			<artifactId>reflections</artifactId>
+			<version>0.9.9-RC1</version>
 		</dependency>
 	</dependencies>
 	<parent>
