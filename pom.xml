@@ -33,6 +33,10 @@
 			<artifactId>infoservice-reference-daten</artifactId>
 		</dependency>
 		<dependency>
+			<groupId>de.adesso.ais.domain-reference</groupId>
+			<artifactId>domain-reference</artifactId>
+		</dependency>
+		<dependency>
 			<groupId>de.adesso.ais.infoservice-reference</groupId>
 			<artifactId>infoservice-reference-modell</artifactId>
 		</dependency>

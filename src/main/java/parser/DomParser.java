@@ -22,6 +22,7 @@ import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
+import org.apache.commons.lang.StringUtils;
 import org.eclipse.emf.common.notify.Adapter;
 import org.eclipse.emf.common.notify.Notification;
 import org.eclipse.emf.common.util.EList;
@@ -820,6 +821,7 @@ public class DomParser {
                     }
                 }
             }
+
             Iterator<Field> iter = fields.iterator();
             while (iter.hasNext()) {
 
@@ -1059,15 +1061,13 @@ public class DomParser {
         for (int i = 0; i < children.getLength(); i++) {
             Node item = children.item(i);
 
-            if (item.getNodeType() == 1) {
+            if (item.hasAttributes()) {
                 NamedNodeMap attributes = item.getAttributes();
                 if (item.getNodeName().contentEquals("key")) {
                     Node att = attributes.getNamedItem("href");
                     if (att != null) {
                         key = cm.retrieveFromCache(att.getNodeValue());
 
-                    } else {
-                        key = cm.retrieveFromCache(attributes.getNamedItem("xsi:type").getNodeValue());
                     }
                 }
 
@@ -1213,8 +1213,9 @@ public class DomParser {
             br = new BufferedReader(new InputStreamReader(input));
             while ((newString = br.readLine()) != null) {
                 if (newString.contains("href=")) {
-                    newString = newString.replace(newString.substring((newString.indexOf("=") + 2), newString.indexOf("#") + 1), "");
+                    newString = newString.replace(StringUtils.substringBetween(newString, "href=", "_"), "\"");
                 }
+
                 strTotale.append(newString + '\n');
             }
 
