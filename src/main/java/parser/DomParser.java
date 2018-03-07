@@ -52,6 +52,11 @@ import tools.JavaPackageNameResolver;
 import tools.NameSpaceResolver;
 import tools.Uri2PackageNameConverter;
 
+/**
+ * 
+ * @author mpouma
+ *
+ */
 public class DomParser {
     private List<Object> speicher;
     private static transient Object prototype;
@@ -66,6 +71,11 @@ public class DomParser {
         speicher = new ArrayList<Object>();
     }
 
+    /**
+     * 
+     * @param filePath
+     * @param ecoreFilePath
+     */
     public void parseXml(String filePath, String ecoreFilePath) {
 
         // Get Document Builder
@@ -119,7 +129,11 @@ public class DomParser {
 
     }
 
-    // Enums parser
+    /**
+     * 
+     * @param nList
+     *            Enums parser
+     */
     public void parseEnums(NodeList nList) {
         for (int temp = 0; temp < nList.getLength(); temp++) {
             Node node = nList.item(temp);
@@ -145,7 +159,11 @@ public class DomParser {
 
     }
 
-    // Prototypes parser
+    /**
+     * 
+     * @param nList
+     *            Prototypes parser
+     */
     public void parsePrototypes(NodeList nList) {
         for (int temp = 0; temp < nList.getLength(); temp++) {
             Node node = nList.item(temp);
@@ -156,7 +174,11 @@ public class DomParser {
         }
     }
 
-    // Functions parser
+    /**
+     * Functions parser
+     * 
+     * @param nList
+     */
     public void parseFunction(NodeList nList) {
         Object function = null;
         for (int temp = 0; temp < nList.getLength(); temp++) {
@@ -168,7 +190,17 @@ public class DomParser {
         }
     }
 
-    // constructs and save the simple enum in the cache and in the Memory
+    /**
+     * constructs and save the simple enum in the cache and in the Memory
+     * 
+     * @param packageName
+     * @param localName
+     * @param literalsName
+     * @param literalsKey
+     * @param nodeValue
+     *            there is a bug to fix: the NoSuchMethodError is thrown because of the absence of the method toKey() by the identifier interfaces this cause an initialization error. as solution, the
+     *            method tokey() should be add to all identifier interfaces
+     */
     @SuppressWarnings("unchecked")
     public void saveEnum(String packageName, String localName, String literalsName, String literalsKey, String nodeValue) {
         IEnumeration enumeration = null;
@@ -219,7 +251,15 @@ public class DomParser {
         }
     }
 
-    // constructs and save an Enum that have not null key attribute in the cache and in the Memory
+    /**
+     * 
+     * @param packageName
+     * @param localName
+     * @param literalsKey
+     * @param nodeValue
+     * @throws ClassNotFoundException
+     *             Note: this method should be useless when the NoSuchMethodError bug is fixed constructs and save an Enum that have not null key attribute in the cache and in the Memory
+     */
     public void saveFromEnumClass(String packageName, String localName, String literalsKey, String nodeValue) throws ClassNotFoundException {
         @SuppressWarnings("unused")
         Object identifier = null;
@@ -251,7 +291,13 @@ public class DomParser {
 
     }
 
-    // for nodes that doesn't have type attribute (often happens by List Element) we refer to the parent to discover the child type
+    /**
+     * 
+     * @param parentClass
+     * @param nodeClass
+     * @param node
+     * @return for nodes that doesn't have type attribute (often happens by List Element) we refer to the parent to discover the child type
+     */
     public Object visitNodeWithParent(Class<?> parentClass, Class<?> nodeClass, Node node) {
         // List<Class<?>> fields = new ArrayList<Class<?>>();
         // Reflections reflections = new Reflections(nodeClass.getPackage().getName());
@@ -429,7 +475,12 @@ public class DomParser {
 
     }
 
-    // recursive call for prototypes
+    /**
+     * 
+     * @param node
+     * @param object
+     * @return
+     */
     public Object visitnode(Node node, Object object) {
         Class<?> clazz = null;
         List<Field> fields = null;
@@ -456,13 +507,13 @@ public class DomParser {
                         | InvocationTargetException e) {
                     if (e instanceof ClassNotFoundException) {
 
-                        Map<String, Object> propertyRefFields = new HashMap<String, Object>();
+                        Map<String, Object> propertyRefs = new HashMap<String, Object>();
                         Map<String, String> propertyFields = new HashMap<String, String>();
-                        if (!node.hasChildNodes()) {
+                        if (node.hasChildNodes()) {
                             for (int i = 0; i < node.getChildNodes().getLength(); i++) {
                                 Node it = node.getChildNodes().item(i);
-                                if (it.getNodeType() == 1) {
-                                    propertyRefFields.put(it.getNodeName(), visitnode(it, new Object()));
+                                if (it.hasChildNodes()) {
+                                    propertyRefs.put(it.getAttributes().getNamedItem("modelElementId").getNodeValue(), visitnode(it, new Object()));
                                 }
 
                             }
@@ -474,11 +525,11 @@ public class DomParser {
                             node.getAttributes().getNamedItem("beschreibung") != null ? node.getAttributes().getNamedItem("beschreibung").getNodeValue() : null);
                         if (node.getNodeName().contentEquals("functions")) {
                             return new IFunction() {
-                                private Map<String, Object> propertyRefFields;
+                                public Map<String, Object> containments = new HashMap<String, Object>();
                                 private Map<String, String> propertyFields;
 
                                 private IFunction init(Map<String, String> prop, Map<String, Object> propRf) {
-                                    setPropertyRefFields(propRf);
+                                    containments = propRf;
                                     propertyFields = prop;
                                     return this;
                                 }
@@ -634,14 +685,16 @@ public class DomParser {
 
                                 }
 
-                                public Map<String, Object> getPropertyRefFields() {
-                                    return propertyRefFields;
+                                @SuppressWarnings("unused")
+                                public Map<String, Object> getContainments() {
+                                    return this.containments;
                                 }
 
-                                public void setPropertyRefFields(Map<String, Object> propertyRefFields) {
-                                    this.propertyRefFields = propertyRefFields;
+                                @SuppressWarnings("unused")
+                                public void setContainments(Map<String, Object> containments) {
+                                    this.containments = containments;
                                 }
-                            }.init(propertyFields, propertyRefFields);
+                            }.init(propertyFields, propertyRefs);
 
                         }
 
@@ -815,7 +868,7 @@ public class DomParser {
                                 public void setPropertyRefFields(Map<String, Object> propertyRefFields) {
                                     this.propertyRefFields = propertyRefFields;
                                 }
-                            }.init(propertyFields, propertyRefFields);
+                            }.init(propertyFields, propertyRefs);
 
                         }
                     }
@@ -833,7 +886,7 @@ public class DomParser {
 
                     }
 
-                    if (Map.class.isAssignableFrom(type)) {
+                    else {
                         mapFields.add(field);
                     }
                 } else {
@@ -979,7 +1032,15 @@ public class DomParser {
 
     }
 
-    // constructs and returns an List element
+    /**
+     * 
+     * @param parentClass
+     * @param listClass
+     * @param childNodes
+     * @param item
+     * @param field
+     * @return constructs and returns an List element
+     */
     private Object buildListElement(Class<?> parentClass, Class<?> listClass, NodeList childNodes, Node item, Field field) {
         Object result = null;
         if (childNodes != null) {
@@ -998,7 +1059,18 @@ public class DomParser {
         return result;
     }
 
-    // set the object's fiels according to the corresponding attributes contained in @attrList
+    /**
+     * 
+     * @param clazz
+     * @param obj
+     * @param attrList
+     * @throws NoSuchMethodException
+     * @throws IllegalAccessException
+     * @throws IllegalArgumentException
+     * @throws InvocationTargetException
+     * @throws DOMException
+     *             set the object's fiels according to the corresponding attributes contained in @attrList
+     */
     public void setObjectFields(Class<?> clazz, Object obj, NamedNodeMap attrList)
             throws NoSuchMethodException, IllegalAccessException, IllegalArgumentException, InvocationTargetException, DOMException {
         for (int i = 0; i < attrList.getLength(); i++) {
@@ -1027,7 +1099,19 @@ public class DomParser {
         }
     }
 
-    // resolve and set a reference object to the current object
+    /**
+     * resolve and set a reference object to the current object
+     * 
+     * @param clazz
+     * @param field
+     * @param obj
+     * @param node
+     * @throws NoSuchMethodException
+     * @throws IllegalAccessException
+     * @throws IllegalArgumentException
+     * @throws InvocationTargetException
+     * @throws DOMException
+     */
     public void setRefObject(Class<?> clazz, Field field, Object obj, Node node)
             throws NoSuchMethodException, IllegalAccessException, IllegalArgumentException, InvocationTargetException, DOMException {
         Class<?> type = field.getType();
@@ -1040,7 +1124,20 @@ public class DomParser {
         }
     }
 
-    // constructs and returns the Map to the Object
+    /**
+     * constructs and returns the Map to the Object
+     * 
+     * @param clazz
+     * @param children
+     * @param node
+     * @param field
+     * @return
+     * @throws NoSuchMethodException
+     * @throws IllegalAccessException
+     * @throws IllegalArgumentException
+     * @throws InvocationTargetException
+     * @throws DOMException
+     */
     public Object[] buildMapElement(Class<?>[] clazz, NodeList children, Node node, Field field)
             throws NoSuchMethodException, IllegalAccessException, IllegalArgumentException, InvocationTargetException, DOMException {
         Object[] result = new Object[2];

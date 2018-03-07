@@ -1,5 +1,7 @@
 package parsertests;
 
+import java.lang.reflect.Field;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -8,6 +10,7 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 
 import caches.InsureParserCacheManager;
+import de.adesso.ais.domain.tickets.insure450.impl.Insure450CalculatorEinCalculator;
 import de.adesso.ais.infoservicereference.feldsteuerung.feldelementeigenschaften.impl.StandardFeldelementeigenschaftenStandard;
 import de.adesso.ais.infoservicereference.feldsteuerung.feldelementeigenschaften.impl.StandardFeldelementeigenschaftenStandardBearbeitung;
 import de.adesso.ais.infoservicereference.feldsteuerung.feldelementeigenschaften.impl.StandardFeldelementeigenschaftenStandardBeauskunftung;
@@ -16,6 +19,7 @@ import de.adesso.ais.infoservicereference.feldsteuerung.feldelementeigenschaften
 import de.adesso.ais.infoservicereference.feldsteuerung.feldelementeigenschaften.impl.TemplateFeldelementeigenschaftenModellvariantePolo;
 import de.adesso.ais.infoservicereference.feldsteuerung.impl.FeldsteuerungBestellsystem;
 import de.adesso.ais.infoservicereference.schnittstellensteuerung.impl.SchnittstellensteuerungBestellsystem;
+import insure.core.IFunction;
 import insure.domain.prototype.kontext.IKontext;
 import insure.infoservice.feldsteuerung.Feldsteuerung;
 import insure.infoservice.feldsteuerung.IEingabeelement;
@@ -208,7 +212,7 @@ public class DomParserTest {
     /*--------------------------------------------------------------------------------------------------------
     Feldsteuerung parsing test
     ---------------------------------------------------------------------------------------------------------* */
-    @Test
+    // @Test
     public void FeldsteuerungBestellsystemParsedCorrectly() {
 
         FeldsteuerungBestellsystem fldst1 = new FeldsteuerungBestellsystem();
@@ -322,5 +326,37 @@ public class DomParserTest {
             assert (shn1.getSchnittstellenversorgungen().get(entry.getKey()).getModelElementId().contentEquals(shn2.getSchnittstellenversorgungen().get(entry.getKey()).getModelElementId()));
         }
         assert (shn1.basicGetIdentifier().name().contentEquals(shn2.basicGetIdentifier().name()));
+    }
+
+    /*--------------------------------------------------------------------------------------------------------
+    Functions parsing test
+    ---------------------------------------------------------------------------------------------------------* */
+    @SuppressWarnings("unchecked")
+    @Test
+    public void Insure450CalculatorEinCalculatorParsedCorrectly() {
+        Map<String, Object> testContainment = new HashMap<String, Object>();
+        Insure450CalculatorEinCalculator einCalculator = new Insure450CalculatorEinCalculator();
+        IFunction function = null;
+        Iterator<Object> iter = dParser.getSpeicher().iterator();
+        while (iter.hasNext()) {
+            Object next = iter.next();
+            if (next instanceof IFunction) {
+                if (((IFunction) next).getName().contentEquals("EinCalculator")) {
+                    function = (IFunction) next;
+                }
+            }
+
+        }
+        assert (function != null);
+        Field field = null;
+        try {
+            field = function.getClass().getField("containments");
+            field.setAccessible(true);
+            testContainment = (Map<String, Object>) field.get(function);
+            System.out.println(testContainment.toString());
+        } catch (NoSuchFieldException | SecurityException | IllegalArgumentException | IllegalAccessException e) {
+            // TODO Auto-generated catch block
+        }
+
     }
 }
