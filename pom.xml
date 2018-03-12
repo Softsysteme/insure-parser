@@ -22,11 +22,11 @@
 		</dependency>
 		<dependency>
 			<groupId>insure.infoservice</groupId>
-			<artifactId>insure.infoservice.modell</artifactId>
+			<artifactId>insure.infoservice.daten</artifactId>
 		</dependency>
 		<dependency>
-			<groupId>insure.infoservice</groupId>
-			<artifactId>insure.infoservice.daten</artifactId>
+			<groupId>de.adesso.ais.infoservice-reference</groupId>
+			<artifactId>infoservice-reference-daten-gen</artifactId>
 		</dependency>
 		<dependency>
 			<groupId>de.adesso.ais.infoservice-reference</groupId>
@@ -35,10 +35,6 @@
 		<dependency>
 			<groupId>de.adesso.ais.domain-reference</groupId>
 			<artifactId>domain-reference</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>de.adesso.ais.infoservice-reference</groupId>
-			<artifactId>infoservice-reference-modell</artifactId>
 		</dependency>
 		<dependency>
 			<groupId>de.adesso.ais.infoservice-reference</groupId>
@@ -54,19 +50,11 @@
 		</dependency>
 		<dependency>
 			<groupId>de.adesso.ais.domain-reference</groupId>
-			<artifactId>de.adesso.ais.domainreference.modell</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>de.adesso.ais.domain-reference</groupId>
 			<artifactId>domain-reference-daten-gen</artifactId>
 		</dependency>
 		<dependency>
 			<groupId>de.adesso.ais.domain-reference</groupId>
 			<artifactId>domain-reference-daten</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>insure.domain</groupId>
-			<artifactId>insure.domain.modell</artifactId>
 		</dependency>
 		<dependency>
 			<groupId>insure.domain</groupId>
@@ -81,6 +69,22 @@
 			<artifactId>jaxb-impl</artifactId>
 			<version>2.2.3</version>
 		</dependency>
+		<dependency>
+			<groupId>de.adesso.ais.domain-reference</groupId>
+			<artifactId>de.adesso.ais.domainreference.modell</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>insure.domain</groupId>
+			<artifactId>insure.domain.modell</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>de.adesso.ais.infoservice-reference</groupId>
+			<artifactId>infoservice-reference-modell</artifactId>
+		</dependency>
+		<dependency>
+				<groupId>insure.infoservice</groupId>
+				<artifactId>insure.infoservice.modell</artifactId>
+			</dependency>
 
 		<!-- https://mvnrepository.com/artifact/junit/junit -->
 		<dependency>

@@ -1,39 +1,70 @@
 package tools;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
+import org.xml.sax.SAXException;
+
+import caches.InsureParserCacheManager;
 
 public class JavaPackageNameResolver {
 
-    private Map<String, String> packageName2Uri = new HashMap<String, String>();
-    private Map<String, String> uri2PackageName = new HashMap<String, String>();
-    private String basePackage;
+    private String[] ecorePaths;
 
-    public JavaPackageNameResolver(Document document) {
-        findBasePackageName(document);
-        NodeList nList = document.getElementsByTagName("eSubpackages");
-        for (int i = 0; i < nList.getLength(); i++) {
-            Node item = nList.item(i);
-            visitPackage(item);
+    InsureParserCacheManager cm = InsureParserCacheManager.INSTANCE;
+
+    public JavaPackageNameResolver(String[] ecorePaths) {
+        this.setEcorePaths(ecorePaths);
+        for (int k = 0; k < ecorePaths.length; k++) {
+            init(parseEcoreDoc(ecorePaths[k]));
         }
     }
 
-    public void visitPackage(Node node) {
+    public Document parseEcoreDoc(String ecorePath) {
+        // Get Document Builder
+        DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+        DocumentBuilder builder = null;
+        try {
+            builder = factory.newDocumentBuilder();
+        } catch (ParserConfigurationException e1) {
+            // TODO Auto-generated catch block
+        }
+        // Build Document
+        Document ecoreDocument = null;
+        try {
+            ecoreDocument = builder.parse(this.getClass().getResourceAsStream(ecorePath));
+        } catch (SAXException | IOException e) {
+            // TODO Auto-generated catch block
+        }
+
+        ecoreDocument.getDocumentElement().normalize();
+        return ecoreDocument;
+    }
+
+    public void init(Document document) {
+        NodeList nList = document.getElementsByTagName("eSubpackages");
+        for (int i = 0; i < nList.getLength(); i++) {
+            Node item = nList.item(i);
+            visitPackage(item, document);
+        }
+    }
+
+    public void visitPackage(Node node, Document document) {
         String packageName = contructPackageName(node);
         String NsUri = node.getAttributes().getNamedItem("nsURI").getNodeValue();
-        putInCache(packageName, NsUri);
-    }
-
-    public Map<String, String> getUri2PackageName() {
-        return uri2PackageName;
-    }
-
-    public void setUri2PackageName(Map<String, String> uri2PackageName) {
-        this.uri2PackageName = uri2PackageName;
+        List<Object> list = new ArrayList<Object>(2);
+        list.add(0, packageName);
+        String basePackage = findBasePackageName(document);
+        list.add(1, basePackage != null ? basePackage : "insure");
+        cm.putInCache(NsUri, list);
     }
 
     public String contructPackageName(Node node) {
@@ -47,24 +78,7 @@ public class JavaPackageNameResolver {
         return node.getParentNode().getAttributes().getNamedItem("name").getNodeValue() + "." + result;
     }
 
-    public Map<String, String> getPackageName2Uri() {
-        return packageName2Uri;
-    }
-
-    public void setPackageName2Uri(Map<String, String> packageName2Uri) {
-        this.packageName2Uri = packageName2Uri;
-    }
-
-    private void putInCache(String packageName, String nsUri) {
-        packageName2Uri.put(packageName, nsUri);
-        uri2PackageName.put(nsUri, packageName);
-    }
-
-    public String retrieveFromCache(String nsUri) {
-        return uri2PackageName.get(nsUri);
-    }
-
-    public void findBasePackageName(Document doc) {
+    public String findBasePackageName(Document doc) {
         NodeList nList = doc.getElementsByTagName("eAnnotations");
         for (int i = 0; i < nList.getLength(); i++) {
             Node item = nList.item(i);
@@ -77,7 +91,8 @@ public class JavaPackageNameResolver {
                                 Node item2 = item.getChildNodes().item(j);
                                 if (item2.getNodeName().equals("details")) {
                                     if (item2.hasAttributes()) {
-                                        this.setBasePackage(item2.getAttributes().getNamedItem("value") != null ? item2.getAttributes().getNamedItem("value").getNodeValue() : null);
+
+                                        return item2.getAttributes().getNamedItem("value") != null ? item2.getAttributes().getNamedItem("value").getNodeValue() : null;
                                     }
 
                                 }
@@ -87,15 +102,16 @@ public class JavaPackageNameResolver {
                 }
             }
         }
+        return null;
 
     }
 
-    public String getBasePackage() {
-        return basePackage;
+    public String[] getEcorePaths() {
+        return ecorePaths;
     }
 
-    public void setBasePackage(String basePackage) {
-        this.basePackage = basePackage;
+    public void setEcorePaths(String[] ecorePaths) {
+        this.ecorePaths = ecorePaths;
     }
 
 }

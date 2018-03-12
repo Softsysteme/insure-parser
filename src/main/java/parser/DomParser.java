@@ -23,16 +23,6 @@ import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
 import org.apache.commons.lang.StringUtils;
-import org.eclipse.emf.common.notify.Adapter;
-import org.eclipse.emf.common.notify.Notification;
-import org.eclipse.emf.common.util.EList;
-import org.eclipse.emf.common.util.TreeIterator;
-import org.eclipse.emf.ecore.EClass;
-import org.eclipse.emf.ecore.EObject;
-import org.eclipse.emf.ecore.EOperation;
-import org.eclipse.emf.ecore.EReference;
-import org.eclipse.emf.ecore.EStructuralFeature;
-import org.eclipse.emf.ecore.resource.Resource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.DOMException;
@@ -42,15 +32,9 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
-import com.sun.xml.bind.api.impl.NameConverter;
-
 import caches.InsureParserCacheManager;
 import insure.core.IEnumeration;
-import insure.core.IFunction;
-import insure.core.IPrototype;
-import tools.JavaPackageNameResolver;
 import tools.NameSpaceResolver;
-import tools.Uri2PackageNameConverter;
 
 /**
  * 
@@ -58,26 +42,40 @@ import tools.Uri2PackageNameConverter;
  *
  */
 public class DomParser {
-    private List<Object> speicher;
+    private Map<String, Object> speicher;
+    private String filePath;
     private static transient Object prototype;
-    private JavaPackageNameResolver pResolver;
+    private List<String> referencedXml;
     final static Logger logger = LoggerFactory.getLogger(DomParser.class);
 
     private NameSpaceResolver resolver;
     InsureParserCacheManager cm = InsureParserCacheManager.INSTANCE;
 
     // constructor
-    public DomParser() {
-        speicher = new ArrayList<Object>();
+    public DomParser(String filePath) {
+        this.filePath = filePath;
+        speicher = new HashMap<String, Object>();
+        referencedXml = new ArrayList<String>();
+        this.findReferencedFiles(copyFile(filePath));
+    }
+
+    public void parseFileAndReferencedFiles() {
+        // all referenced xml data are first parsed
+        Iterator<String> iter = referencedXml.iterator();
+        while (iter.hasNext()) {
+            String next = iter.next();
+            parseXml(next);
+        }
+
+        parseXml(filePath);
     }
 
     /**
      * 
      * @param filePath
-     * @param ecoreFilePath
+     *
      */
-    public void parseXml(String filePath, String ecoreFilePath) {
-
+    public void parseXml(String filePath) {
         // Get Document Builder
         DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
         DocumentBuilder builder = null;
@@ -86,23 +84,6 @@ public class DomParser {
         } catch (ParserConfigurationException e1) {
             // TODO Auto-generated catch block
         }
-
-        if (ecoreFilePath != null) {
-            Document ecoreDocument = null;
-            try {
-                ecoreDocument = builder.parse(copyFile(ecoreFilePath));
-            } catch (SAXException | IOException e) {
-                // TODO Auto-generated catch block
-            }
-            ecoreDocument.getDocumentElement().normalize();
-            pResolver = new JavaPackageNameResolver(ecoreDocument);
-            Map<String, String> map = pResolver.getUri2PackageName();
-            for (Map.Entry<String, String> entry : map.entrySet()) {
-                cm.putInCache(entry.getKey(), entry.getValue());
-            }
-
-        }
-
         // Build Document
         Document insureDocument = null;
         try {
@@ -122,8 +103,8 @@ public class DomParser {
         NodeList nListFunctions = insureDocument.getElementsByTagName("functions");
         try {
             parseEnums(nListEnum);
-            parseFunction(nListFunctions);
             parsePrototypes(nListPrototypes);
+            parseFunction(nListFunctions);
         } catch (IllegalArgumentException | DOMException e) {
         }
 
@@ -134,6 +115,7 @@ public class DomParser {
      * @param nList
      *            Enums parser
      */
+    @SuppressWarnings("unchecked")
     public void parseEnums(NodeList nList) {
         for (int temp = 0; temp < nList.getLength(); temp++) {
             Node node = nList.item(temp);
@@ -150,7 +132,7 @@ public class DomParser {
                         String att_ID_Value = nodeMap.getNamedItem("modelElementId").getNodeValue();
                         String att_Name_Value = nodeMap.getNamedItem("name").getNodeValue();
                         String att_Key_Value = nodeMap.getNamedItem("key") != null ? nodeMap.getNamedItem("key").getNodeValue() : null;
-                        saveEnum((String) cm.retrieveFromCache(resolver.getNamespaceURI(list.get(0))), list.get(1), att_Name_Value, att_Key_Value, att_ID_Value);
+                        saveEnum((List<Object>) cm.retrieveFromCache(resolver.getNamespaceURI(list.get(0))), list.get(1), att_Name_Value, att_Key_Value, att_ID_Value);
                     }
                 }
 
@@ -169,7 +151,7 @@ public class DomParser {
             Node node = nList.item(temp);
             String att_ID_Value = node.getAttributes().getNamedItem("modelElementId").getNodeValue();
             prototype = visitnode(node, prototype);
-            speicher.add(prototype);
+            speicher.put(att_ID_Value, prototype);
             cm.putInCache(att_ID_Value, prototype);
         }
     }
@@ -185,7 +167,7 @@ public class DomParser {
             Node node = nList.item(temp);
             String att_ID_Value = node.getAttributes().getNamedItem("modelElementId").getNodeValue();
             function = visitnode(node, new Object());
-            speicher.add(function);
+            speicher.put(att_ID_Value, function);
             cm.putInCache(att_ID_Value, function);
         }
     }
@@ -202,20 +184,22 @@ public class DomParser {
      *            method tokey() should be add to all identifier interfaces
      */
     @SuppressWarnings("unchecked")
-    public void saveEnum(String packageName, String localName, String literalsName, String literalsKey, String nodeValue) {
+    public void saveEnum(List<Object> list, String localName, String literalsName, String literalsKey, String IdValue) {
         IEnumeration enumeration = null;
-        String name = buildFullyQualifiedName(packageName, localName);
+        String name = buildFullyQualifiedName(list, localName);
         name += "Literals";
         @SuppressWarnings("rawtypes")
         Class cls = null;
         try {
             cls = Class.forName(name);
         } catch (ClassNotFoundException | NoSuchMethodError | NoClassDefFoundError e1) {
-            if ((e1 instanceof NoSuchMethodError || e1 instanceof NoClassDefFoundError) && literalsKey != null) {
-                try {
-                    saveFromEnumClass(packageName, localName, literalsKey, nodeValue);
-                } catch (ClassNotFoundException e) {
-                    // TODO Auto-generated catch block
+            if ((e1 instanceof NoSuchMethodError || e1 instanceof NoClassDefFoundError)) {
+                if (literalsKey != null) {
+                    try {
+                        useFromKeyMethodForSaving(list, localName, literalsKey, IdValue);
+                    } catch (ClassNotFoundException e) {
+                        // TODO Auto-generated catch block
+                    }
                 }
             }
 
@@ -244,8 +228,8 @@ public class DomParser {
                 // TODO Auto-generated catch block
             }
             if (enumeration != null) {
-                cm.putInCache(nodeValue, enumeration);
-                speicher.add(enumeration);
+                cm.putInCache(IdValue, enumeration);
+                speicher.put(IdValue, enumeration);
             }
 
         }
@@ -260,10 +244,10 @@ public class DomParser {
      * @throws ClassNotFoundException
      *             Note: this method should be useless when the NoSuchMethodError bug is fixed constructs and save an Enum that have not null key attribute in the cache and in the Memory
      */
-    public void saveFromEnumClass(String packageName, String localName, String literalsKey, String nodeValue) throws ClassNotFoundException {
+    public void useFromKeyMethodForSaving(List<Object> list, String localName, String literalsKey, String IdValue) throws ClassNotFoundException {
         @SuppressWarnings("unused")
-        Object identifier = null;
-        String name = buildFullyQualifiedName(packageName, localName);
+        Object objectToSave = null;
+        String name = buildFullyQualifiedName(list, localName);
         Class<?> cls = null;
         try {
             cls = Class.forName(name);
@@ -278,15 +262,15 @@ public class DomParser {
 
         }
         try {
-            identifier = method1.invoke(cls, Integer.parseInt(literalsKey));
+            objectToSave = method1.invoke(cls, Integer.parseInt(literalsKey));
         } catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
             // TODO Auto-generated catch block
 
         }
 
-        if (identifier != null) {
-            cm.putInCache(nodeValue, identifier);
-            speicher.add(identifier);
+        if (objectToSave != null) {
+            cm.putInCache(IdValue, objectToSave);
+            speicher.put(IdValue, objectToSave);
         }
 
     }
@@ -298,7 +282,7 @@ public class DomParser {
      * @param node
      * @return for nodes that doesn't have type attribute (often happens by List Element) we refer to the parent to discover the child type
      */
-    public Object visitNodeWithParent(Class<?> parentClass, Class<?> nodeClass, Node node) {
+    public Object visitNodeWithParent(Class<?> nodeClass, Node node) {
         // List<Class<?>> fields = new ArrayList<Class<?>>();
         // Reflections reflections = new Reflections(nodeClass.getPackage().getName());
         // Set<?> subTypes = reflections.getSubTypesOf(nodeClass);
@@ -309,10 +293,11 @@ public class DomParser {
 
         // try to find a concrete class implementing the interface (waiting for better solution)
         if (nodeClass.isInterface()) {
+            String concreteClassName = nodeClass.getPackage().getName() + "." + nodeClass.getSimpleName().substring(1, nodeClass.getSimpleName().length());
             try {
-                nodeClass = Class.forName(nodeClass.getName().replace("I", ""));
+                nodeClass = Class.forName(concreteClassName);
             } catch (ClassNotFoundException e) {
-                // TODO Auto-generated catch block
+                System.out.println(concreteClassName + " not found");
             }
         } else {
             try {
@@ -365,7 +350,7 @@ public class DomParser {
                 // only Element nodes getChildNodesWithName
                 for (int i = 0; i < node.getChildNodes().getLength(); i++) {
                     Node item = node.getChildNodes().item(i);
-                    if (item.getNodeType() == 1) {
+                    if (item.hasChildNodes()) {
                         if (field.getName().contentEquals(item.getNodeName())) {
                             ParameterizedType pt = (ParameterizedType) field.getGenericType();
                             Type[] mapTypes = pt.getActualTypeArguments();
@@ -412,7 +397,7 @@ public class DomParser {
                 // only Element nodes getChildNodesWithName
                 for (int i = 0; i < node.getChildNodes().getLength(); i++) {
                     Node item = node.getChildNodes().item(i);
-                    if (item.getNodeType() == 1) {
+                    if (item.hasChildNodes()) {
                         if (field.getName().contentEquals(item.getNodeName())) {
                             ParameterizedType pt = (ParameterizedType) field.getGenericType();
                             Type listType = pt.getActualTypeArguments()[0];
@@ -457,13 +442,11 @@ public class DomParser {
             for (Field field : otherFields) {
                 for (int i = 0; i < node.getChildNodes().getLength(); i++) {
                     Node item = node.getChildNodes().item(i);
-                    if (item.getNodeType() == 1) {
+                    if (item.hasChildNodes() || item.getNodeType() == 1) {
                         if (field.getName().contentEquals(item.getNodeName())) {
                             try {
                                 setRefObject(nodeClass, field, result, item);
                             } catch (NoSuchMethodException | IllegalAccessException | IllegalArgumentException | InvocationTargetException | DOMException e) {
-                                // TODO Auto-generated catch block
-                                e.printStackTrace();
                             }
                         }
                     }
@@ -471,6 +454,7 @@ public class DomParser {
             }
 
         }
+        cm.putInCache(node.getAttributes().getNamedItem("modelElementId").getNodeValue(), result);
         return result;
 
     }
@@ -492,454 +476,217 @@ public class DomParser {
         if (nodeMap.getNamedItem("href") != null) {
             return nodeMap.getNamedItem("href").getNodeValue();
         } else {
+
             if (nodeMap.getNamedItem("xsi:type") != null) {
                 Node nodeType = nodeMap.getNamedItem("xsi:type");
                 String prototypeName = nodeType.getNodeValue();
                 List<String> list = splitString(prototypeName);
                 try {
-                    clazz = Class.forName(buildFullyQualifiedName((String) cm.retrieveFromCache(resolver.getNamespaceURI((list.get(0)))), list.get(1)));
+                    clazz = Class.forName(buildFullyQualifiedName(cm.retrieveFromCache(resolver.getNamespaceURI((list.get(0)))), list.get(1)));
+                    if (clazz.isInterface()) {
+                        try {
+                            clazz = Class.forName(clazz.getName().replace("I", ""));
+                        } catch (ClassNotFoundException e) {
+                            // TODO Auto-generated catch block
+                        }
+                    }
                     Constructor<?> constructor = clazz.getDeclaredConstructor();
 
                     object = constructor.newInstance();
                     fields = getAllDeclaredFields(clazz);
 
-                } catch (ClassNotFoundException | InstantiationException | NoSuchMethodException | SecurityException | IllegalAccessException | IllegalArgumentException
-                        | InvocationTargetException e) {
-                    if (e instanceof ClassNotFoundException) {
+                } catch (InstantiationException | NoSuchMethodException | SecurityException | IllegalAccessException | IllegalArgumentException e) {
 
-                        Map<String, Object> propertyRefs = new HashMap<String, Object>();
-                        Map<String, String> propertyFields = new HashMap<String, String>();
-                        if (node.hasChildNodes()) {
-                            for (int i = 0; i < node.getChildNodes().getLength(); i++) {
-                                Node it = node.getChildNodes().item(i);
-                                if (it.hasChildNodes()) {
-                                    propertyRefs.put(it.getAttributes().getNamedItem("modelElementId").getNodeValue(), visitnode(it, new Object()));
-                                }
-
+                } catch (ClassNotFoundException e) {
+                    Map<String, Object> propertyRefs = new HashMap<String, Object>();
+                    Map<String, String> propertyFields = new HashMap<String, String>();
+                    if (node.hasChildNodes()) {
+                        for (int i = 0; i < node.getChildNodes().getLength(); i++) {
+                            Node it = node.getChildNodes().item(i);
+                            if (it.hasChildNodes()) {
+                                propertyRefs.put(it.getAttributes().getNamedItem("modelElementId").getNodeValue(), visitnode(it, new Object()));
                             }
-                        }
-                        propertyFields.put("modelElementId",
-                            node.getAttributes().getNamedItem("modelElementId") != null ? node.getAttributes().getNamedItem("modelElementId").getNodeValue() : null);
-                        propertyFields.put("name", node.getAttributes().getNamedItem("name") != null ? node.getAttributes().getNamedItem("name").getNodeValue() : null);
-                        propertyFields.put("beschreibung",
-                            node.getAttributes().getNamedItem("beschreibung") != null ? node.getAttributes().getNamedItem("beschreibung").getNodeValue() : null);
-                        if (node.getNodeName().contentEquals("functions")) {
-                            return new IFunction() {
-                                public Map<String, Object> containments = new HashMap<String, Object>();
-                                private Map<String, String> propertyFields;
-
-                                private IFunction init(Map<String, String> prop, Map<String, Object> propRf) {
-                                    containments = propRf;
-                                    propertyFields = prop;
-                                    return this;
-                                }
-
-                                @Override
-                                public String getName() {
-                                    // TODO Auto-generated method stub
-                                    return propertyFields.get("name");
-                                }
-
-                                @Override
-                                public void setName(String value) {
-                                    propertyFields.remove("name");
-                                    propertyFields.put("name", value);
-
-                                }
-
-                                @Override
-                                public String getBeschreibung() {
-                                    return propertyFields.get("beschreibung");
-                                }
-
-                                @Override
-                                public void setBeschreibung(String value) {
-                                    propertyFields.remove("beschreibung");
-                                    propertyFields.put("beschreibung", value);
-
-                                }
-
-                                @Override
-                                public String getModelElementId() {
-                                    return propertyFields.get("modelElementId");
-                                }
-
-                                @Override
-                                public void setModelElementId(String value) {
-                                    propertyFields.remove("modelElementId");
-                                    propertyFields.put("modelElementId", value);
-
-                                }
-
-                                @Override
-                                public EClass eClass() {
-                                    // TODO Auto-generated method stub
-                                    return null;
-                                }
-
-                                @Override
-                                public Resource eResource() {
-                                    // TODO Auto-generated method stub
-                                    return null;
-                                }
-
-                                @Override
-                                public EObject eContainer() {
-                                    // TODO Auto-generated method stub
-                                    return null;
-                                }
-
-                                @Override
-                                public EStructuralFeature eContainingFeature() {
-                                    // TODO Auto-generated method stub
-                                    return null;
-                                }
-
-                                @Override
-                                public EReference eContainmentFeature() {
-                                    // TODO Auto-generated method stub
-                                    return null;
-                                }
-
-                                @Override
-                                public EList<EObject> eContents() {
-                                    // TODO Auto-generated method stub
-                                    return null;
-                                }
-
-                                @Override
-                                public TreeIterator<EObject> eAllContents() {
-                                    // TODO Auto-generated method stub
-                                    return null;
-                                }
-
-                                @Override
-                                public boolean eIsProxy() {
-                                    // TODO Auto-generated method stub
-                                    return false;
-                                }
-
-                                @Override
-                                public EList<EObject> eCrossReferences() {
-                                    // TODO Auto-generated method stub
-                                    return null;
-                                }
-
-                                @Override
-                                public Object eGet(EStructuralFeature feature) {
-                                    // TODO Auto-generated method stub
-                                    return null;
-                                }
-
-                                @Override
-                                public Object eGet(EStructuralFeature feature, boolean resolve) {
-                                    // TODO Auto-generated method stub
-                                    return null;
-                                }
-
-                                @Override
-                                public void eSet(EStructuralFeature feature, Object newValue) {
-                                    // TODO Auto-generated method stub
-
-                                }
-
-                                @Override
-                                public boolean eIsSet(EStructuralFeature feature) {
-                                    // TODO Auto-generated method stub
-                                    return false;
-                                }
-
-                                @Override
-                                public void eUnset(EStructuralFeature feature) {
-                                    // TODO Auto-generated method stub
-
-                                }
-
-                                @Override
-                                public Object eInvoke(EOperation operation, EList<?> arguments) throws InvocationTargetException {
-                                    // TODO Auto-generated method stub
-                                    return null;
-                                }
-
-                                @Override
-                                public EList<Adapter> eAdapters() {
-                                    // TODO Auto-generated method stub
-                                    return null;
-                                }
-
-                                @Override
-                                public boolean eDeliver() {
-                                    // TODO Auto-generated method stub
-                                    return false;
-                                }
-
-                                @Override
-                                public void eSetDeliver(boolean deliver) {
-                                    // TODO Auto-generated method stub
-
-                                }
-
-                                @Override
-                                public void eNotify(Notification notification) {
-                                    // TODO Auto-generated method stub
-
-                                }
-
-                                @SuppressWarnings("unused")
-                                public Map<String, Object> getContainments() {
-                                    return this.containments;
-                                }
-
-                                @SuppressWarnings("unused")
-                                public void setContainments(Map<String, Object> containments) {
-                                    this.containments = containments;
-                                }
-                            }.init(propertyFields, propertyRefs);
-
-                        }
-
-                        if (node.getNodeName().contentEquals("prototypes")) {
-                            return new IPrototype() {
-
-                                private Map<String, Object> propertyRefFields;
-                                private Map<String, String> propertyFields;
-
-                                private IPrototype init(Map<String, String> prop, Map<String, Object> propRf) {
-                                    setPropertyRefFields(propRf);
-                                    propertyFields = prop;
-                                    return this;
-                                }
-
-                                @Override
-                                public String getName() {
-                                    // TODO Auto-generated method stub
-                                    return propertyFields.get("name");
-                                }
-
-                                @Override
-                                public void setName(String value) {
-                                    propertyFields.remove("name");
-                                    propertyFields.put("name", value);
-
-                                }
-
-                                @Override
-                                public String getBeschreibung() {
-                                    return propertyFields.get("beschreibung");
-                                }
-
-                                @Override
-                                public void setBeschreibung(String value) {
-                                    propertyFields.remove("beschreibung");
-                                    propertyFields.put("beschreibung", value);
-
-                                }
-
-                                @Override
-                                public String getModelElementId() {
-                                    return propertyFields.get("modelElementId");
-                                }
-
-                                @Override
-                                public void setModelElementId(String value) {
-                                    propertyFields.remove("modelElementId");
-                                    propertyFields.put("modelElementId", value);
-
-                                }
-
-                                @Override
-                                public EClass eClass() {
-                                    // TODO Auto-generated method stub
-                                    return null;
-                                }
-
-                                @Override
-                                public Resource eResource() {
-                                    // TODO Auto-generated method stub
-                                    return null;
-                                }
-
-                                @Override
-                                public EObject eContainer() {
-                                    // TODO Auto-generated method stub
-                                    return null;
-                                }
-
-                                @Override
-                                public EStructuralFeature eContainingFeature() {
-                                    // TODO Auto-generated method stub
-                                    return null;
-                                }
-
-                                @Override
-                                public EReference eContainmentFeature() {
-                                    // TODO Auto-generated method stub
-                                    return null;
-                                }
-
-                                @Override
-                                public EList<EObject> eContents() {
-                                    // TODO Auto-generated method stub
-                                    return null;
-                                }
-
-                                @Override
-                                public TreeIterator<EObject> eAllContents() {
-                                    // TODO Auto-generated method stub
-                                    return null;
-                                }
-
-                                @Override
-                                public boolean eIsProxy() {
-                                    // TODO Auto-generated method stub
-                                    return false;
-                                }
-
-                                @Override
-                                public EList<EObject> eCrossReferences() {
-                                    // TODO Auto-generated method stub
-                                    return null;
-                                }
-
-                                @Override
-                                public Object eGet(EStructuralFeature feature) {
-                                    // TODO Auto-generated method stub
-                                    return null;
-                                }
-
-                                @Override
-                                public Object eGet(EStructuralFeature feature, boolean resolve) {
-                                    // TODO Auto-generated method stub
-                                    return null;
-                                }
-
-                                @Override
-                                public void eSet(EStructuralFeature feature, Object newValue) {
-                                    // TODO Auto-generated method stub
-
-                                }
-
-                                @Override
-                                public boolean eIsSet(EStructuralFeature feature) {
-                                    // TODO Auto-generated method stub
-                                    return false;
-                                }
-
-                                @Override
-                                public void eUnset(EStructuralFeature feature) {
-                                    // TODO Auto-generated method stub
-
-                                }
-
-                                @Override
-                                public Object eInvoke(EOperation operation, EList<?> arguments) throws InvocationTargetException {
-                                    // TODO Auto-generated method stub
-                                    return null;
-                                }
-
-                                @Override
-                                public EList<Adapter> eAdapters() {
-                                    // TODO Auto-generated method stub
-                                    return null;
-                                }
-
-                                @Override
-                                public boolean eDeliver() {
-                                    // TODO Auto-generated method stub
-                                    return false;
-                                }
-
-                                @Override
-                                public void eSetDeliver(boolean deliver) {
-                                    // TODO Auto-generated method stub
-
-                                }
-
-                                @Override
-                                public void eNotify(Notification notification) {
-                                    // TODO Auto-generated method stub
-
-                                }
-
-                                public Map<String, Object> getPropertyRefFields() {
-                                    return propertyRefFields;
-                                }
-
-                                public void setPropertyRefFields(Map<String, Object> propertyRefFields) {
-                                    this.propertyRefFields = propertyRefFields;
-                                }
-                            }.init(propertyFields, propertyRefs);
 
                         }
                     }
+                    propertyFields.put("modelElementId",
+                        node.getAttributes().getNamedItem("modelElementId") != null ? node.getAttributes().getNamedItem("modelElementId").getNodeValue() : null);
+                    propertyFields.put("name", node.getAttributes().getNamedItem("name") != null ? node.getAttributes().getNamedItem("name").getNodeValue() : null);
+                    propertyFields.put("beschreibung",
+                        node.getAttributes().getNamedItem("beschreibung") != null ? node.getAttributes().getNamedItem("beschreibung").getNodeValue() : null);
+                    return new Object() {
+                        public Map<String, Object> containments = new HashMap<String, Object>();
+                        private Map<String, String> propertyFields = new HashMap<String, String>();;
+
+                        private Object init(Map<String, String> prop, Map<String, Object> propRf) {
+                            containments = propRf;
+                            propertyFields = prop;
+                            return this;
+                        }
+
+                        @SuppressWarnings("unused")
+                        public String getName() {
+                            return propertyFields.get("name");
+                        }
+
+                        @SuppressWarnings("unused")
+                        public void setName(String value) {
+                            propertyFields.remove("name");
+                            propertyFields.put("name", value);
+
+                        }
+
+                        @SuppressWarnings("unused")
+                        public String getBeschreibung() {
+                            return propertyFields.get("beschreibung");
+                        }
+
+                        @SuppressWarnings("unused")
+                        public void setBeschreibung(String value) {
+                            propertyFields.remove("beschreibung");
+                            propertyFields.put("beschreibung", value);
+
+                        }
+
+                        @SuppressWarnings("unused")
+                        public String getModelElementId() {
+                            return propertyFields.get("modelElementId");
+                        }
+
+                        @SuppressWarnings("unused")
+                        public void setModelElementId(String value) {
+                            propertyFields.remove("modelElementId");
+                            propertyFields.put("modelElementId", value);
+
+                        }
+
+                        @SuppressWarnings("unused")
+                        public Map<String, Object> getContainments() {
+                            return this.containments;
+                        }
+
+                        @SuppressWarnings("unused")
+                        public void setContainments(Map<String, Object> containments) {
+                            this.containments = containments;
+                        }
+                    }.init(propertyFields, propertyRefs);
+
+                } catch (InvocationTargetException e) {
+                    // TODO Auto-generated catch block
                 }
-            }
 
-            Iterator<Field> iter = fields.iterator();
-            while (iter.hasNext()) {
+                Iterator<Field> iter = fields.iterator();
+                while (iter.hasNext()) {
 
-                Field field = (iter.next());
-                Class<?> type = field.getType();
-                if (List.class.isAssignableFrom(type) || Map.class.isAssignableFrom(type)) {
-                    if (List.class.isAssignableFrom(type)) {
-                        listFields.add(field);
+                    Field field = (iter.next());
+                    Class<?> type = field.getType();
+                    if (List.class.isAssignableFrom(type) || Map.class.isAssignableFrom(type)) {
+                        if (List.class.isAssignableFrom(type)) {
+                            listFields.add(field);
 
+                        }
+
+                        else {
+                            mapFields.add(field);
+                        }
+                    } else {
+                        otherFields.add(field);
+                    }
+
+                }
+                if (node.hasAttributes()) {
+                    if (node.getAttributes().getNamedItem("href") != null) {
+                        return cm.retrieveFromCache(node.getAttributes().getNamedItem("href").getNodeValue());
                     }
 
                     else {
-                        mapFields.add(field);
+                        try {
+                            setObjectFields(clazz, object, nodeMap);
+                        } catch (NoSuchMethodException | IllegalAccessException | IllegalArgumentException | InvocationTargetException | DOMException e) {
+                            // TODO Auto-generated catch block
+                        }
+
                     }
-                } else {
-                    otherFields.add(field);
                 }
 
-            }
-            if (node.hasAttributes()) {
-                if (node.getAttributes().getNamedItem("href") != null) {
-                    return cm.retrieveFromCache(node.getAttributes().getNamedItem("href").getNodeValue());
-                }
-
-                else {
-                    try {
-                        setObjectFields(clazz, object, nodeMap);
-                    } catch (NoSuchMethodException | IllegalAccessException | IllegalArgumentException | InvocationTargetException | DOMException e) {
-                        // TODO Auto-generated catch block
-                    }
-
-                }
-            }
-
-        }
-
-        if (node.hasChildNodes()) {
-            for (Field field : mapFields) {
-                Map<Object, Object> map = new HashMap<Object, Object>();
-                // only Element nodes getChildNodesWithName
-                for (int i = 0; i < node.getChildNodes().getLength(); i++) {
-                    Node item = node.getChildNodes().item(i);
-                    if (item.getNodeType() == 1) {
-                        if (field.getName().contentEquals(item.getNodeName())) {
-                            ParameterizedType pt = (ParameterizedType) field.getGenericType();
-                            Type[] mapTypes = pt.getActualTypeArguments();
-                            Class<?>[] mapClasses = new Class<?>[mapTypes.length];
-                            for (int k = 0; k < mapClasses.length; k++) {
+                if (node.hasChildNodes()) {
+                    for (Field field : mapFields) {
+                        Map<Object, Object> map = new HashMap<Object, Object>();
+                        // only Element nodes getChildNodesWithName
+                        for (int i = 0; i < node.getChildNodes().getLength(); i++) {
+                            Node item = node.getChildNodes().item(i);
+                            if (item.hasChildNodes()) {
+                                if (field.getName().contentEquals(item.getNodeName())) {
+                                    ParameterizedType pt = (ParameterizedType) field.getGenericType();
+                                    Type[] mapTypes = pt.getActualTypeArguments();
+                                    Class<?>[] mapClasses = new Class<?>[mapTypes.length];
+                                    for (int k = 0; k < mapClasses.length; k++) {
+                                        try {
+                                            mapClasses[k] = Class.forName(mapTypes[k].getTypeName());
+                                        } catch (ClassNotFoundException e) {
+                                            // TODO Auto-generated catch block
+                                        }
+                                    }
+                                    Method put = null;
+                                    try {
+                                        put = HashMap.class.getDeclaredMethod("put", Object.class, Object.class);
+                                    } catch (NoSuchMethodException | SecurityException e1) {
+                                        // TODO Auto-generated catch block
+                                    }
+                                    try {
+                                        Object[] obj = buildMapElement(mapClasses, item.getChildNodes(), item, field);
+                                        put.invoke(map, obj[0], obj[1]);
+                                    } catch (NoSuchMethodException | IllegalAccessException | IllegalArgumentException | InvocationTargetException | DOMException e) {
+                                        // TODO Auto-generated catch block
+                                    }
+                                }
+                            }
+                            Method methode = null;
+                            try {
+                                methode = findMethod(clazz, "set" + Character.toUpperCase(field.getName().charAt(0)) + field.getName().substring(1, field.getName().length()),
+                                    field.getType());
+                            } catch (NoSuchMethodException e) {
+                                // TODO Auto-generated catch block
+                            }
+                            if (methode != null) {
                                 try {
-                                    mapClasses[k] = Class.forName(mapTypes[k].getTypeName());
-                                } catch (ClassNotFoundException e) {
+                                    methode.invoke(object, map);
+                                } catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
                                     // TODO Auto-generated catch block
                                 }
                             }
-                            Method put = null;
-                            try {
-                                put = HashMap.class.getDeclaredMethod("put", Object.class, Object.class);
-                            } catch (NoSuchMethodException | SecurityException e1) {
-                                // TODO Auto-generated catch block
-                            }
-                            try {
-                                Object[] obj = buildMapElement(mapClasses, item.getChildNodes(), item, field);
-                                put.invoke(map, obj[0], obj[1]);
-                            } catch (NoSuchMethodException | IllegalAccessException | IllegalArgumentException | InvocationTargetException | DOMException e) {
-                                // TODO Auto-generated catch block
+                        }
+
+                    }
+                }
+
+                for (Field field : listFields) {
+                    List<Object> lst = new ArrayList<Object>();
+                    // only Element nodes getChildNodesWithName
+                    for (int i = 0; i < node.getChildNodes().getLength(); i++) {
+                        Node item = node.getChildNodes().item(i);
+                        if (item.hasChildNodes()) {
+                            if (field.getName().contentEquals(item.getNodeName())) {
+                                ParameterizedType pt = (ParameterizedType) field.getGenericType();
+                                Type listType = pt.getActualTypeArguments()[0];
+                                Class<?> listClass = null;
+                                try {
+                                    listClass = Class.forName(listType.getTypeName());
+                                } catch (ClassNotFoundException e2) {
+                                    // TODO Auto-generated catch blockF
+                                }
+                                Method add = null;
+                                try {
+                                    add = ArrayList.class.getDeclaredMethod("add", Object.class);
+                                } catch (NoSuchMethodException | SecurityException e1) {
+                                    // TODO Auto-generated catch block
+                                }
+                                try {
+                                    Object obj = buildListElement(clazz, listClass, item.getChildNodes(), item, field);
+                                    add.invoke(lst, obj);
+                                } catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException | DOMException e) {
+                                    // TODO Auto-generated catch block
+                                }
                             }
                         }
                     }
@@ -947,81 +694,69 @@ public class DomParser {
                     try {
                         methode = findMethod(clazz, "set" + Character.toUpperCase(field.getName().charAt(0)) + field.getName().substring(1, field.getName().length()),
                             field.getType());
+
                     } catch (NoSuchMethodException e) {
                         // TODO Auto-generated catch block
+
                     }
+
                     if (methode != null) {
                         try {
-                            methode.invoke(object, map);
+                            methode.invoke(object, lst);
                         } catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
                             // TODO Auto-generated catch block
                         }
                     }
+
                 }
-
-            }
-        }
-
-        for (Field field : listFields) {
-            List<Object> lst = new ArrayList<Object>();
-            // only Element nodes getChildNodesWithName
-            for (int i = 0; i < node.getChildNodes().getLength(); i++) {
-                Node item = node.getChildNodes().item(i);
-                if (item.getNodeType() == 1) {
-                    if (field.getName().contentEquals(item.getNodeName())) {
-                        ParameterizedType pt = (ParameterizedType) field.getGenericType();
-                        Type listType = pt.getActualTypeArguments()[0];
-                        Class<?> listClass = null;
-                        try {
-                            listClass = Class.forName(listType.getTypeName());
-                        } catch (ClassNotFoundException e2) {
-                            // TODO Auto-generated catch blockF
-                        }
-                        Method add = null;
-                        try {
-                            add = ArrayList.class.getDeclaredMethod("add", Object.class);
-                        } catch (NoSuchMethodException | SecurityException e1) {
-                            // TODO Auto-generated catch block
-                        }
-                        try {
-                            Object obj = buildListElement(clazz, listClass, item.getChildNodes(), item, field);
-                            add.invoke(lst, obj);
-                        } catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException | DOMException e) {
-                            // TODO Auto-generated catch block
+                for (Field field : otherFields) {
+                    for (int i = 0; i < node.getChildNodes().getLength(); i++) {
+                        Node item = node.getChildNodes().item(i);
+                        if (item.hasChildNodes() || item.getNodeType() == 1) {
+                            if (field.getName().contentEquals(item.getNodeName())) {
+                                try {
+                                    setRefObject(clazz, field, object, item);
+                                } catch (NoSuchMethodException | IllegalAccessException | IllegalArgumentException | InvocationTargetException | DOMException e) {
+                                    // TODO Auto-generated catch block
+                                }
+                            }
                         }
                     }
                 }
-            }
-            Method methode = null;
-            try {
-                methode = findMethod(clazz, "set" + Character.toUpperCase(field.getName().charAt(0)) + field.getName().substring(1, field.getName().length()),
-                    field.getType());
+            } else {
+                if (node.getParentNode().getAttributes().getNamedItem("xsi:type") != null) {
+                    List<String> list = splitString(node.getParentNode().getAttributes().getNamedItem("xsi:type").getNodeValue());
+                    try {
+                        clazz = Class.forName(buildFullyQualifiedName(cm.retrieveFromCache(resolver.getNamespaceURI((list.get(0)))), list.get(1)));
+                        if (clazz.isInterface()) {
+                            try {
+                                clazz = Class.forName(clazz.getName().replace("I", ""));
+                            } catch (ClassNotFoundException e) {
+                                // TODO Auto-generated catch block
+                            }
+                        }
+                        for (Field f : this.getAllDeclaredFields(clazz)) {
 
-            } catch (NoSuchMethodException e) {
-                // TODO Auto-generated catch block
+                            if (f.getName().contentEquals(node.getNodeName())) {
+                                f.setAccessible(true);
+                                clazz = f.getType();
+                            }
 
-            }
+                        }
+                        object = visitNodeWithParent(clazz, node);
+                    } catch (ClassNotFoundException e) {
 
-            if (methode != null) {
-                try {
-                    methode.invoke(object, lst);
-                } catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
-                    // TODO Auto-generated catch block
-                    e.printStackTrace();
-                }
-            }
-
-        }
-        for (Field field : otherFields) {
-            for (int i = 0; i < node.getChildNodes().getLength(); i++) {
-                Node item = node.getChildNodes().item(i);
-                if (item.getNodeType() == 1) {
-                    if (field.getName().contentEquals(item.getNodeName())) {
-                        try {
-                            setRefObject(clazz, field, object, item);
-                        } catch (NoSuchMethodException | IllegalAccessException | IllegalArgumentException | InvocationTargetException | DOMException e) {
-                            // TODO Auto-generated catch block
-                            e.printStackTrace();
+                    }
+                } else {
+                    Object obj = cm.retrieveFromCache(node.getParentNode().getAttributes().getNamedItem("modelElementId").getNodeValue());
+                    if (obj != null) {
+                        List<Field> fieldList = this.getAllDeclaredFields(object.getClass());
+                        Iterator<Field> iter = fieldList.iterator();
+                        while (iter.hasNext()) {
+                            Field next = iter.next();
+                            if (next.getName().contentEquals(node.getNodeName())) {
+                                visitNodeWithParent(next.getType(), node);
+                            }
                         }
                     }
                 }
@@ -1051,7 +786,7 @@ public class DomParser {
                 if (item.getAttributes().getNamedItem("xsi:type") != null) {
                     result = visitnode(item, new Object());
                 } else {
-                    result = visitNodeWithParent(parentClass, listClass, item);
+                    result = visitNodeWithParent(listClass, item);
                 }
             }
 
@@ -1079,20 +814,22 @@ public class DomParser {
             Type type = (attributCorrespondsToField(item, getAllDeclaredFields(clazz)));
             if (type != null) {
                 Class<?> cl = null;
-
-                try {
-                    cl = Class.forName(type.getTypeName());
-                } catch (ClassNotFoundException e) {
-
-                }
-
-                Method methode = findMethod(clazz, "set" + Character.toUpperCase(nodeN.charAt(0)) + nodeN.substring(1, nodeN.length()), cl);
-                if (cl.getPackage().getName().contains("java.lang") || cl.getPackage().getName().contains("java.util")) {
+                if (type.getTypeName().contains("java.lang") || type.getTypeName().contains("java.util") || type.getTypeName().contains("double")) {
+                    Method methode = findMethod(clazz, "set" + Character.toUpperCase(nodeN.charAt(0)) + nodeN.substring(1, nodeN.length()), type.getClass());
                     methode.invoke(obj, item.getNodeValue());
-                }
+                } else {
+                    try {
+                        cl = Class.forName(type.getTypeName());
 
-                else {
-                    methode.invoke(obj, cm.retrieveFromCache(item.getNodeValue()));
+                    } catch (ClassNotFoundException e) {
+                    }
+
+                    Method methode = findMethod(clazz, "set" + Character.toUpperCase(nodeN.charAt(0)) + nodeN.substring(1, nodeN.length()), cl);
+                    Object object = cm.retrieveFromCache(item.getNodeValue());
+                    if (object != null) {
+                        methode.invoke(obj, object);
+                    }
+
                 }
 
             }
@@ -1113,13 +850,59 @@ public class DomParser {
      * @throws DOMException
      */
     public void setRefObject(Class<?> clazz, Field field, Object obj, Node node)
-            throws NoSuchMethodException, IllegalAccessException, IllegalArgumentException, InvocationTargetException, DOMException {
+            throws NoSuchMethodException, IllegalAccessException, InvocationTargetException, DOMException {
         Class<?> type = field.getType();
         Method methode = findMethod(clazz, "set" + Character.toUpperCase(node.getNodeName().charAt(0)) + node.getNodeName().substring(1, node.getNodeName().length()), type);
-        if (node.hasAttributes()) {
+        if (node.getNodeType() == 1 || node.hasChildNodes()) {
             if (node.getAttributes().getNamedItem("href") != null) {
-                methode.invoke(obj, cm.retrieveFromCache(node.getAttributes().getNamedItem("href").getNodeValue()));
+                for (int i = 0; i < node.getChildNodes().getLength(); i++) {
+                    Node item = node.getChildNodes().item(i);
+                    if (item.hasChildNodes()) {
+                        List<Field> fieldList = getAllDeclaredFields(cm.retrieveFromCache(node.getAttributes().getNamedItem("href").getNodeValue()).getClass());
+                        Iterator<Field> iter = fieldList.iterator();
+                        while (iter.hasNext()) {
+                            Field next = iter.next();
+                            if (next.getName().contentEquals(item.getNodeName())) {
+                                visitNodeWithParent(next.getType(), item);
+                            }
+                        }
 
+                    }
+                }
+                try {
+                    methode.invoke(obj, cm.retrieveFromCache(node.getAttributes().getNamedItem("href").getNodeValue()));
+                } catch (IllegalArgumentException e) {
+                    field.setAccessible(true);
+                    field.set(obj, cm.retrieveFromCache(node.getAttributes().getNamedItem("href").getNodeValue()));
+                }
+
+            } else {
+                Object object = visitnode(node, new Object());
+                if (object != null) {
+                    for (int i = 0; i < node.getChildNodes().getLength(); i++) {
+                        Node item = node.getChildNodes().item(i);
+                        if (item.getNodeType() == 1) {
+                            List<Field> fieldList = getAllDeclaredFields(object.getClass());
+                            Iterator<Field> iter = fieldList.iterator();
+                            while (iter.hasNext()) {
+                                Field next = iter.next();
+                                if (next.getName().contentEquals(item.getNodeName())) {
+                                    visitNodeWithParent(next.getType(), item);
+                                }
+                            }
+
+                        }
+                    }
+                    if (node.getAttributes().getNamedItem("modelElementId") != null) {
+                        cm.putInCache(node.getAttributes().getNamedItem("modelElementId").getNodeValue(), object);
+                        try {
+                            methode.invoke(obj, object);
+                        } catch (IllegalArgumentException e) {
+                            field.setAccessible(true);
+                            field.set(obj, object);
+                        }
+                    }
+                }
             }
         }
     }
@@ -1187,13 +970,6 @@ public class DomParser {
     /*--------------------------------------------------------------------------------------------------------
      Getters and Setters
      ---------------------------------------------------------------------------------------------------------* */
-    public JavaPackageNameResolver getpResolver() {
-        return pResolver;
-    }
-
-    public void setpResolver(JavaPackageNameResolver pResolver) {
-        this.pResolver = pResolver;
-    }
 
     public NameSpaceResolver getResolver() {
         return resolver;
@@ -1203,11 +979,11 @@ public class DomParser {
         this.resolver = resolver;
     }
 
-    public List<Object> getSpeicher() {
+    public Map<String, Object> getSpeicher() {
         return speicher;
     }
 
-    public void setSpeicher(List<Object> speicher) {
+    public void setSpeicher(Map<String, Object> speicher) {
         this.speicher = speicher;
     }
 
@@ -1285,18 +1061,13 @@ public class DomParser {
         return result;
     }
 
-    public String buildFullyQualifiedName(String packageName, String className) {
-        if (packageName != null) {
-            String basePackageName = pResolver.getBasePackage();
-            return basePackageName != null ? basePackageName + "." + packageName + "." + className : "insure." + packageName + "." + className;
+    @SuppressWarnings("unchecked")
+    public String buildFullyQualifiedName(Object list, String className) {
+        List<Object> l = (List<Object>) list;
+        if (l != null) {
+            return l.get(1) + "." + l.get(0) + "." + className;
         }
         return null;
-    }
-
-    // convert the namespace to a valid package name
-    public String convertToPackageName(String xmlNamespace) {
-        NameConverter nameConverter = new Uri2PackageNameConverter();
-        return nameConverter.toPackageName(xmlNamespace);
     }
 
     // suppress unwanted expressions after the attribute href leaving only the ID
@@ -1321,6 +1092,28 @@ public class DomParser {
         } // calls it
         return new ByteArrayInputStream(strTotale.toString().getBytes(StandardCharsets.UTF_8));
 
+    }
+
+    public void findReferencedFiles(InputStream input) {
+
+        BufferedReader br = null;
+        String newString = "";
+        try {
+
+            br = new BufferedReader(new InputStreamReader(input));
+            while ((newString = br.readLine()) != null) {
+                if (newString.contains("href=")) {
+                    String fullPath = StringUtils.substringBetween(newString, "href=", "#");
+                    int index = fullPath.lastIndexOf("/");
+                    if (!referencedXml.contains("/" + fullPath.substring(index + 1))) {
+                        referencedXml.add("/" + fullPath.substring(index + 1));
+                    }
+                }
+            }
+
+        } catch (IOException e) {
+            // TODO Auto-generated catch block
+        } // calls it
     }
 
     // copy the given file to the classpath
