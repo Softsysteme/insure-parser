@@ -192,17 +192,18 @@ public class DomParser {
         Class cls = null;
         try {
             cls = Class.forName(name);
-        } catch (ClassNotFoundException | NoSuchMethodError | NoClassDefFoundError e1) {
-            if ((e1 instanceof NoSuchMethodError || e1 instanceof NoClassDefFoundError)) {
-                if (literalsKey != null) {
-                    try {
-                        useFromKeyMethodForSaving(list, localName, literalsKey, IdValue);
-                    } catch (ClassNotFoundException e) {
-                        // TODO Auto-generated catch block
-                    }
+        } catch (NoSuchMethodError e) {
+            if (literalsKey != null) {
+                try {
+                    useFromKeyMethodForSaving(list, localName, literalsKey, IdValue);
+                } catch (ClassNotFoundException e1) {
+
                 }
             }
 
+        } catch (ClassNotFoundException e) {
+            // TODO Auto-generated catch block
+        } catch (NoClassDefFoundError e2) {
         }
 
         Method method1 = null;
@@ -213,7 +214,6 @@ public class DomParser {
                 method1 = cls.getMethod("getInstance");
                 method2 = cls.getMethod("valueOf", String.class);
             } catch (NoSuchMethodException | SecurityException e1) {
-                // TODO Auto-generated catch block
             }
 
             Object obj = null;
@@ -224,6 +224,18 @@ public class DomParser {
             }
             try {
                 enumeration = (IEnumeration) method2.invoke(obj, literalsName);
+                if (enumeration == null) {
+                    if (literalsKey != null) {
+                        try {
+                            Method method3 = cls.getMethod("fromKey", int.class);
+                            enumeration = (IEnumeration) method3.invoke(obj, Integer.parseInt(literalsKey));
+                        } catch (Exception e) {
+                            // TODO Auto-generated catch block
+                            System.out.println(e.toString());
+                        }
+                    }
+
+                }
             } catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException e1) {
                 // TODO Auto-generated catch block
             }

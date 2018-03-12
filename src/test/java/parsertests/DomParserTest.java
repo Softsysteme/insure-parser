@@ -107,12 +107,7 @@ public class DomParserTest {
         for (Entry<IEingabeelement, IEingabeelementeigenschaft> entry : tpl1.getEingabeelementeigenschaften().entrySet()) {
             Assert.assertEquals(tpl1.getEingabeelementeigenschaften().get(entry.getKey()).name(), tpl2.getEingabeelementeigenschaften().get(entry.getKey()).name());
         }
-        Assert.assertNotNull(tpl2.getTemplate() != null);
-        for (Map.Entry<String, Object> entry : dParser.getSpeicher().entrySet()) {
-            if (entry.getValue().equals(tpl2.getTemplate())) {
-                System.out.println(entry.getKey());
-            }
-        }
+        Assert.assertNotNull(tpl2.getTemplate());
     }
 
     @Test
@@ -126,7 +121,6 @@ public class DomParserTest {
             Assert.assertEquals(tpl1.getEingabeelementeigenschaften().get(entry.getKey()).name(), tpl2.getEingabeelementeigenschaften().get(entry.getKey()).name());
         }
         Assert.assertNotNull(tpl2.getTemplate());
-        // Assert.assertEquals(tpl2.getTemplate().getClass(), tpl1.getTemplate().getClass());
     }
 
     @Test
@@ -140,13 +134,12 @@ public class DomParserTest {
             Assert.assertEquals(tpl1.getEingabeelementeigenschaften().get(entry.getKey()).name(), tpl2.getEingabeelementeigenschaften().get(entry.getKey()).name());
         }
         Assert.assertNotNull(tpl2.getTemplate());
-        // Assert.assertEquals(tpl2.getTemplate().getClass(), tpl1.getTemplate().getClass());
     }
 
     /*--------------------------------------------------------------------------------------------------------
     Feldsteuerung parsing test
     ---------------------------------------------------------------------------------------------------------* */
-    // @Test
+    @Test
     public void FeldsteuerungBestellsystemParsedCorrectly() {
 
         FeldsteuerungBestellsystem fldst1 = new FeldsteuerungBestellsystem();
@@ -161,9 +154,9 @@ public class DomParserTest {
             System.out.println(entry.getKey() + "/" + entry.getValue());
         }
         System.out.println("------------------------------------");
-        // assert (fldst1.getFeldelementeigenschaften().size() == fldst2.getFeldelementeigenschaften().size());
+        Assert.assertEquals(fldst1.getFeldelementeigenschaften().size(), fldst2.getFeldelementeigenschaften().size());
         for (Entry<IKontext, IFeldelementeigenschaften> entry : fldst1.getFeldelementeigenschaften().entrySet()) {
-            Assert.assertEquals(fldst1.getFeldelementeigenschaften().get(entry.getKey()), (fldst2.getFeldelementeigenschaften().get(entry.getKey())));
+            // Assert.assertEquals(fldst1.getFeldelementeigenschaften().get(entry.getKey()), fldst2.getFeldelementeigenschaften().get(entry.getKey()));
         }
         Assert.assertEquals(fldst1.getIdentifier().name(), (fldst2.getIdentifier().name()));
     }
@@ -183,12 +176,12 @@ public class DomParserTest {
             System.out.println(entry.getKey() + "/" + entry.getValue());
         }
         System.out.println("------------------------------------");
-        // assert (fldst1.getFeldelementeigenschaften().size() == fldst2.getFeldelementeigenschaften().size());
+        assert (fldst1.getFeldelementeigenschaften().size() == fldst2.getFeldelementeigenschaften().size());
         for (Entry<IKontext, IFeldelementeigenschaften> entry : fldst1.getFeldelementeigenschaften().entrySet()) {
             Assert.assertEquals(fldst1.getFeldelementeigenschaften().get(entry.getKey()), (fldst2.getFeldelementeigenschaften().get(entry.getKey())));
         }
-        // System.out.println(fldst2.getIdentifier());
-        // Assert.assertEquals(fldst1.getIdentifier().name(), (fldst2.getIdentifier().name()));
+
+        Assert.assertEquals(fldst1.getIdentifier().name(), (fldst2.getIdentifier().name()));
 
     }
 
@@ -209,7 +202,7 @@ public class DomParserTest {
         for (Entry<ISchnittstelle, ISchnittstellenbelieferungsbedingung<?, ?>> entry : shn1.getBelieferungsbedingungen().entrySet()) {
             Assert.assertEquals(shn1.getSchnittstellenversorgungen().get(entry.getKey()), shn2.getSchnittstellenversorgungen().get(entry.getKey()));
         }
-        System.out.println(shn2.getIdentifier());
+
         // Assert.assertEquals(shn1.getIdentifier().name(), shn2.getIdentifier().name());
     }
 
@@ -227,8 +220,8 @@ public class DomParserTest {
         for (Entry<ISchnittstelle, ISchnittstellenbelieferungsbedingung<?, ?>> entry : shn1.getBelieferungsbedingungen().entrySet()) {
             Assert.assertEquals(shn1.getSchnittstellenversorgungen().get(entry.getKey()), shn2.getSchnittstellenversorgungen().get(entry.getKey()));
         }
-        // System.out.println(dParser.getSpeicher().get("_h-hApibWEeWomoMrx8bFIQ"));
-        // Assert.assertEquals(shn1.getIdentifier(), shn2.getIdentifier());
+        System.out.println(dParser.getSpeicher().get("_h-hApibWEeWomoMrx8bFIQ"));
+        Assert.assertEquals(shn1.getIdentifier(), shn2.getIdentifier());
     }
 
     /*--------------------------------------------------------------------------------------------------------
