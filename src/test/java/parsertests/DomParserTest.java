@@ -146,14 +146,6 @@ public class DomParserTest {
         Feldsteuerung fldst2 = (Feldsteuerung) dParser.getSpeicher().get("_KXNjOBsREeWeoYGlWqgNWQ");
         Assert.assertNotNull(fldst2);
         Assert.assertEquals(fldst2.getName(), fldst1.getName());
-        for (Entry<IKontext, IFeldelementeigenschaften> entry : fldst1.getFeldelementeigenschaften().entrySet()) {
-            System.out.println(entry.getKey() + "/" + entry.getValue());
-        }
-        System.out.println("------------------------------------");
-        for (Entry<IKontext, IFeldelementeigenschaften> entry : fldst2.getFeldelementeigenschaften().entrySet()) {
-            System.out.println(entry.getKey() + "/" + entry.getValue());
-        }
-        System.out.println("------------------------------------");
         Assert.assertEquals(fldst1.getFeldelementeigenschaften().size(), fldst2.getFeldelementeigenschaften().size());
         for (Entry<IKontext, IFeldelementeigenschaften> entry : fldst1.getFeldelementeigenschaften().entrySet()) {
             // Assert.assertEquals(fldst1.getFeldelementeigenschaften().get(entry.getKey()), fldst2.getFeldelementeigenschaften().get(entry.getKey()));
@@ -168,14 +160,6 @@ public class DomParserTest {
         Feldsteuerung fldst2 = (Feldsteuerung) dParser.getSpeicher().get("_FONP99OqEeSVoOolBb6ZYQ");
         Assert.assertNotNull(fldst2);
         Assert.assertEquals(fldst2.getName(), fldst1.getName());
-        for (Entry<IKontext, IFeldelementeigenschaften> entry : fldst1.getFeldelementeigenschaften().entrySet()) {
-            System.out.println(entry.getKey() + "/" + entry.getValue());
-        }
-        System.out.println("------------------------------------");
-        for (Entry<IKontext, IFeldelementeigenschaften> entry : fldst2.getFeldelementeigenschaften().entrySet()) {
-            System.out.println(entry.getKey() + "/" + entry.getValue());
-        }
-        System.out.println("------------------------------------");
         assert (fldst1.getFeldelementeigenschaften().size() == fldst2.getFeldelementeigenschaften().size());
         for (Entry<IKontext, IFeldelementeigenschaften> entry : fldst1.getFeldelementeigenschaften().entrySet()) {
             Assert.assertEquals(fldst1.getFeldelementeigenschaften().get(entry.getKey()), (fldst2.getFeldelementeigenschaften().get(entry.getKey())));
@@ -206,6 +190,7 @@ public class DomParserTest {
         // Assert.assertEquals(shn1.getIdentifier().name(), shn2.getIdentifier().name());
     }
 
+    @SuppressWarnings("unlikely-arg-type")
     @Test
     public void SchnittstellensteuerungStandardParsedCorrectly() {
         SchnittstellensteuerungStandard shn1 = new SchnittstellensteuerungStandard();
@@ -217,10 +202,10 @@ public class DomParserTest {
         for (Map.Entry<IKontext, ISchnittstellenzuordnung> entry : shn1.getSchnittstellenversorgungen().entrySet()) {
             Assert.assertEquals(shn1.getSchnittstellenversorgungen().get(entry.getKey()), shn2.getSchnittstellenversorgungen().get(entry.getKey()));
         }
+        Assert.assertEquals(shn1.getBelieferungsbedingungen().size(), shn2.getBelieferungsbedingungen().size());
         for (Entry<ISchnittstelle, ISchnittstellenbelieferungsbedingung<?, ?>> entry : shn1.getBelieferungsbedingungen().entrySet()) {
             Assert.assertEquals(shn1.getSchnittstellenversorgungen().get(entry.getKey()), shn2.getSchnittstellenversorgungen().get(entry.getKey()));
         }
-        System.out.println(dParser.getSpeicher().get("_h-hApibWEeWomoMrx8bFIQ"));
         Assert.assertEquals(shn1.getIdentifier(), shn2.getIdentifier());
     }
 
@@ -228,11 +213,11 @@ public class DomParserTest {
     Functions parsing test
     ---------------------------------------------------------------------------------------------------------* */
     @SuppressWarnings("unchecked")
-    // @Test
+    @Test
     public void Insure450CalculatorEinCalculatorParsedCorrectly() {
         // Map<String, Object> testContainment = new HashMap<String, Object>();
         // Insure450CalculatorEinCalculator einCalculator = new Insure450CalculatorEinCalculator();
-        // IFunction function = null;
+        // Object function = null;
         // Iterator<Object> iter = dParser.getSpeicher().iterator();
         // while (iter.hasNext()) {
         // Object next = iter.next();
@@ -294,6 +279,7 @@ public class DomParserTest {
         // System.out.println(entry.getKey() + "," + entry.getValue());
         // }
         // System.out.println(cm.retrieveFromCache("_sRGtUOOqEeavgqX1epbq9g"));
+        System.out.println(cm.retrieveFromCache("_sRGtUOOqEeavgqX1epbq9g") + "loooooooooool");
     }
 
 }

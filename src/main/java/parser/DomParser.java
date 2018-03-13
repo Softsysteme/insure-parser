@@ -230,8 +230,7 @@ public class DomParser {
                             Method method3 = cls.getMethod("fromKey", int.class);
                             enumeration = (IEnumeration) method3.invoke(obj, Integer.parseInt(literalsKey));
                         } catch (Exception e) {
-                            // TODO Auto-generated catch block
-                            System.out.println(e.toString());
+                            e.printStackTrace();
                         }
                     }
 
@@ -348,12 +347,7 @@ public class DomParser {
             }
         }
         if (node.hasAttributes()) {
-            try {
-                setObjectFields(nodeClass, result, node.getAttributes());
-            } catch (NoSuchMethodException | IllegalAccessException | IllegalArgumentException | InvocationTargetException | DOMException e) {
-                // TODO Auto-generated catch block
-            }
-
+            setObjectFields(nodeClass, result, node.getAttributes());
         }
 
         if (node.hasChildNodes()) {
@@ -456,11 +450,10 @@ public class DomParser {
                     Node item = node.getChildNodes().item(i);
                     if (item.hasChildNodes() || item.getNodeType() == 1) {
                         if (field.getName().contentEquals(item.getNodeName())) {
-                            try {
-                                setRefObject(nodeClass, field, result, item);
-                            } catch (NoSuchMethodException | IllegalAccessException | IllegalArgumentException | InvocationTargetException | DOMException e) {
-                            }
+                            setRefObject(nodeClass, field, result, item);
+
                         }
+
                     }
                 }
             }
@@ -478,17 +471,16 @@ public class DomParser {
      * @return
      */
     public Object visitnode(Node node, Object object) {
-        Class<?> clazz = null;
-        List<Field> fields = null;
-        List<Field> listFields = new ArrayList<Field>();
-        List<Field> mapFields = new ArrayList<Field>();
-        List<Field> otherFields = new ArrayList<Field>();
         // get attributes names and values
         NamedNodeMap nodeMap = node.getAttributes();
         if (nodeMap.getNamedItem("href") != null) {
             return nodeMap.getNamedItem("href").getNodeValue();
         } else {
-
+            Class<?> clazz = null;
+            List<Field> fields = null;
+            List<Field> listFields = new ArrayList<Field>();
+            List<Field> mapFields = new ArrayList<Field>();
+            List<Field> otherFields = new ArrayList<Field>();
             if (nodeMap.getNamedItem("xsi:type") != null) {
                 Node nodeType = nodeMap.getNamedItem("xsi:type");
                 String prototypeName = nodeType.getNodeValue();
@@ -612,13 +604,9 @@ public class DomParser {
                     }
 
                     else {
-                        try {
-                            setObjectFields(clazz, object, nodeMap);
-                        } catch (NoSuchMethodException | IllegalAccessException | IllegalArgumentException | InvocationTargetException | DOMException e) {
-                            // TODO Auto-generated catch block
-                        }
-
+                        setObjectFields(clazz, object, nodeMap);
                     }
+
                 }
 
                 if (node.hasChildNodes()) {
@@ -728,8 +716,9 @@ public class DomParser {
                             if (field.getName().contentEquals(item.getNodeName())) {
                                 try {
                                     setRefObject(clazz, field, object, item);
-                                } catch (NoSuchMethodException | IllegalAccessException | IllegalArgumentException | InvocationTargetException | DOMException e) {
+                                } catch (DOMException e) {
                                     // TODO Auto-generated catch block
+                                    e.printStackTrace();
                                 }
                             }
                         }
@@ -818,17 +807,64 @@ public class DomParser {
      * @throws DOMException
      *             set the object's fiels according to the corresponding attributes contained in @attrList
      */
-    public void setObjectFields(Class<?> clazz, Object obj, NamedNodeMap attrList)
-            throws NoSuchMethodException, IllegalAccessException, IllegalArgumentException, InvocationTargetException, DOMException {
+    @SuppressWarnings("unchecked")
+    public void setObjectFields(Class<?> clazz, Object obj, NamedNodeMap attrList) {
         for (int i = 0; i < attrList.getLength(); i++) {
             Node item = attrList.item(i);
             String nodeN = item.getNodeName();
+            Method methode = null;
             Type type = (attributCorrespondsToField(item, getAllDeclaredFields(clazz)));
             if (type != null) {
                 Class<?> cl = null;
                 if (type.getTypeName().contains("java.lang") || type.getTypeName().contains("java.util") || type.getTypeName().contains("double")) {
-                    Method methode = findMethod(clazz, "set" + Character.toUpperCase(nodeN.charAt(0)) + nodeN.substring(1, nodeN.length()), type.getClass());
-                    methode.invoke(obj, item.getNodeValue());
+                    if (((Class<?>) type).isAssignableFrom(List.class)) {
+                        ParameterizedType pt = null;
+                        int k = 0;
+                        try {
+                            methode = ArrayList.class.getDeclaredMethod("add", Object.class);
+                        } catch (NoSuchMethodException | SecurityException e1) {
+                            // TODO Auto-generated catch block
+                            e1.printStackTrace();
+                        }
+                        List<String> nameList = new ArrayList<String>();
+                        String objectNames = item.getNodeValue();
+
+                        while (StringUtils.indexOf(objectNames, " ", k) != -1) {
+                            nameList.add(objectNames.substring(k, StringUtils.indexOf(objectNames, " ", k)));
+                            k = StringUtils.indexOf(objectNames, " ", k) + 1;
+                        }
+                        nameList.add(objectNames.substring(k, objectNames.length()));
+
+                        try {
+                            Iterator<String> it = nameList.iterator();
+                            while (it.hasNext()) {
+                                String next = it.next();
+                                if (cm.retrieveFromCache(next) != null)
+                                    methode.invoke(clazz.getDeclaredField(nodeN), cm.retrieveFromCache(next));
+                            }
+                        } catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException | NoSuchFieldException | SecurityException | DOMException e) {
+                            // TODO Auto-generated catch block
+                            e.printStackTrace();
+                        }
+
+                    } else {
+                        try {
+                            methode = findMethod(clazz, "set" + Character.toUpperCase(nodeN.charAt(0)) + nodeN.substring(1, nodeN.length()),
+                                attributCorrespondsToField(nodeN, this.getAllDeclaredFields(clazz)).getType());
+                        } catch (NoSuchMethodException | SecurityException e1) {
+                            e1.printStackTrace();
+                        }
+
+                        try {
+                            if (((Class<?>) type).isAssignableFrom(Integer.class)) {
+                                methode.invoke(obj, Integer.parseInt(item.getNodeValue()));
+                            }
+                        } catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException | DOMException e) {
+                            // TODO Auto-generated catch block
+                            e.printStackTrace();
+                        }
+
+                    }
                 } else {
                     try {
                         cl = Class.forName(type.getTypeName());
@@ -836,10 +872,22 @@ public class DomParser {
                     } catch (ClassNotFoundException e) {
                     }
 
-                    Method methode = findMethod(clazz, "set" + Character.toUpperCase(nodeN.charAt(0)) + nodeN.substring(1, nodeN.length()), cl);
+                    try {
+                        methode = findMethod(clazz, "set" + Character.toUpperCase(nodeN.charAt(0)) + nodeN.substring(1, nodeN.length()), cl);
+                    } catch (NoSuchMethodException e) {
+                        // TODO Auto-generated catch block
+                        e.printStackTrace();
+                    }
                     Object object = cm.retrieveFromCache(item.getNodeValue());
                     if (object != null) {
-                        methode.invoke(obj, object);
+
+                        try {
+                            methode.invoke(obj, object);
+                        } catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
+                            // TODO Auto-generated catch block
+                            e.printStackTrace();
+                        }
+
                     }
 
                 }
@@ -862,30 +910,33 @@ public class DomParser {
      * @throws DOMException
      */
     public void setRefObject(Class<?> clazz, Field field, Object obj, Node node)
-            throws NoSuchMethodException, IllegalAccessException, InvocationTargetException, DOMException {
+            throws DOMException {
         Class<?> type = field.getType();
-        Method methode = findMethod(clazz, "set" + Character.toUpperCase(node.getNodeName().charAt(0)) + node.getNodeName().substring(1, node.getNodeName().length()), type);
+        Method methode = null;
+        try {
+            methode = findMethod(clazz, "set" + Character.toUpperCase(node.getNodeName().charAt(0)) + node.getNodeName().substring(1, node.getNodeName().length()), type);
+        } catch (NoSuchMethodException e1) {
+            // TODO Auto-generated catch block
+        }
         if (node.getNodeType() == 1 || node.hasChildNodes()) {
             if (node.getAttributes().getNamedItem("href") != null) {
-                for (int i = 0; i < node.getChildNodes().getLength(); i++) {
-                    Node item = node.getChildNodes().item(i);
-                    if (item.hasChildNodes()) {
-                        List<Field> fieldList = getAllDeclaredFields(cm.retrieveFromCache(node.getAttributes().getNamedItem("href").getNodeValue()).getClass());
-                        Iterator<Field> iter = fieldList.iterator();
-                        while (iter.hasNext()) {
-                            Field next = iter.next();
-                            if (next.getName().contentEquals(item.getNodeName())) {
-                                visitNodeWithParent(next.getType(), item);
-                            }
-                        }
-
-                    }
-                }
                 try {
-                    methode.invoke(obj, cm.retrieveFromCache(node.getAttributes().getNamedItem("href").getNodeValue()));
+                    try {
+                        methode.invoke(obj, cm.retrieveFromCache(node.getAttributes().getNamedItem("href").getNodeValue()));
+                    } catch (IllegalAccessException | InvocationTargetException e) {
+                        // TODO Auto-generated catch block
+                    }
                 } catch (IllegalArgumentException e) {
                     field.setAccessible(true);
-                    field.set(obj, cm.retrieveFromCache(node.getAttributes().getNamedItem("href").getNodeValue()));
+                    try {
+                        field.set(obj, cm.retrieveFromCache(node.getAttributes().getNamedItem("href").getNodeValue()));
+                    } catch (IllegalArgumentException e1) {
+                        // TODO Auto-generated catch block
+                        e1.printStackTrace();
+                    } catch (IllegalAccessException e1) {
+                        // TODO Auto-generated catch block
+                        e1.printStackTrace();
+                    }
                 }
 
             } else {
@@ -893,7 +944,7 @@ public class DomParser {
                 if (object != null) {
                     for (int i = 0; i < node.getChildNodes().getLength(); i++) {
                         Node item = node.getChildNodes().item(i);
-                        if (item.getNodeType() == 1) {
+                        if (item.getNodeType() == 1 || node.hasChildNodes()) {
                             List<Field> fieldList = getAllDeclaredFields(object.getClass());
                             Iterator<Field> iter = fieldList.iterator();
                             while (iter.hasNext()) {
@@ -907,11 +958,29 @@ public class DomParser {
                     }
                     if (node.getAttributes().getNamedItem("modelElementId") != null) {
                         cm.putInCache(node.getAttributes().getNamedItem("modelElementId").getNodeValue(), object);
+                        speicher.put(node.getAttributes().getNamedItem("modelElementId").getNodeValue(), object);
                         try {
-                            methode.invoke(obj, object);
+                            try {
+                                methode.invoke(obj, object);
+                            } catch (IllegalAccessException e) {
+                                // TODO Auto-generated catch block
+                                e.printStackTrace();
+                            } catch (InvocationTargetException e) {
+                                // TODO Auto-generated catch block
+                                e.printStackTrace();
+                            }
                         } catch (IllegalArgumentException e) {
+                            // System.out.println(e.toString());
                             field.setAccessible(true);
-                            field.set(obj, object);
+                            try {
+                                field.set(obj, object);
+                            } catch (IllegalArgumentException e1) {
+                                // TODO Auto-generated catch block
+                                e1.printStackTrace();
+                            } catch (IllegalAccessException e1) {
+                                // TODO Auto-generated catch block
+                                e1.printStackTrace();
+                            }
                         }
                     }
                 }
@@ -1143,6 +1212,7 @@ public class DomParser {
             }
             clazz = clazz.getSuperclass();
         }
+
         return flds;
     }
 
@@ -1153,6 +1223,19 @@ public class DomParser {
             Field next = iter.next();
             if (next.getName().contentEquals(node.getNodeName())) {
                 return next.getType();
+            }
+        }
+        return null;
+
+    }
+
+    // return the Type of the field corresponding to a node attribute
+    public Field attributCorrespondsToField(String nodeName, List<Field> fields) {
+        Iterator<Field> iter = fields.iterator();
+        while (iter.hasNext()) {
+            Field next = iter.next();
+            if (next.getName().contentEquals(nodeName)) {
+                return next;
             }
         }
         return null;
