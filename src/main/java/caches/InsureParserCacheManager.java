@@ -63,7 +63,12 @@ public enum InsureParserCacheManager {
 
     public void putInCache(String key, Object value) {
         try {
-            objectCache.put(new Element(key, value));
+            if (this.retrieveFromCache(key) != null) {
+                objectCache.remove(key);
+                objectCache.put(new Element(key, value));
+            } else {
+                objectCache.put(new Element(key, value));
+            }
         } catch (CacheException e) {
             logger.error(String.format("Problem occurred while putting data into cache: %s", e.getMessage()));
         }

@@ -8,6 +8,9 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 
 import caches.InsureParserCacheManager;
+import de.adesso.ais.domainreference.tickets.insure754.IInsure754TableContent;
+import de.adesso.ais.domainreference.tickets.insure754.IInsure754TableRow;
+import de.adesso.ais.domainreference.tickets.insure754.Insure754Table;
 import de.adesso.ais.infoservicereference.feldsteuerung.feldelementeigenschaften.impl.StandardFeldelementeigenschaftenStandard;
 import de.adesso.ais.infoservicereference.feldsteuerung.feldelementeigenschaften.impl.StandardFeldelementeigenschaftenStandardBearbeitung;
 import de.adesso.ais.infoservicereference.feldsteuerung.feldelementeigenschaften.impl.StandardFeldelementeigenschaftenStandardBeauskunftung;
@@ -148,7 +151,7 @@ public class DomParserTest {
         Assert.assertEquals(fldst2.getName(), fldst1.getName());
         Assert.assertEquals(fldst1.getFeldelementeigenschaften().size(), fldst2.getFeldelementeigenschaften().size());
         for (Entry<IKontext, IFeldelementeigenschaften> entry : fldst1.getFeldelementeigenschaften().entrySet()) {
-            // Assert.assertEquals(fldst1.getFeldelementeigenschaften().get(entry.getKey()), fldst2.getFeldelementeigenschaften().get(entry.getKey()));
+            // Assert.assertNotNull(fldst2.getFeldelementeigenschaften().get(entry.getKey()));
         }
         Assert.assertEquals(fldst1.getIdentifier().name(), (fldst2.getIdentifier().name()));
     }
@@ -181,13 +184,11 @@ public class DomParserTest {
         Assert.assertEquals(shn1.getName(), shn2.getName());
         Assert.assertEquals(shn1.getSchnittstellenversorgungen().size(), shn2.getSchnittstellenversorgungen().size());
         for (Map.Entry<IKontext, ISchnittstellenzuordnung> entry : shn1.getSchnittstellenversorgungen().entrySet()) {
+            System.out.println(entry.getKey() + "   " + entry.getValue());
             // Assert.assertEquals(shn1.getSchnittstellenversorgungen().get(entry.getKey()), shn2.getSchnittstellenversorgungen().get(entry.getKey()));
         }
-        for (Entry<ISchnittstelle, ISchnittstellenbelieferungsbedingung<?, ?>> entry : shn1.getBelieferungsbedingungen().entrySet()) {
-            Assert.assertEquals(shn1.getSchnittstellenversorgungen().get(entry.getKey()), shn2.getSchnittstellenversorgungen().get(entry.getKey()));
-        }
-
-        // Assert.assertEquals(shn1.getIdentifier().name(), shn2.getIdentifier().name());
+        System.out.println(shn1.getBelieferungsbedingungen().toString());
+        Assert.assertEquals(shn1.getIdentifier().name(), shn2.getIdentifier().name());
     }
 
     @SuppressWarnings("unlikely-arg-type")
@@ -279,7 +280,24 @@ public class DomParserTest {
         // System.out.println(entry.getKey() + "," + entry.getValue());
         // }
         // System.out.println(cm.retrieveFromCache("_sRGtUOOqEeavgqX1epbq9g"));
-        System.out.println(cm.retrieveFromCache("_sRGtUOOqEeavgqX1epbq9g") + "loooooooooool");
+        int i = 0;
+        for (String key : cm.getKeys()) {
+            if (key.contentEquals("_yObRoL-3EeeW0_8SxuqYYg")) {
+                Insure754Table object;
+                object = (Insure754Table) cm.retrieveFromCache(key);
+                // System.out.println(object.getName() + " ," + object.getRows().size());
+                for (IInsure754TableRow inst : object.getRows()) {
+                    for (IInsure754TableContent content : inst.getContent()) {
+                        // System.out.println(content.toString());
+                        if (content.getFurtherContent() != null) {
+                            // System.out.println("further content: " + content.getFurtherContent().toString());
+                        }
+                    }
+                    // System.out.println(inst.toString());
+                }
+            }
+            // System.out.println(key + "(" + i++ + ")" + " ," + cm.retrieveFromCache(key).toString());
+        }
     }
 
 }

@@ -33,7 +33,11 @@ import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
 import caches.InsureParserCacheManager;
+import insure.core.IContainment;
 import insure.core.IEnumeration;
+import insure.core.IFunction;
+import insure.core.factory.function.IFunctionCreator;
+import insure.core.factory.function.IFunctionFactoryContributor;
 import tools.NameSpaceResolver;
 
 /**
@@ -55,18 +59,28 @@ public class DomParser {
     public DomParser(String filePath) {
         this.filePath = filePath;
         speicher = new HashMap<String, Object>();
-        referencedXml = new ArrayList<String>();
-        this.findReferencedFiles(copyFile(filePath));
     }
 
     public void parseFileAndReferencedFiles() {
+        referencedXml = this.findReferencedFiles(copyFile(filePath));
         // all referenced xml data are first parsed
         Iterator<String> iter = referencedXml.iterator();
         while (iter.hasNext()) {
             String next = iter.next();
+            if (findReferencedFiles(copyFile(next)).size() == 0) {
+                parseXml(next);
+            }
+        }
+        Iterator<String> iter2 = referencedXml.iterator();
+        while (iter2.hasNext()) {
+            String next = iter2.next();
+            if (findReferencedFiles(copyFile(next)).size() > 0) {
+                for (int i = 0; i < findReferencedFiles(copyFile(next)).size(); i++) {
+                    parseXml(findReferencedFiles(copyFile(next)).get(i));
+                }
+            }
             parseXml(next);
         }
-
         parseXml(filePath);
     }
 
@@ -101,8 +115,11 @@ public class DomParser {
         NodeList nListPrototypes = insureDocument.getElementsByTagName("prototypes");
         // Get all functions
         NodeList nListFunctions = insureDocument.getElementsByTagName("functions");
+        // parse prototypes and functions two times to be sure all references are resolved
         try {
             parseEnums(nListEnum);
+            parsePrototypes(nListPrototypes);
+            parseFunction(nListFunctions);
             parsePrototypes(nListPrototypes);
             parseFunction(nListFunctions);
         } catch (IllegalArgumentException | DOMException e) {
@@ -190,20 +207,13 @@ public class DomParser {
         name += "Literals";
         @SuppressWarnings("rawtypes")
         Class cls = null;
+
         try {
             cls = Class.forName(name);
-        } catch (NoSuchMethodError e) {
-            if (literalsKey != null) {
-                try {
-                    useFromKeyMethodForSaving(list, localName, literalsKey, IdValue);
-                } catch (ClassNotFoundException e1) {
-
-                }
-            }
-
-        } catch (ClassNotFoundException e) {
+        } catch (ClassNotFoundException e2) {
             // TODO Auto-generated catch block
-        } catch (NoClassDefFoundError e2) {
+        } catch (NoSuchMethodError e) {
+            System.out.println("no such method error was thrown");
         }
 
         Method method1 = null;
@@ -229,61 +239,21 @@ public class DomParser {
                         try {
                             Method method3 = cls.getMethod("fromKey", int.class);
                             enumeration = (IEnumeration) method3.invoke(obj, Integer.parseInt(literalsKey));
+                            cm.putInCache(IdValue, enumeration);
+                            speicher.put(IdValue, enumeration);
                         } catch (Exception e) {
-                            e.printStackTrace();
+                            // TODO Auto-generated catch block
                         }
                     }
-
+                } else {
+                    cm.putInCache(IdValue, enumeration);
+                    speicher.put(IdValue, enumeration);
                 }
             } catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException e1) {
                 // TODO Auto-generated catch block
             }
-            if (enumeration != null) {
-                cm.putInCache(IdValue, enumeration);
-                speicher.put(IdValue, enumeration);
-            }
 
         }
-    }
-
-    /**
-     * 
-     * @param packageName
-     * @param localName
-     * @param literalsKey
-     * @param nodeValue
-     * @throws ClassNotFoundException
-     *             Note: this method should be useless when the NoSuchMethodError bug is fixed constructs and save an Enum that have not null key attribute in the cache and in the Memory
-     */
-    public void useFromKeyMethodForSaving(List<Object> list, String localName, String literalsKey, String IdValue) throws ClassNotFoundException {
-        @SuppressWarnings("unused")
-        Object objectToSave = null;
-        String name = buildFullyQualifiedName(list, localName);
-        Class<?> cls = null;
-        try {
-            cls = Class.forName(name);
-        } catch (ClassNotFoundException e) {
-            throw e;
-        }
-        Method method1 = null;
-        try {
-            method1 = cls.getMethod("fromKey", int.class);
-        } catch (NoSuchMethodException | SecurityException e) {
-            // TODO Auto-generated catch block
-
-        }
-        try {
-            objectToSave = method1.invoke(cls, Integer.parseInt(literalsKey));
-        } catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
-            // TODO Auto-generated catch block
-
-        }
-
-        if (objectToSave != null) {
-            cm.putInCache(IdValue, objectToSave);
-            speicher.put(IdValue, objectToSave);
-        }
-
     }
 
     /**
@@ -294,30 +264,9 @@ public class DomParser {
      * @return for nodes that doesn't have type attribute (often happens by List Element) we refer to the parent to discover the child type
      */
     public Object visitNodeWithParent(Class<?> nodeClass, Node node) {
-        // List<Class<?>> fields = new ArrayList<Class<?>>();
-        // Reflections reflections = new Reflections(nodeClass.getPackage().getName());
-        // Set<?> subTypes = reflections.getSubTypesOf(nodeClass);
-        // Iterator<?> it = subTypes.iterator();
-        // while (it.hasNext()) {
-        // // System.out.println(it.next());
-        // }
 
         // try to find a concrete class implementing the interface (waiting for better solution)
-        if (nodeClass.isInterface()) {
-            String concreteClassName = nodeClass.getPackage().getName() + "." + nodeClass.getSimpleName().substring(1, nodeClass.getSimpleName().length());
-            try {
-                nodeClass = Class.forName(concreteClassName);
-            } catch (ClassNotFoundException e) {
-                System.out.println(concreteClassName + " not found");
-            }
-        } else {
-            try {
-                nodeClass = Class.forName(nodeClass.getName());
-            } catch (ClassNotFoundException e) {
-                // TODO Auto-generated catch block
-            }
-        }
-
+        nodeClass = searchConcreteClass(nodeClass);
         Object result = null;
         try {
             result = nodeClass.newInstance();
@@ -403,7 +352,7 @@ public class DomParser {
                 // only Element nodes getChildNodesWithName
                 for (int i = 0; i < node.getChildNodes().getLength(); i++) {
                     Node item = node.getChildNodes().item(i);
-                    if (item.hasChildNodes()) {
+                    if (item.hasChildNodes() || item.getNodeType() == 1) {
                         if (field.getName().contentEquals(item.getNodeName())) {
                             ParameterizedType pt = (ParameterizedType) field.getGenericType();
                             Type listType = pt.getActualTypeArguments()[0];
@@ -474,6 +423,7 @@ public class DomParser {
         // get attributes names and values
         NamedNodeMap nodeMap = node.getAttributes();
         if (nodeMap.getNamedItem("href") != null) {
+            cm.putInCache(nodeMap.getNamedItem("modelElementId").getNodeValue(), nodeMap.getNamedItem("href").getNodeValue());
             return nodeMap.getNamedItem("href").getNodeValue();
         } else {
             Class<?> clazz = null;
@@ -483,32 +433,26 @@ public class DomParser {
             List<Field> otherFields = new ArrayList<Field>();
             if (nodeMap.getNamedItem("xsi:type") != null) {
                 Node nodeType = nodeMap.getNamedItem("xsi:type");
-                String prototypeName = nodeType.getNodeValue();
-                List<String> list = splitString(prototypeName);
+                String objectName = nodeType.getNodeValue();
+                List<String> list = splitString(objectName);
+                String buildFullyQualifiedName = buildFullyQualifiedName(cm.retrieveFromCache(resolver.getNamespaceURI((list.get(0)))), list.get(1));
                 try {
-                    clazz = Class.forName(buildFullyQualifiedName(cm.retrieveFromCache(resolver.getNamespaceURI((list.get(0)))), list.get(1)));
-                    if (clazz.isInterface()) {
-                        try {
-                            clazz = Class.forName(clazz.getName().replace("I", ""));
-                        } catch (ClassNotFoundException e) {
-                            // TODO Auto-generated catch block
-                        }
-                    }
+                    clazz = Class.forName(buildFullyQualifiedName);
                     Constructor<?> constructor = clazz.getDeclaredConstructor();
-
                     object = constructor.newInstance();
                     fields = getAllDeclaredFields(clazz);
-
                 } catch (InstantiationException | NoSuchMethodException | SecurityException | IllegalAccessException | IllegalArgumentException e) {
 
                 } catch (ClassNotFoundException e) {
+
                     Map<String, Object> propertyRefs = new HashMap<String, Object>();
                     Map<String, String> propertyFields = new HashMap<String, String>();
                     if (node.hasChildNodes()) {
                         for (int i = 0; i < node.getChildNodes().getLength(); i++) {
                             Node it = node.getChildNodes().item(i);
-                            if (it.hasChildNodes()) {
-                                propertyRefs.put(it.getAttributes().getNamedItem("modelElementId").getNodeValue(), visitnode(it, new Object()));
+                            if (it.hasChildNodes() || it.getNodeType() == 1) {
+                                Object child = visitnode(it, new Object());
+                                propertyRefs.put(it.getAttributes().getNamedItem("modelElementId").getNodeValue(), child);
                             }
 
                         }
@@ -518,70 +462,103 @@ public class DomParser {
                     propertyFields.put("name", node.getAttributes().getNamedItem("name") != null ? node.getAttributes().getNamedItem("name").getNodeValue() : null);
                     propertyFields.put("beschreibung",
                         node.getAttributes().getNamedItem("beschreibung") != null ? node.getAttributes().getNamedItem("beschreibung").getNodeValue() : null);
-                    return new Object() {
-                        public Map<String, Object> containments = new HashMap<String, Object>();
-                        private Map<String, String> propertyFields = new HashMap<String, String>();;
 
-                        private Object init(Map<String, String> prop, Map<String, Object> propRf) {
-                            containments = propRf;
-                            propertyFields = prop;
-                            return this;
+                    if (node.getNodeName().contentEquals("functions")) {
+                        int count = 0;
+                        for (int i = 0; i < node.getChildNodes().getLength(); i++) {
+                            if (node.getChildNodes().item(i).getNodeType() == 1) {
+                                count++;
+                            }
                         }
 
-                        @SuppressWarnings("unused")
-                        public String getName() {
-                            return propertyFields.get("name");
+                        if (count == 0) {
+                            class ParsedFunction implements IFunction {
+                                private String name;
+                                private String beschreibung;
+
+                                public ParsedFunction() {
+                                    name = propertyFields.get("name");
+                                    beschreibung = propertyFields.get("beschreibung");
+                                }
+
+                                @SuppressWarnings("unused")
+                                public String getName() {
+                                    return name;
+                                }
+
+                                @SuppressWarnings("unused")
+                                public void setName(String name) {
+                                    this.name = name;
+                                }
+
+                                @SuppressWarnings("unused")
+                                public String getBeschreibung() {
+                                    return beschreibung;
+                                }
+
+                                @SuppressWarnings("unused")
+                                public void setBeschreibung(String beschreibung) {
+                                    this.beschreibung = beschreibung;
+                                }
+                            }
+                            class ParsedFunctionFactoryContributor implements IFunctionFactoryContributor {
+
+                                @SuppressWarnings("unchecked")
+                                @Override
+                                public <T extends IFunction> T create(final String name) {
+
+                                    if (buildFullyQualifiedName.equals(name)) {
+                                        return (T) new ParsedFunctionCreator().create();
+                                    }
+
+                                    return null;
+                                }
+
+                                class ParsedFunctionCreator implements IFunctionCreator<ParsedFunction> {
+
+                                    @Override
+                                    public ParsedFunction create() {
+                                        return new ParsedFunction();
+                                    }
+
+                                }
+
+                            }
+                            ParsedFunctionFactoryContributor contributor = new ParsedFunctionFactoryContributor();
+                            ParsedFunction function = contributor.create(buildFullyQualifiedName);
+                            cm.putInCache(propertyFields.get("modelElementId"), function);
+                            speicher.put(propertyFields.get("modelElementId"), function);
+                            return function;
                         }
+                    }
+                    class ParsedContainment implements IContainment {
+                        private java.util.Map<String, insure.core.IContainment> containments = new HashMap<String, insure.core.IContainment>();
+                        private String name;
+                        private String beschreibung;
+                        private String modelElementId;
 
-                        @SuppressWarnings("unused")
-                        public void setName(String value) {
-                            propertyFields.remove("name");
-                            propertyFields.put("name", value);
-
+                        public ParsedContainment() {
+                            for (Map.Entry<String, Object> entry : propertyRefs.entrySet()) {
+                                containments.put(entry.getKey(), (IContainment) entry.getValue());
+                            }
+                            this.name = propertyFields.get("name");
+                            this.beschreibung = propertyFields.get("beschreibung");
+                            this.modelElementId = propertyFields.get("modelElementId");
                         }
+                    }
 
-                        @SuppressWarnings("unused")
-                        public String getBeschreibung() {
-                            return propertyFields.get("beschreibung");
-                        }
+                    ParsedContainment containment = new ParsedContainment();
+                    cm.putInCache(node.getAttributes().getNamedItem("modelElementId").getNodeValue(), containment);
+                    speicher.put(node.getAttributes().getNamedItem("modelElementId").getNodeValue(), containment);
+                    return containment;
 
-                        @SuppressWarnings("unused")
-                        public void setBeschreibung(String value) {
-                            propertyFields.remove("beschreibung");
-                            propertyFields.put("beschreibung", value);
+                } catch (
 
-                        }
-
-                        @SuppressWarnings("unused")
-                        public String getModelElementId() {
-                            return propertyFields.get("modelElementId");
-                        }
-
-                        @SuppressWarnings("unused")
-                        public void setModelElementId(String value) {
-                            propertyFields.remove("modelElementId");
-                            propertyFields.put("modelElementId", value);
-
-                        }
-
-                        @SuppressWarnings("unused")
-                        public Map<String, Object> getContainments() {
-                            return this.containments;
-                        }
-
-                        @SuppressWarnings("unused")
-                        public void setContainments(Map<String, Object> containments) {
-                            this.containments = containments;
-                        }
-                    }.init(propertyFields, propertyRefs);
-
-                } catch (InvocationTargetException e) {
-                    // TODO Auto-generated catch block
+                InvocationTargetException e) {
                 }
 
                 Iterator<Field> iter = fields.iterator();
                 while (iter.hasNext()) {
-
                     Field field = (iter.next());
                     Class<?> type = field.getType();
                     if (List.class.isAssignableFrom(type) || Map.class.isAssignableFrom(type)) {
@@ -609,7 +586,7 @@ public class DomParser {
 
                 }
 
-                if (node.hasChildNodes()) {
+                if (node.hasChildNodes() || node.getNodeType() == 1) {
                     for (Field field : mapFields) {
                         Map<Object, Object> map = new HashMap<Object, Object>();
                         // only Element nodes getChildNodesWithName
@@ -665,7 +642,7 @@ public class DomParser {
                     // only Element nodes getChildNodesWithName
                     for (int i = 0; i < node.getChildNodes().getLength(); i++) {
                         Node item = node.getChildNodes().item(i);
-                        if (item.hasChildNodes()) {
+                        if (item.hasChildNodes() || item.getNodeType() == 1) {
                             if (field.getName().contentEquals(item.getNodeName())) {
                                 ParameterizedType pt = (ParameterizedType) field.getGenericType();
                                 Type listType = pt.getActualTypeArguments()[0];
@@ -673,7 +650,7 @@ public class DomParser {
                                 try {
                                     listClass = Class.forName(listType.getTypeName());
                                 } catch (ClassNotFoundException e2) {
-                                    // TODO Auto-generated catch blockF
+                                    // TODO Auto-generated catch block
                                 }
                                 Method add = null;
                                 try {
@@ -749,21 +726,21 @@ public class DomParser {
 
                     }
                 } else {
-                    Object obj = cm.retrieveFromCache(node.getParentNode().getAttributes().getNamedItem("modelElementId").getNodeValue());
-                    if (obj != null) {
-                        List<Field> fieldList = this.getAllDeclaredFields(object.getClass());
+                    Object parent = cm.retrieveFromCache(node.getParentNode().getAttributes().getNamedItem("modelElementId").getNodeValue());
+                    if (parent != null) {
+                        List<Field> fieldList = this.getAllDeclaredFields(parent.getClass());
                         Iterator<Field> iter = fieldList.iterator();
                         while (iter.hasNext()) {
                             Field next = iter.next();
                             if (next.getName().contentEquals(node.getNodeName())) {
-                                visitNodeWithParent(next.getType(), node);
+                                object = visitNodeWithParent(next.getType(), node);
                             }
                         }
                     }
                 }
             }
         }
-
+        cm.putInCache(node.getAttributes().getNamedItem("modelElementId").getNodeValue(), object);
         return object;
 
     }
@@ -778,21 +755,14 @@ public class DomParser {
      * @return constructs and returns an List element
      */
     private Object buildListElement(Class<?> parentClass, Class<?> listClass, NodeList childNodes, Node item, Field field) {
-        Object result = null;
-        if (childNodes != null) {
-            if (item.hasAttributes()) {
-                if (item.getAttributes().getNamedItem("href") != null) {
-                    return cm.retrieveFromCache(item.getAttributes().getNamedItem("href").getNodeValue());
-                }
-                if (item.getAttributes().getNamedItem("xsi:type") != null) {
-                    result = visitnode(item, new Object());
-                } else {
-                    result = visitNodeWithParent(listClass, item);
-                }
-            }
-
+        if (item.getAttributes().getNamedItem("href") != null) {
+            return cm.retrieveFromCache(item.getAttributes().getNamedItem("href").getNodeValue());
         }
-        return result;
+        if (item.getAttributes().getNamedItem("xsi:type") != null) {
+            return visitnode(item, new Object());
+        }
+
+        return visitNodeWithParent(listClass, item);
     }
 
     /**
@@ -813,38 +783,43 @@ public class DomParser {
             Node item = attrList.item(i);
             String nodeN = item.getNodeName();
             Method methode = null;
+            for (Field f : getAllDeclaredFields(clazz)) {
+            }
             Type type = (attributCorrespondsToField(item, getAllDeclaredFields(clazz)));
             if (type != null) {
                 Class<?> cl = null;
-                if (type.getTypeName().contains("java.lang") || type.getTypeName().contains("java.util") || type.getTypeName().contains("double")) {
+                if (type.getTypeName().contains("java.lang") || type.getTypeName().contains("java.util") || type.getTypeName().contains("double") || type.getTypeName().contains("int")) {
                     if (((Class<?>) type).isAssignableFrom(List.class)) {
-                        ParameterizedType pt = null;
                         int k = 0;
                         try {
                             methode = ArrayList.class.getDeclaredMethod("add", Object.class);
                         } catch (NoSuchMethodException | SecurityException e1) {
                             // TODO Auto-generated catch block
-                            e1.printStackTrace();
                         }
-                        List<String> nameList = new ArrayList<String>();
-                        String objectNames = item.getNodeValue();
+                        List<String> IdsList = new ArrayList<String>();
+                        String objectId = item.getNodeValue();
 
-                        while (StringUtils.indexOf(objectNames, " ", k) != -1) {
-                            nameList.add(objectNames.substring(k, StringUtils.indexOf(objectNames, " ", k)));
-                            k = StringUtils.indexOf(objectNames, " ", k) + 1;
+                        while (StringUtils.indexOf(objectId, " ", k) != -1) {
+                            IdsList.add(objectId.substring(k, StringUtils.indexOf(objectId, " ", k)));
+                            k = StringUtils.indexOf(objectId, " ", k) + 1;
                         }
-                        nameList.add(objectNames.substring(k, objectNames.length()));
+                        IdsList.add(objectId.substring(k, objectId.length()));
 
                         try {
-                            Iterator<String> it = nameList.iterator();
+                            Iterator<String> it = IdsList.iterator();
+                            Field field = clazz.getDeclaredField(nodeN);
+                            field.setAccessible(true);
+                            List<?> list = new ArrayList<>();
                             while (it.hasNext()) {
                                 String next = it.next();
-                                if (cm.retrieveFromCache(next) != null)
-                                    methode.invoke(clazz.getDeclaredField(nodeN), cm.retrieveFromCache(next));
+                                if (cm.retrieveFromCache(next) != null) {
+                                    methode.invoke(list, cm.retrieveFromCache(next));
+                                }
                             }
+
+                            field.set(obj, list);
                         } catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException | NoSuchFieldException | SecurityException | DOMException e) {
                             // TODO Auto-generated catch block
-                            e.printStackTrace();
                         }
 
                     } else {
@@ -852,7 +827,6 @@ public class DomParser {
                             methode = findMethod(clazz, "set" + Character.toUpperCase(nodeN.charAt(0)) + nodeN.substring(1, nodeN.length()),
                                 attributCorrespondsToField(nodeN, this.getAllDeclaredFields(clazz)).getType());
                         } catch (NoSuchMethodException | SecurityException e1) {
-                            e1.printStackTrace();
                         }
 
                         try {
@@ -861,7 +835,6 @@ public class DomParser {
                             }
                         } catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException | DOMException e) {
                             // TODO Auto-generated catch block
-                            e.printStackTrace();
                         }
 
                     }
@@ -876,16 +849,15 @@ public class DomParser {
                         methode = findMethod(clazz, "set" + Character.toUpperCase(nodeN.charAt(0)) + nodeN.substring(1, nodeN.length()), cl);
                     } catch (NoSuchMethodException e) {
                         // TODO Auto-generated catch block
-                        e.printStackTrace();
                     }
                     Object object = cm.retrieveFromCache(item.getNodeValue());
                     if (object != null) {
 
                         try {
                             methode.invoke(obj, object);
-                        } catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
-                            // TODO Auto-generated catch block
-                            e.printStackTrace();
+                        } catch (Exception e) {
+                            // TODO Auto-generated catch block;
+                            // e.printStackTrace();
                         }
 
                     }
@@ -927,20 +899,15 @@ public class DomParser {
                         // TODO Auto-generated catch block
                     }
                 } catch (IllegalArgumentException e) {
-                    field.setAccessible(true);
-                    try {
-                        field.set(obj, cm.retrieveFromCache(node.getAttributes().getNamedItem("href").getNodeValue()));
-                    } catch (IllegalArgumentException e1) {
-                        // TODO Auto-generated catch block
-                        e1.printStackTrace();
-                    } catch (IllegalAccessException e1) {
-                        // TODO Auto-generated catch block
-                        e1.printStackTrace();
-                    }
                 }
 
             } else {
-                Object object = visitnode(node, new Object());
+                Object object;
+                if (node.getAttributes().getNamedItem("xsi:type") != null) {
+                    object = visitnode(node, new Object());
+                } else {
+                    object = visitNodeWithParent(field.getType(), node);
+                }
                 if (object != null) {
                     for (int i = 0; i < node.getChildNodes().getLength(); i++) {
                         Node item = node.getChildNodes().item(i);
@@ -950,7 +917,7 @@ public class DomParser {
                             while (iter.hasNext()) {
                                 Field next = iter.next();
                                 if (next.getName().contentEquals(item.getNodeName())) {
-                                    visitNodeWithParent(next.getType(), item);
+                                    cm.putInCache(node.getAttributes().getNamedItem("modelElementId").getNodeValue(), visitNodeWithParent(next.getType(), item));
                                 }
                             }
 
@@ -964,23 +931,11 @@ public class DomParser {
                                 methode.invoke(obj, object);
                             } catch (IllegalAccessException e) {
                                 // TODO Auto-generated catch block
-                                e.printStackTrace();
                             } catch (InvocationTargetException e) {
                                 // TODO Auto-generated catch block
-                                e.printStackTrace();
                             }
                         } catch (IllegalArgumentException e) {
-                            // System.out.println(e.toString());
-                            field.setAccessible(true);
-                            try {
-                                field.set(obj, object);
-                            } catch (IllegalArgumentException e1) {
-                                // TODO Auto-generated catch block
-                                e1.printStackTrace();
-                            } catch (IllegalAccessException e1) {
-                                // TODO Auto-generated catch block
-                                e1.printStackTrace();
-                            }
+
                         }
                     }
                 }
@@ -1081,6 +1036,33 @@ public class DomParser {
         return false;
     }
 
+    public Class<?> searchConcreteClass(Class<?> nodeClass) {
+        if (nodeClass.isInterface()) {
+            String concreteClassName = nodeClass.getPackage().getName() + "." + nodeClass.getSimpleName().substring(1, nodeClass.getSimpleName().length());
+            try {
+                nodeClass = Class.forName(concreteClassName);
+            } catch (ClassNotFoundException e) {
+                System.out.println(concreteClassName + " not found");
+            }
+        } else {
+            try {
+                nodeClass = Class.forName(nodeClass.getName());
+            } catch (ClassNotFoundException e) {
+                // TODO Auto-generated catch block
+            }
+        }
+        return nodeClass;
+
+        // List<Class<?>> fields = new ArrayList<Class<?>>();
+        // Reflections reflections = new Reflections(nodeClass.getPackage().getName());
+        // Set<?> subTypes = reflections.getSubTypesOf(nodeClass);
+        // Iterator<?> it = subTypes.iterator();
+        // while (it.hasNext()) {
+        // // System.out.println(it.next());
+        // }
+
+    }
+
     // return a list containing the childnodes with the given name
     public List<Node> getChildNodesWithName(Node parent, String childName) {
         List<Node> result = new ArrayList<Node>();
@@ -1091,6 +1073,16 @@ public class DomParser {
         }
         return result;
     }
+
+    // public IFunction createInstance(Class<?> clazz, Method m) {
+    //
+    // class FunctionClass implements IFunction {
+    // int a = 0;
+    // }
+    //
+    // return;
+    //
+    // }
 
     // search for a method declared in a class and return it
     public Method findMethod(Class<?> clazz, String methodName, Class<?>... parameterTypes) throws NoSuchMethodException {
@@ -1175,8 +1167,9 @@ public class DomParser {
 
     }
 
-    public void findReferencedFiles(InputStream input) {
+    public List<String> findReferencedFiles(InputStream input) {
 
+        List<String> referencesList = new ArrayList<String>();
         BufferedReader br = null;
         String newString = "";
         try {
@@ -1186,8 +1179,8 @@ public class DomParser {
                 if (newString.contains("href=")) {
                     String fullPath = StringUtils.substringBetween(newString, "href=", "#");
                     int index = fullPath.lastIndexOf("/");
-                    if (!referencedXml.contains("/" + fullPath.substring(index + 1))) {
-                        referencedXml.add("/" + fullPath.substring(index + 1));
+                    if (!referencesList.contains("/" + fullPath.substring(index + 1))) {
+                        referencesList.add("/" + fullPath.substring(index + 1));
                     }
                 }
             }
@@ -1195,6 +1188,7 @@ public class DomParser {
         } catch (IOException e) {
             // TODO Auto-generated catch block
         } // calls it
+        return referencesList;
     }
 
     // copy the given file to the classpath
