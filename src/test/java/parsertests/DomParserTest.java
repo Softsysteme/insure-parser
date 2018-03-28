@@ -8,9 +8,7 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 
 import caches.InsureParserCacheManager;
-import de.adesso.ais.domainreference.tickets.insure754.IInsure754TableContent;
-import de.adesso.ais.domainreference.tickets.insure754.IInsure754TableRow;
-import de.adesso.ais.domainreference.tickets.insure754.Insure754Table;
+import de.adesso.ais.domainreference.tickets.insure450.Insure450Formel;
 import de.adesso.ais.infoservicereference.feldsteuerung.feldelementeigenschaften.impl.StandardFeldelementeigenschaftenStandard;
 import de.adesso.ais.infoservicereference.feldsteuerung.feldelementeigenschaften.impl.StandardFeldelementeigenschaftenStandardBearbeitung;
 import de.adesso.ais.infoservicereference.feldsteuerung.feldelementeigenschaften.impl.StandardFeldelementeigenschaftenStandardBeauskunftung;
@@ -19,6 +17,10 @@ import de.adesso.ais.infoservicereference.feldsteuerung.feldelementeigenschaften
 import de.adesso.ais.infoservicereference.feldsteuerung.feldelementeigenschaften.impl.TemplateFeldelementeigenschaftenModellvariantePolo;
 import de.adesso.ais.infoservicereference.feldsteuerung.impl.FeldsteuerungBestellsystem;
 import de.adesso.ais.infoservicereference.schnittstellensteuerung.impl.SchnittstellensteuerungBestellsystem;
+import factory.ParsedPrototypeFactory;
+import insure.core.IIdentifiablePrototype;
+import insure.core.IPrototypeIdentifier;
+import insure.core.impl.Prototype;
 import insure.domain.prototype.kontext.IKontext;
 import insure.infoservice.feldsteuerung.Feldsteuerung;
 import insure.infoservice.feldsteuerung.IEingabeelement;
@@ -31,6 +33,7 @@ import insure.infoservice.schnittstellensteuerung.ISchnittstelle;
 import insure.infoservice.schnittstellensteuerung.ISchnittstellenbelieferungsbedingung;
 import insure.infoservice.schnittstellensteuerung.ISchnittstellenzuordnung;
 import insure.infoservice.schnittstellensteuerung.Schnittstellensteuerung;
+import insure.infoservice.schnittstellensteuerung.Schnittstellenzuordnung;
 import insure.infoservice.schnittstellensteuerung.impl.SchnittstellensteuerungStandard;
 import parser.DomParser;
 import tools.JavaPackageNameResolver;
@@ -106,11 +109,12 @@ public class DomParserTest {
         tpl2 = (TemplateFeldelementeigenschaften) dParser.getSpeicher().get("_zt5SyibeEeWDoMiQXiXZDQ");
         Assert.assertNotNull(tpl2);
         Assert.assertEquals(tpl1.getName(), tpl2.getName());
-        assert (tpl1.getEingabeelementeigenschaften().size() == tpl2.getEingabeelementeigenschaften().size());
+        Assert.assertEquals(tpl1.getEingabeelementeigenschaften().size(), tpl2.getEingabeelementeigenschaften().size());
         for (Entry<IEingabeelement, IEingabeelementeigenschaft> entry : tpl1.getEingabeelementeigenschaften().entrySet()) {
             Assert.assertEquals(tpl1.getEingabeelementeigenschaften().get(entry.getKey()).name(), tpl2.getEingabeelementeigenschaften().get(entry.getKey()).name());
         }
         Assert.assertNotNull(tpl2.getTemplate());
+        Assert.assertEquals(((Prototype) tpl2.getTemplate()).getName(), ((Prototype) tpl1.getTemplate()).getName());
     }
 
     @Test
@@ -124,6 +128,7 @@ public class DomParserTest {
             Assert.assertEquals(tpl1.getEingabeelementeigenschaften().get(entry.getKey()).name(), tpl2.getEingabeelementeigenschaften().get(entry.getKey()).name());
         }
         Assert.assertNotNull(tpl2.getTemplate());
+        Assert.assertEquals(((Prototype) tpl2.getTemplate()).getName(), ((Prototype) tpl1.getTemplate()).getName());
     }
 
     @Test
@@ -137,6 +142,7 @@ public class DomParserTest {
             Assert.assertEquals(tpl1.getEingabeelementeigenschaften().get(entry.getKey()).name(), tpl2.getEingabeelementeigenschaften().get(entry.getKey()).name());
         }
         Assert.assertNotNull(tpl2.getTemplate());
+        Assert.assertEquals(((Prototype) tpl2.getTemplate()).getName(), ((Prototype) tpl1.getTemplate()).getName());
     }
 
     /*--------------------------------------------------------------------------------------------------------
@@ -150,8 +156,9 @@ public class DomParserTest {
         Assert.assertNotNull(fldst2);
         Assert.assertEquals(fldst2.getName(), fldst1.getName());
         Assert.assertEquals(fldst1.getFeldelementeigenschaften().size(), fldst2.getFeldelementeigenschaften().size());
-        for (Entry<IKontext, IFeldelementeigenschaften> entry : fldst1.getFeldelementeigenschaften().entrySet()) {
-            // Assert.assertNotNull(fldst2.getFeldelementeigenschaften().get(entry.getKey()));
+        for (Entry<IKontext, IFeldelementeigenschaften> entry : fldst2.getFeldelementeigenschaften().entrySet()) {
+            Assert.assertNotNull(fldst2.getFeldelementeigenschaften().get(entry.getKey()));
+            Assert.assertEquals(((Prototype) fldst1.getFeldelementeigenschaften().get(entry.getKey())).getName(), ((Prototype) fldst2.getFeldelementeigenschaften().get(entry.getKey())).getName());
         }
         Assert.assertEquals(fldst1.getIdentifier().name(), (fldst2.getIdentifier().name()));
     }
@@ -160,7 +167,7 @@ public class DomParserTest {
     public void FeldsteuerungStandardParsedCorrectly() {
 
         FeldsteuerungStandard fldst1 = new FeldsteuerungStandard();
-        Feldsteuerung fldst2 = (Feldsteuerung) dParser.getSpeicher().get("_FONP99OqEeSVoOolBb6ZYQ");
+        Feldsteuerung fldst2 = (Feldsteuerung) cm.retrieveFromCache("_FONP99OqEeSVoOolBb6ZYQ");
         Assert.assertNotNull(fldst2);
         Assert.assertEquals(fldst2.getName(), fldst1.getName());
         assert (fldst1.getFeldelementeigenschaften().size() == fldst2.getFeldelementeigenschaften().size());
@@ -183,11 +190,11 @@ public class DomParserTest {
         Assert.assertNotNull(shn2);
         Assert.assertEquals(shn1.getName(), shn2.getName());
         Assert.assertEquals(shn1.getSchnittstellenversorgungen().size(), shn2.getSchnittstellenversorgungen().size());
+        Assert.assertEquals(shn1.getBelieferungsbedingungen().size(), shn2.getBelieferungsbedingungen().size());
         for (Map.Entry<IKontext, ISchnittstellenzuordnung> entry : shn1.getSchnittstellenversorgungen().entrySet()) {
-            System.out.println(entry.getKey() + "   " + entry.getValue());
-            // Assert.assertEquals(shn1.getSchnittstellenversorgungen().get(entry.getKey()), shn2.getSchnittstellenversorgungen().get(entry.getKey()));
+            Assert.assertEquals(((Schnittstellenzuordnung) (shn1.getSchnittstellenversorgungen().get(entry.getKey()))).getName(),
+                ((Schnittstellenzuordnung) (shn2.getSchnittstellenversorgungen().get(entry.getKey()))).getName());
         }
-        System.out.println(shn1.getBelieferungsbedingungen().toString());
         Assert.assertEquals(shn1.getIdentifier().name(), shn2.getIdentifier().name());
     }
 
@@ -195,7 +202,7 @@ public class DomParserTest {
     @Test
     public void SchnittstellensteuerungStandardParsedCorrectly() {
         SchnittstellensteuerungStandard shn1 = new SchnittstellensteuerungStandard();
-        Schnittstellensteuerung shn2 = (Schnittstellensteuerung) dParser.getSpeicher().get("_bCozoSbWEeWomoMrx8bFIQ");
+        Schnittstellensteuerung shn2 = (Schnittstellensteuerung) cm.retrieveFromCache("_bCozoSbWEeWomoMrx8bFIQ");
 
         Assert.assertNotNull(shn2);
         Assert.assertEquals(shn1.getName(), shn2.getName());
@@ -216,88 +223,31 @@ public class DomParserTest {
     @SuppressWarnings("unchecked")
     @Test
     public void Insure450CalculatorEinCalculatorParsedCorrectly() {
-        // Map<String, Object> testContainment = new HashMap<String, Object>();
-        // Insure450CalculatorEinCalculator einCalculator = new Insure450CalculatorEinCalculator();
-        // Object function = null;
-        // Iterator<Object> iter = dParser.getSpeicher().iterator();
-        // while (iter.hasNext()) {
-        // Object next = iter.next();
-        // if (next instanceof IFunction) {
-        // if (((IFunction) next).getName().contentEquals("EinCalculator")) {
-        // function = (IFunction) next;
-        // }
-        // }
-        //
-        // }
-        // assert (function != null);
-        // Field field = null;
-        //
-        // try {
-        // field = function.getClass().getField("containments");
-        // } catch (NoSuchFieldException | SecurityException e) {
-        // // TODO Auto-generated catch block
-        //
-        // }
-        // field.setAccessible(true);
-        // try {
-        // testContainment.putAll((Map<String, Object>) field.get(function));
-        // // testContainment.put((String) function.getClass().getField("modelElementId").get(function), function);
-        //
-        // } catch (IllegalArgumentException | IllegalAccessException | SecurityException e) {
-        // // TODO Auto-generated catch block
-        // }
-        // boolean weiter = true;
-        // while (weiter) {
-        // Iterator<Entry<String, Object>> it = testContainment.entrySet().iterator();
-        // while (it.hasNext()) {
-        // Entry<String, Object> entry = it.next();
-        // for (Field f : entry.getValue().getClass().getDeclaredFields()) {
-        // f.setAccessible(true);
-        // Object object = null;
-        // try {
-        // object = f.get(entry.getValue());
-        // } catch (IllegalArgumentException | IllegalAccessException e) {
-        // // TODO Auto-generated catch block
-        // }
-        // if (object != null) {
-        // for (Field fd : dParser.getAllDeclaredFields(object.getClass())) {
-        // if (fd.getName().contentEquals("modelElementId")) {
-        // fd.setAccessible(true);
-        // try {
-        // weiter = (testContainment.putIfAbsent((String) fd.get(object), object)) != null;
-        // } catch (IllegalArgumentException | IllegalAccessException e) {
-        // // TODO Auto-generated catch block
-        // }
-        //
-        // }
-        // }
-        //
-        // }
-        // }
-        // }
-        // }
-        // for (Entry<String, Object> entry : testContainment.entrySet()) {
-        // System.out.println(entry.getKey() + "," + entry.getValue());
-        // }
-        // System.out.println(cm.retrieveFromCache("_sRGtUOOqEeavgqX1epbq9g"));
-        int i = 0;
-        for (String key : cm.getKeys()) {
-            if (key.contentEquals("_yObRoL-3EeeW0_8SxuqYYg")) {
-                Insure754Table object;
-                object = (Insure754Table) cm.retrieveFromCache(key);
-                // System.out.println(object.getName() + " ," + object.getRows().size());
-                for (IInsure754TableRow inst : object.getRows()) {
-                    for (IInsure754TableContent content : inst.getContent()) {
-                        // System.out.println(content.toString());
-                        if (content.getFurtherContent() != null) {
-                            // System.out.println("further content: " + content.getFurtherContent().toString());
-                        }
-                    }
-                    // System.out.println(inst.toString());
-                }
-            }
-            // System.out.println(key + "(" + i++ + ")" + " ," + cm.retrieveFromCache(key).toString());
-        }
+        Object calculator = cm.retrieveFromCache("_vgyhc-IYEeaDE84Dco1_hQ");
+        Assert.assertNotNull(calculator);
+        Insure450Formel calculatorBody = (Insure450Formel) ((DomParser.ParsedContainment) calculator).getContainments().get("_phBZIOLrEeaBppv9oYiIvQ");
+        Assert.assertNotNull(calculatorBody);
+        Assert.assertNotNull(calculatorBody.getExpression());
+        Assert.assertNotNull(calculatorBody.getExpression().getLeft());
+        Assert.assertNotNull(calculatorBody.getExpression().getLeft().getLeft());
+        Assert.assertNotNull(calculatorBody.getExpression().getLeft().getLeft().getLeft());
+        Assert.assertNotNull(calculatorBody.getExpression().getLeft().getLeft().getRight());
+        Assert.assertNotNull(calculatorBody.getExpression().getLeft().getLeft());
+        Assert.assertNotNull(calculatorBody.getExpression().getRight());
+        Assert.assertNotNull(calculatorBody.getExpression().getRight().getLeft());
+        Assert.assertNotNull(calculatorBody.getExpression().getRight().getRight());
     }
 
+    /*-------------------------------------------------------------------------------------------------------------
+     * identifiable prototypes factory test
+     * ------------------------------------------------------------------------------------------------------------*/
+    @Test
+    public void parsedPrototypeFactoryWorksCorrectly() {
+        ParsedPrototypeFactory factory = new ParsedPrototypeFactory(paths);
+        Assert.assertNotNull(factory.getIdentifiablePrototypeMap());
+        System.out.println(factory.getIdentifiablePrototypeMap().size());
+        for (Entry<IPrototypeIdentifier, IIdentifiablePrototype<IPrototypeIdentifier>> entry : factory.getIdentifiablePrototypeMap().entrySet()) {
+            System.out.println(entry.getKey() + "    ," + entry.getValue());
+        }
+    }
 }

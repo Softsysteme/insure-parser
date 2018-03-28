@@ -68,7 +68,7 @@ public class DomParser {
         while (iter.hasNext()) {
             String next = iter.next();
             if (findReferencedFiles(copyFile(next)).size() == 0) {
-                parseXml(next);
+                parseXml(next, false);
             }
         }
         Iterator<String> iter2 = referencedXml.iterator();
@@ -76,12 +76,12 @@ public class DomParser {
             String next = iter2.next();
             if (findReferencedFiles(copyFile(next)).size() > 0) {
                 for (int i = 0; i < findReferencedFiles(copyFile(next)).size(); i++) {
-                    parseXml(findReferencedFiles(copyFile(next)).get(i));
+                    parseXml(findReferencedFiles(copyFile(next)).get(i), false);
                 }
             }
-            parseXml(next);
+            parseXml(next, false);
         }
-        parseXml(filePath);
+        parseXml(filePath, true);
     }
 
     /**
@@ -89,7 +89,7 @@ public class DomParser {
      * @param filePath
      *
      */
-    public void parseXml(String filePath) {
+    public void parseXml(String filePath, boolean keepInMemory) {
         // Get Document Builder
         DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
         DocumentBuilder builder = null;
@@ -117,11 +117,11 @@ public class DomParser {
         NodeList nListFunctions = insureDocument.getElementsByTagName("functions");
         // parse prototypes and functions two times to be sure all references are resolved
         try {
-            parseEnums(nListEnum);
-            parsePrototypes(nListPrototypes);
-            parseFunction(nListFunctions);
-            parsePrototypes(nListPrototypes);
-            parseFunction(nListFunctions);
+            parseEnums(nListEnum, keepInMemory);
+            parsePrototypes(nListPrototypes, keepInMemory);
+            parseFunction(nListFunctions, keepInMemory);
+            parsePrototypes(nListPrototypes, keepInMemory);
+            parseFunction(nListFunctions, keepInMemory);
         } catch (IllegalArgumentException | DOMException e) {
         }
 
@@ -133,7 +133,7 @@ public class DomParser {
      *            Enums parser
      */
     @SuppressWarnings("unchecked")
-    public void parseEnums(NodeList nList) {
+    public void parseEnums(NodeList nList, boolean keepInMemory) {
         for (int temp = 0; temp < nList.getLength(); temp++) {
             Node node = nList.item(temp);
             if (node.getNodeType() == Node.ELEMENT_NODE) {
@@ -144,12 +144,11 @@ public class DomParser {
                     if (nodeMap.getNamedItem("xsi:type") != null) {
                         Node nodeType = nodeMap.getNamedItem("xsi:type");
                         String nodeName = nodeType.getNodeValue();
-
                         List<String> list = splitString(nodeName);
                         String att_ID_Value = nodeMap.getNamedItem("modelElementId").getNodeValue();
                         String att_Name_Value = nodeMap.getNamedItem("name").getNodeValue();
                         String att_Key_Value = nodeMap.getNamedItem("key") != null ? nodeMap.getNamedItem("key").getNodeValue() : null;
-                        saveEnum((List<Object>) cm.retrieveFromCache(resolver.getNamespaceURI(list.get(0))), list.get(1), att_Name_Value, att_Key_Value, att_ID_Value);
+                        saveEnum((List<Object>) cm.retrieveFromCache(resolver.getNamespaceURI(list.get(0))), list.get(1), att_Name_Value, att_Key_Value, att_ID_Value, keepInMemory);
                     }
                 }
 
@@ -163,13 +162,15 @@ public class DomParser {
      * @param nList
      *            Prototypes parser
      */
-    public void parsePrototypes(NodeList nList) {
+    public void parsePrototypes(NodeList nList, boolean keepInMemory) {
         for (int temp = 0; temp < nList.getLength(); temp++) {
             Node node = nList.item(temp);
             String att_ID_Value = node.getAttributes().getNamedItem("modelElementId").getNodeValue();
             prototype = visitnode(node, prototype);
-            speicher.put(att_ID_Value, prototype);
             cm.putInCache(att_ID_Value, prototype);
+            if (keepInMemory) {
+                speicher.put(att_ID_Value, prototype);
+            }
         }
     }
 
@@ -178,14 +179,16 @@ public class DomParser {
      * 
      * @param nList
      */
-    public void parseFunction(NodeList nList) {
+    public void parseFunction(NodeList nList, boolean keepInMemory) {
         Object function = null;
         for (int temp = 0; temp < nList.getLength(); temp++) {
             Node node = nList.item(temp);
             String att_ID_Value = node.getAttributes().getNamedItem("modelElementId").getNodeValue();
             function = visitnode(node, new Object());
-            speicher.put(att_ID_Value, function);
             cm.putInCache(att_ID_Value, function);
+            if (keepInMemory) {
+                speicher.put(att_ID_Value, function);
+            }
         }
     }
 
@@ -201,7 +204,7 @@ public class DomParser {
      *            method tokey() should be add to all identifier interfaces
      */
     @SuppressWarnings("unchecked")
-    public void saveEnum(List<Object> list, String localName, String literalsName, String literalsKey, String IdValue) {
+    public void saveEnum(List<Object> list, String localName, String literalsName, String literalsKey, String IdValue, boolean keepInMemory) {
         IEnumeration enumeration = null;
         String name = buildFullyQualifiedName(list, localName);
         name += "Literals";
@@ -234,26 +237,36 @@ public class DomParser {
             }
             try {
                 enumeration = (IEnumeration) method2.invoke(obj, literalsName);
+
                 if (enumeration == null) {
-                    if (literalsKey != null) {
-                        try {
-                            Method method3 = cls.getMethod("fromKey", int.class);
-                            enumeration = (IEnumeration) method3.invoke(obj, Integer.parseInt(literalsKey));
-                            cm.putInCache(IdValue, enumeration);
-                            speicher.put(IdValue, enumeration);
-                        } catch (Exception e) {
-                            // TODO Auto-generated catch block
+                    if (literalsKey == null) {
+                        literalsKey = "0";
+                    } // default key
+                    try {
+                        Method method3 = cls.getMethod("fromKey", int.class);
+                        enumeration = (IEnumeration) method3.invoke(obj, Integer.parseInt(literalsKey));
+                        if (literalsName.contentEquals("Der_Up")) {
+                            System.out.println(enumeration);
                         }
+                        cm.putInCache(IdValue, enumeration);
+                        if (keepInMemory) {
+                            speicher.put(IdValue, enumeration);
+                        }
+                    } catch (Exception e) {
+                        // TODO Auto-generated catch block
                     }
                 } else {
                     cm.putInCache(IdValue, enumeration);
-                    speicher.put(IdValue, enumeration);
+                    if (keepInMemory) {
+                        speicher.put(IdValue, enumeration);
+                    }
                 }
             } catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException e1) {
                 // TODO Auto-generated catch block
             }
 
         }
+
     }
 
     /**
@@ -299,13 +312,13 @@ public class DomParser {
             setObjectFields(nodeClass, result, node.getAttributes());
         }
 
-        if (node.hasChildNodes()) {
+        if (node.hasChildNodes() || node.getNodeType() == 1) {
             for (Field field : mapFields) {
                 Map<Object, Object> map = new HashMap<Object, Object>();
                 // only Element nodes getChildNodesWithName
                 for (int i = 0; i < node.getChildNodes().getLength(); i++) {
                     Node item = node.getChildNodes().item(i);
-                    if (item.hasChildNodes()) {
+                    if (item.hasChildNodes() || item.getNodeType() == 1) {
                         if (field.getName().contentEquals(item.getNodeName())) {
                             ParameterizedType pt = (ParameterizedType) field.getGenericType();
                             Type[] mapTypes = pt.getActualTypeArguments();
@@ -472,84 +485,33 @@ public class DomParser {
                         }
 
                         if (count == 0) {
-                            class ParsedFunction implements IFunction {
-                                private String name;
-                                private String beschreibung;
-
-                                public ParsedFunction() {
-                                    name = propertyFields.get("name");
-                                    beschreibung = propertyFields.get("beschreibung");
+                            class ParsedFunctionCreator implements IFunctionCreator<ParsedFunction> {
+                                @Override
+                                public ParsedFunction create() {
+                                    return new ParsedFunction(propertyFields.get("name"), propertyFields.get("beschreibung"));
                                 }
 
-                                @SuppressWarnings("unused")
-                                public String getName() {
-                                    return name;
-                                }
-
-                                @SuppressWarnings("unused")
-                                public void setName(String name) {
-                                    this.name = name;
-                                }
-
-                                @SuppressWarnings("unused")
-                                public String getBeschreibung() {
-                                    return beschreibung;
-                                }
-
-                                @SuppressWarnings("unused")
-                                public void setBeschreibung(String beschreibung) {
-                                    this.beschreibung = beschreibung;
-                                }
                             }
                             class ParsedFunctionFactoryContributor implements IFunctionFactoryContributor {
-
                                 @SuppressWarnings("unchecked")
                                 @Override
                                 public <T extends IFunction> T create(final String name) {
-
                                     if (buildFullyQualifiedName.equals(name)) {
                                         return (T) new ParsedFunctionCreator().create();
                                     }
 
                                     return null;
                                 }
-
-                                class ParsedFunctionCreator implements IFunctionCreator<ParsedFunction> {
-
-                                    @Override
-                                    public ParsedFunction create() {
-                                        return new ParsedFunction();
-                                    }
-
-                                }
-
                             }
+
                             ParsedFunctionFactoryContributor contributor = new ParsedFunctionFactoryContributor();
                             ParsedFunction function = contributor.create(buildFullyQualifiedName);
                             cm.putInCache(propertyFields.get("modelElementId"), function);
-                            speicher.put(propertyFields.get("modelElementId"), function);
                             return function;
                         }
                     }
-                    class ParsedContainment implements IContainment {
-                        private java.util.Map<String, insure.core.IContainment> containments = new HashMap<String, insure.core.IContainment>();
-                        private String name;
-                        private String beschreibung;
-                        private String modelElementId;
-
-                        public ParsedContainment() {
-                            for (Map.Entry<String, Object> entry : propertyRefs.entrySet()) {
-                                containments.put(entry.getKey(), (IContainment) entry.getValue());
-                            }
-                            this.name = propertyFields.get("name");
-                            this.beschreibung = propertyFields.get("beschreibung");
-                            this.modelElementId = propertyFields.get("modelElementId");
-                        }
-                    }
-
-                    ParsedContainment containment = new ParsedContainment();
+                    ParsedContainment containment = new ParsedContainment(propertyFields.get("name"), propertyFields.get("beschreibung"), propertyRefs);
                     cm.putInCache(node.getAttributes().getNamedItem("modelElementId").getNodeValue(), containment);
-                    speicher.put(node.getAttributes().getNamedItem("modelElementId").getNodeValue(), containment);
                     return containment;
 
                 } catch (
@@ -592,7 +554,7 @@ public class DomParser {
                         // only Element nodes getChildNodesWithName
                         for (int i = 0; i < node.getChildNodes().getLength(); i++) {
                             Node item = node.getChildNodes().item(i);
-                            if (item.hasChildNodes()) {
+                            if (item.hasChildNodes() || item.getNodeType() == 1) {
                                 if (field.getName().contentEquals(item.getNodeName())) {
                                     ParameterizedType pt = (ParameterizedType) field.getGenericType();
                                     Type[] mapTypes = pt.getActualTypeArguments();
@@ -1301,4 +1263,71 @@ public class DomParser {
         }
     }
 
+    public class ParsedContainment implements IFunction {
+        private java.util.Map<String, insure.core.IContainment> containments = new HashMap<String, insure.core.IContainment>();
+        private String name;
+        private String beschreibung;
+
+        public ParsedContainment(String name, String beschreibung, Map<String, Object> propertyRefs) {
+            for (Map.Entry<String, Object> entry : propertyRefs.entrySet()) {
+                containments.put(entry.getKey(), (IContainment) entry.getValue());
+            }
+            this.name = name;
+            this.beschreibung = beschreibung;
+        }
+
+        public java.util.Map<String, insure.core.IContainment> getContainments() {
+            return containments;
+        }
+
+        public void setContainments(java.util.Map<String, insure.core.IContainment> containments) {
+            this.containments = containments;
+        }
+
+        public String getName() {
+            return name;
+        }
+
+        public void setName(String name) {
+            this.name = name;
+        }
+
+        public String getBeschreibung() {
+            return beschreibung;
+        }
+
+        public void setBeschreibung(String beschreibung) {
+            this.beschreibung = beschreibung;
+        }
+    }
+
+    public class ParsedFunction implements IFunction {
+        private String name;
+        private String beschreibung;
+
+        public ParsedFunction(String name, String beschreibung) {
+            this.name = name;
+            this.beschreibung = beschreibung;
+        }
+
+        @SuppressWarnings("unused")
+        public String getName() {
+            return name;
+        }
+
+        @SuppressWarnings("unused")
+        public void setName(String name) {
+            this.name = name;
+        }
+
+        @SuppressWarnings("unused")
+        public String getBeschreibung() {
+            return beschreibung;
+        }
+
+        @SuppressWarnings("unused")
+        public void setBeschreibung(String beschreibung) {
+            this.beschreibung = beschreibung;
+        }
+    }
 }
