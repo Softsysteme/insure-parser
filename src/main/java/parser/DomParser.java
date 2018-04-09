@@ -1,17 +1,12 @@
 package parser;
 
-import java.io.BufferedReader;
-import java.io.ByteArrayInputStream;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
-import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -45,11 +40,9 @@ import tools.NameSpaceResolver;
  * @author mpouma
  *
  */
-public class DomParser {
-    private Map<String, Object> speicher;
-    private String filePath;
+public class DomParser extends AbstractDomParser {
+
     private static transient Object prototype;
-    private List<String> referencedXml;
     final static Logger logger = LoggerFactory.getLogger(DomParser.class);
 
     private NameSpaceResolver resolver;
@@ -57,10 +50,10 @@ public class DomParser {
 
     // constructor
     public DomParser(String filePath) {
-        this.filePath = filePath;
-        speicher = new HashMap<String, Object>();
+        super(filePath);
     }
 
+    @Override
     public void parseFileAndReferencedFiles() {
         referencedXml = this.findReferencedFiles(copyFile(filePath));
         // all referenced xml data are first parsed
@@ -74,9 +67,10 @@ public class DomParser {
         Iterator<String> iter2 = referencedXml.iterator();
         while (iter2.hasNext()) {
             String next = iter2.next();
-            if (findReferencedFiles(copyFile(next)).size() > 0) {
-                for (int i = 0; i < findReferencedFiles(copyFile(next)).size(); i++) {
-                    parseXml(findReferencedFiles(copyFile(next)).get(i), false);
+            List<String> findReferencedFiles = findReferencedFiles(copyFile(next));
+            if (findReferencedFiles.size() > 0) {
+                for (int i = 0; i < findReferencedFiles.size(); i++) {
+                    parseXml(findReferencedFiles.get(i), false);
                 }
             }
             parseXml(next, false);
@@ -89,6 +83,7 @@ public class DomParser {
      * @param filePath
      *
      */
+    @Override
     public void parseXml(String filePath, boolean keepInMemory) {
         // Get Document Builder
         DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
@@ -160,7 +155,7 @@ public class DomParser {
     /**
      * 
      * @param nList
-     *            Prototypes parser
+     *            this method parse all prototypes
      */
     public void parsePrototypes(NodeList nList, boolean keepInMemory) {
         for (int temp = 0; temp < nList.getLength(); temp++) {
@@ -200,8 +195,6 @@ public class DomParser {
      * @param literalsName
      * @param literalsKey
      * @param nodeValue
-     *            there is a bug to fix: the NoSuchMethodError is thrown because of the absence of the method toKey() by the identifier interfaces this cause an initialization error. as solution, the
-     *            method tokey() should be add to all identifier interfaces
      */
     @SuppressWarnings("unchecked")
     public void saveEnum(List<Object> list, String localName, String literalsName, String literalsKey, String IdValue, boolean keepInMemory) {
@@ -245,9 +238,6 @@ public class DomParser {
                     try {
                         Method method3 = cls.getMethod("fromKey", int.class);
                         enumeration = (IEnumeration) method3.invoke(obj, Integer.parseInt(literalsKey));
-                        if (literalsName.contentEquals("Der_Up")) {
-                            System.out.println(enumeration);
-                        }
                         cm.putInCache(IdValue, enumeration);
                         if (keepInMemory) {
                             speicher.put(IdValue, enumeration);
@@ -274,7 +264,7 @@ public class DomParser {
      * @param parentClass
      * @param nodeClass
      * @param node
-     * @return for nodes that doesn't have type attribute (often happens by List Element) we refer to the parent to discover the child type
+     * @return for nodes that doesn't have type attribute (often happens by List Elements) we refer to the parent to discover the child type
      */
     public Object visitNodeWithParent(Class<?> nodeClass, Node node) {
 
@@ -966,302 +956,8 @@ public class DomParser {
     }
 
     /*--------------------------------------------------------------------------------------------------------
-     Getters and Setters
-     ---------------------------------------------------------------------------------------------------------* */
-
-    public NameSpaceResolver getResolver() {
-        return resolver;
-    }
-
-    public void setResolver(NameSpaceResolver resolver) {
-        this.resolver = resolver;
-    }
-
-    public Map<String, Object> getSpeicher() {
-        return speicher;
-    }
-
-    public void setSpeicher(Map<String, Object> speicher) {
-        this.speicher = speicher;
-    }
-
-    /*--------------------------------------------------------------------------------------------------------
     Help Methods
     ---------------------------------------------------------------------------------------------------------* */
-
-    // returns true when the node contains a child with the given name
-    public boolean containsChild(Node node, String childName) {
-        for (int i = 0; i < node.getChildNodes().getLength(); i++) {
-            if (node.getChildNodes().item(i).getNodeName().contentEquals(childName))
-                return true;
-        }
-        return false;
-    }
-
-    public Class<?> searchConcreteClass(Class<?> nodeClass) {
-        if (nodeClass.isInterface()) {
-            String concreteClassName = nodeClass.getPackage().getName() + "." + nodeClass.getSimpleName().substring(1, nodeClass.getSimpleName().length());
-            try {
-                nodeClass = Class.forName(concreteClassName);
-            } catch (ClassNotFoundException e) {
-                System.out.println(concreteClassName + " not found");
-            }
-        } else {
-            try {
-                nodeClass = Class.forName(nodeClass.getName());
-            } catch (ClassNotFoundException e) {
-                // TODO Auto-generated catch block
-            }
-        }
-        return nodeClass;
-
-        // List<Class<?>> fields = new ArrayList<Class<?>>();
-        // Reflections reflections = new Reflections(nodeClass.getPackage().getName());
-        // Set<?> subTypes = reflections.getSubTypesOf(nodeClass);
-        // Iterator<?> it = subTypes.iterator();
-        // while (it.hasNext()) {
-        // // System.out.println(it.next());
-        // }
-
-    }
-
-    // return a list containing the childnodes with the given name
-    public List<Node> getChildNodesWithName(Node parent, String childName) {
-        List<Node> result = new ArrayList<Node>();
-        for (int i = 0; i < parent.getChildNodes().getLength(); i++) {
-            Node item = parent.getChildNodes().item(i);
-            if (item.getNodeName().contentEquals(childName) && (item.getNodeType() == 1))
-                result.add(i, item);
-        }
-        return result;
-    }
-
-    // public IFunction createInstance(Class<?> clazz, Method m) {
-    //
-    // class FunctionClass implements IFunction {
-    // int a = 0;
-    // }
-    //
-    // return;
-    //
-    // }
-
-    // search for a method declared in a class and return it
-    public Method findMethod(Class<?> clazz, String methodName, Class<?>... parameterTypes) throws NoSuchMethodException {
-        // First try the trivial approach. This works usually, but not always.
-        try {
-            return clazz.getMethod(methodName, parameterTypes);
-        } catch (NoSuchMethodException ex) {
-        }
-
-        // Then loop through all available methods, checking them one by one.
-        for (Method method : clazz.getMethods()) {
-
-            String name = method.getName();
-            if (!methodName.equals(name)) { // The method must have right name.
-                continue;
-            }
-
-            Class<?>[] acceptedParameterTypes = method.getParameterTypes();
-            if (acceptedParameterTypes.length != parameterTypes.length) { // Must have right number of parameters.
-                continue;
-            }
-
-            boolean match = true;
-            for (int i = 0; i < acceptedParameterTypes.length; i++) { // All parameters must be right type.
-                if (null != parameterTypes[i] && !acceptedParameterTypes[i].isAssignableFrom(parameterTypes[i])) {
-                    match = false;
-                    break;
-                }
-                if (null == parameterTypes[i] && acceptedParameterTypes[i].isPrimitive()) { // Accept null except for primitive fields.
-                    match = false;
-                    break;
-                }
-            }
-
-            if (match) {
-                return method;
-            }
-
-        }
-        // None of our trials was successful!
-        throw new NoSuchMethodException();
-    }
-
-    // returns a list containing both elements prefix and namespace
-    public List<String> splitString(String s) {
-        List<String> result = new ArrayList<String>();
-        result.add(0, s.substring(0, s.indexOf(':')));
-        result.add(1, s.substring(s.indexOf(':') + 1, s.length()));
-        return result;
-    }
-
-    @SuppressWarnings("unchecked")
-    public String buildFullyQualifiedName(Object list, String className) {
-        List<Object> l = (List<Object>) list;
-        if (l != null) {
-            return l.get(1) + "." + l.get(0) + "." + className;
-        }
-        return null;
-    }
-
-    // suppress unwanted expressions after the attribute href leaving only the ID
-    public InputStream correctHref(InputStream input) {
-
-        BufferedReader br = null;
-        String newString = "";
-        StringBuilder strTotale = new StringBuilder();
-        try {
-
-            br = new BufferedReader(new InputStreamReader(input));
-            while ((newString = br.readLine()) != null) {
-                if (newString.contains("href=")) {
-                    newString = newString.replace(StringUtils.substringBetween(newString, "href=", "_"), "\"");
-                }
-
-                strTotale.append(newString + '\n');
-            }
-
-        } catch (IOException e) {
-            // TODO Auto-generated catch block
-        } // calls it
-        return new ByteArrayInputStream(strTotale.toString().getBytes(StandardCharsets.UTF_8));
-
-    }
-
-    public List<String> findReferencedFiles(InputStream input) {
-
-        List<String> referencesList = new ArrayList<String>();
-        BufferedReader br = null;
-        String newString = "";
-        try {
-
-            br = new BufferedReader(new InputStreamReader(input));
-            while ((newString = br.readLine()) != null) {
-                if (newString.contains("href=")) {
-                    String fullPath = StringUtils.substringBetween(newString, "href=", "#");
-                    int index = fullPath.lastIndexOf("/");
-                    if (!referencesList.contains("/" + fullPath.substring(index + 1))) {
-                        referencesList.add("/" + fullPath.substring(index + 1));
-                    }
-                }
-            }
-
-        } catch (IOException e) {
-            // TODO Auto-generated catch block
-        } // calls it
-        return referencesList;
-    }
-
-    // copy the given file to the classpath
-    public InputStream copyFile(String xmlPath) {
-        return this.getClass().getResourceAsStream(xmlPath);
-
-    }
-
-    // returns a list containing all the fields declared in the type hierrachy
-    public List<Field> getAllDeclaredFields(Class<?> clazz) {
-        List<Field> flds = new ArrayList<Field>();
-        while (clazz.getSuperclass() != null) {
-            for (Field f : clazz.getDeclaredFields()) {
-                flds.add(f);
-            }
-            clazz = clazz.getSuperclass();
-        }
-
-        return flds;
-    }
-
-    // return the Type of the field corresponding to a node attribute
-    public Type attributCorrespondsToField(Node node, List<Field> fields) {
-        Iterator<Field> iter = fields.iterator();
-        while (iter.hasNext()) {
-            Field next = iter.next();
-            if (next.getName().contentEquals(node.getNodeName())) {
-                return next.getType();
-            }
-        }
-        return null;
-
-    }
-
-    // return the Type of the field corresponding to a node attribute
-    public Field attributCorrespondsToField(String nodeName, List<Field> fields) {
-        Iterator<Field> iter = fields.iterator();
-        while (iter.hasNext()) {
-            Field next = iter.next();
-            if (next.getName().contentEquals(nodeName)) {
-                return next;
-            }
-        }
-        return null;
-
-    }
-
-    @SuppressWarnings({ "unchecked", "rawtypes" })
-    public static Map getFieldNamesAndValues(final Object valueObj) throws IllegalArgumentException,
-            IllegalAccessException {
-
-        logger.info("Begin - getFieldNamesAndValues");
-        if (valueObj != null) {
-            Class c1 = valueObj.getClass();
-            logger.info("Class name got is: " + c1.getName());
-
-            Map fieldMap = new HashMap();
-            Field[] valueObjFields = c1.getDeclaredFields();
-
-            // compare values now
-            for (int i = 0; i < valueObjFields.length; i++) {
-
-                String fieldName = valueObjFields[i].getName();
-
-                logger.info("Getting Field Values for Field: " + valueObjFields[i].getName());
-                valueObjFields[i].setAccessible(true);
-
-                Object newObj = valueObjFields[i].get(valueObj);
-
-                logger.info("Value of field  " + fieldName + "  value: " + newObj);
-                fieldMap.put(fieldName, newObj);
-
-            }
-            logger.info("End - getFieldNamesAndValues");
-            return fieldMap;
-        }
-        return null;
-    }
-
-    // returns true if every single node's attribute match a field of the given class
-    public boolean nodeAttMatchClassAtt(Class<?> cl, Node node) {
-        List<Field> fields = getAllDeclaredFields(cl);
-        List<String> fieldsName = new ArrayList<String>();
-        List<String> attNames = new ArrayList<String>();
-
-        for (int i = 0; i < fields.size(); i++) {
-            fieldsName.add(fields.get(i).getName());
-        }
-
-        for (int j = 0; j < node.getChildNodes().getLength(); j++) {
-            attNames.add(node.getChildNodes().item(j).getNodeName());
-        }
-
-        return fieldsName.containsAll(attNames);
-
-    }
-
-    // prints all the objects contained in the memory for a good visibillity
-    public void printMemoryContentInDetails() {
-        for (int i = 0; i < speicher.size(); i++) {
-            Object object = speicher.get(i);
-            try {
-                System.out.println(getFieldNamesAndValues(object));
-                System.out.println("---------------------------------------------");
-            } catch (IllegalArgumentException e) {
-                // TODO Auto-generated catch block
-            } catch (IllegalAccessException e) {
-                // TODO Auto-generated catch block
-            }
-        }
-    }
 
     public class ParsedContainment implements IFunction {
         private java.util.Map<String, insure.core.IContainment> containments = new HashMap<String, insure.core.IContainment>();

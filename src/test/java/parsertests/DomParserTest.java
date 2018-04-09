@@ -245,7 +245,7 @@ public class DomParserTest {
     public void parsedPrototypeFactoryWorksCorrectly() {
         ParsedPrototypeFactory factory = new ParsedPrototypeFactory(paths);
         Assert.assertNotNull(factory.getIdentifiablePrototypeMap());
-        System.out.println(factory.getIdentifiablePrototypeMap().size());
+        Assert.assertEquals(5, factory.getIdentifiablePrototypeMap().size());
         for (Entry<IPrototypeIdentifier, IIdentifiablePrototype<IPrototypeIdentifier>> entry : factory.getIdentifiablePrototypeMap().entrySet()) {
             System.out.println(entry.getKey() + "    ," + entry.getValue());
         }
