@@ -38,10 +38,6 @@
 		</dependency>
 		<dependency>
 			<groupId>de.adesso.ais.infoservice-reference</groupId>
-			<artifactId>infoservice-reference-daten-gen</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>de.adesso.ais.infoservice-reference</groupId>
 			<artifactId>infoservice-reference-gen</artifactId>
 		</dependency>
 		<dependency>
@@ -122,5 +118,6 @@
 		<groupId>insure-parser-parent</groupId>
 		<artifactId>insure-parser-parent</artifactId>
 		<version>0.0.1-SNAPSHOT</version>
+		<relativePath>../insure-parser-parent</relativePath>
 	</parent>
 </project>

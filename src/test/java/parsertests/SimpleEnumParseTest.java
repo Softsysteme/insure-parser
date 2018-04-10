@@ -5,8 +5,6 @@ import java.util.List;
 import javax.xml.bind.JAXBException;
 import javax.xml.stream.XMLStreamException;
 
-import org.junit.Test;
-
 import caches.InsureParserCacheManager;
 import insure.SuperRoot;
 import insure.core.IEnumeration;
@@ -15,7 +13,7 @@ import parser.XmlParser;
 
 public class SimpleEnumParseTest {
 
-    @Test
+    // @Test
     public void somthingWasParsed() {
         XmlParser parser = new XmlParser();
         InsureParserCacheManager cm = InsureParserCacheManager.INSTANCE;
@@ -31,7 +29,7 @@ public class SimpleEnumParseTest {
         assert (!cm.getKeys().isEmpty());
     }
 
-    @Test
+    // @Test
     public void parsedObjectsAreFromTypeIEnumeration() {
         XmlParser parser = new XmlParser();
         InsureParserCacheManager cm = InsureParserCacheManager.INSTANCE;
